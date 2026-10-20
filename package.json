@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "qa": "node tools/qa.mjs"
+    "qa": "node tools/qa.mjs",
+    "new": "node tools/new-deck.mjs"
   },
   "devDependencies": {
     "playwright": "1.64.1"
