@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big words. Real demos. Honest fallbacks.</title>
+<meta name="description" content="A talk deck template: big type, real screenshots, live demos with fallbacks, and presenter extras for questions.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="engine/deck.css">
+<link rel="stylesheet" href="themes/community.css" id="theme">
+<script>{const t=new URLSearchParams(location.search).get("theme");if(/^[\w-]+$/.test(t||""))document.getElementById("theme").href=`themes/${t}.css`}</script>
+<script type="application/json" id="deck-config">
+{
+  "title": "Big words. Real demos. Honest fallbacks.",
+  "brand": "Your Name · Event name",
+  "sections": {
+    "Welcome": 1,
+    "The hook": 1,
+    "Demo": 2,
+    "How it works": 4,
+    "Push for more": 3,
+    "Takeaway": 1,
+    "Extras": 0
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="sr-status" class="sr-only" aria-live="polite"></div>
+
+<main id="deck">
+
+<section class="slide slide--cover" id="cover" data-section="Welcome" data-chrome="off" data-title="Big words. Real demos. Honest fallbacks.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Event name · Project showcase</div>
+      <h1 class="title" data-fill="title"><span>Big words.</span><span>Real demos.</span><em>Honest fallbacks.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 20 October 2026</span></div>
+    </div>
+    <div class="mascots">
+      <i class="mascot m-pentagon"></i>
+      <i class="mascot m-octagon"></i>
+      <i class="mascot m-hexagon"></i>
+      <i class="mascot m-diamond"></i>
+      <i class="mascot m-triangle"></i>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00–0:20.</b> Say the promise in one breath: what the audience will see, and that it’s real.</p>
+    <p>“Everything tonight is a real run. Where something is drawn, I’ll say so.”</p>
+  </aside>
+</section>
+
+<section class="slide slide--about" id="speaker" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <figure class="about-portrait"><img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk"></figure>
+  <img class="pet about-pet" src="assets/pet.svg" alt="">
+  <div class="about-panel">
+    <svg class="about-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Builder · Speaker · Your city</p>
+    <h2 class="about-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="about-summary">One line about what you do. <strong>One line about tonight.</strong></p>
+    <div class="about-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:20–0:40.</b> One breath. Swap in your portrait (<code>assets/portrait.svg</code>), logo and pixel pet.</p>
+  </aside>
+</section>
+
+<section class="slide" id="one-idea" data-section="The hook" data-title="One idea per slide">
+  <div class="eyebrow">The hook</div>
+  <h2 class="title">One idea per slide. <em>Say it big.</em></h2>
+  <p class="sub" data-step>If it needs a third line, <strong>it’s two slides.</strong></p>
+  <img class="pet pet--corner" src="assets/pet.svg" alt="">
+  <aside class="notes">
+    <p><b>0:40–1:10.</b> The key line. Pause after it. Space reveals the sub line.</p>
+    <p class="src">Authoring: eyebrow, then a title with one <code>&lt;em&gt;</code> for the payoff. <code>data-step</code> holds anything back until Space.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda" data-section="The hook" data-title="Three parts">
+  <div class="eyebrow">Tonight</div>
+  <h2 class="title title--wide">Three parts. <em>Fifteen minutes.</em></h2>
+  <div class="pillars">
+    <div class="pillar" style="--c:var(--a1)"><i><span>01</span><span>0:00</span></i><strong>The hook</strong><span>Why anyone should care, in one line.</span></div>
+    <div class="pillar" style="--c:var(--a2)"><i><span>02</span><span>2:00</span></i><strong>The demo</strong><span>A real run, with a screenshot behind every live beat.</span></div>
+    <div class="pillar" style="--c:var(--a4)"><i><span>03</span><span>10:00</span></i><strong>The takeaway</strong><span>What to do on Monday.</span></div>
+  </div>
+  <aside class="notes">
+    <p><b>1:10–2:00.</b> Name the parts and the clock, then move on.</p>
+    <p class="src">Pillars take any colour slot: <code>style="--c:var(--a2)"</code>. Set <code>--n</code> on <code>.pillars</code> for more columns.</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover slide--opener" id="input" data-section="Demo" data-title="Here’s a real input">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>The demo</div>
+      <h2 class="title"><span>“Here’s a real input.</span><span>Watch what</span><em>comes out.”</em></h2>
+    </div>
+    <div class="cover-art">
+      <figure class="tilt" style="--rh:66vh"><img src="assets/sample/receipt.svg" alt="A clearly marked sample input slip listing coffee beans, notebooks, sticky notes, an HDMI adapter, a spare clicker, water and snacks"></figure>
+      <p class="sticker" data-step>Spoiler: it worked ✓<small>second try</small></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>2:00–2:20.</b> Show the messy input before the clean output. Space pops the sticker; it’s the laugh line.</p>
+    <p class="src">Use clearly marked mock data on slides. No card numbers, addresses or account IDs.</p>
+  </aside>
+</section>
+
+<section class="slide" id="real-answer" data-section="Demo" data-live="Your app" data-title="What did it actually say?">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>Demo · real answer</div>
+      <h2 class="ask">What changed this week?</h2>
+      <div class="tags"><span><b>24 s</b></span><span>First try</span><span>Names hidden</span></div>
+      <div class="callout" data-step><b>Bonus</b><p>“Two meetings match. Which one moves?”</p></div>
+    </div>
+    <figure class="shot" style="--h:70vh"><img src="assets/sample/answer.svg" alt="Sample answer listing three changes: the release moved to Thursday, two docs updated, and one open question flagged rather than guessed"><figcaption><b>Real run</b>names hidden</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE (optional) → your app. Ask the exact question on the slide. Cap the wait at 20 s, then come back here.</p>
+    <p><b>2:20–3:20.</b> Read the answer’s best line aloud. Space reveals the callout.</p>
+    <p class="src"><code>data-live</code> puts “● Live: …” in the footer and the overview, so you know where a switch is safe.</p>
+  </aside>
+</section>
+
+<section class="slide" id="prompt" data-section="Demo" data-title="Let the prompt type">
+  <div class="eyebrow"><span class="n">02</span>Demo</div>
+  <h2 class="title title--wide">Show the source. <em>Let the prompt type.</em></h2>
+  <div class="flow">
+    <div class="mock" role="img" aria-label="Drawn illustration of a notes app with eight pages">
+      <div class="mock-title">📒 My notes</div>
+      <div class="mock-sub">A page per thing</div>
+      <div class="tiles">
+        <div class="tile" style="--i:0;--t:#d3e5ef"><em>💻</em><strong>Work laptop</strong><span>Device</span></div>
+        <div class="tile" style="--i:1;--t:#e8deee"><em>📱</em><strong>Phone</strong><span>Device</span></div>
+        <div class="tile" style="--i:2;--t:#fdecc8"><em>🎧</em><strong>Headphones</strong><span>Audio</span></div>
+        <div class="tile is-hit" style="--i:3;--t:#dbeddb"><em>🧾</em><strong>Warranties</strong><span>Docs</span></div>
+        <div class="tile" style="--i:4;--t:#fadec9"><em>🎮</em><strong>Console</strong><span>Games</span></div>
+        <div class="tile" style="--i:5;--t:#d3e5ef"><em>🚲</em><strong>Bike</strong><span>Outdoors</span></div>
+        <div class="tile" style="--i:6;--t:#e8deee"><em>📷</em><strong>Camera</strong><span>Device</span></div>
+        <div class="tile" style="--i:7;--t:#fdecc8"><em>🗓️</em><strong>Plans</strong><span>Life</span></div>
+      </div>
+    </div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="composer">
+      <div class="composer-mode"><span class="on">Chat</span><span>Work</span></div>
+      <div class="composer-box">
+        <div class="composer-chips"><span class="composer-chip"><i>N</i>Notes</span></div>
+        <div class="composer-text" data-type="Which of my things are still under warranty?" data-ph="Ask anything">Which of my things are still under warranty?</div>
+        <div class="composer-bar"><span class="plus">+</span><span>Medium ⌄</span><span class="send">↑</span></div>
+      </div>
+      <p class="composer-label"><b>Drawn</b>the prompt I really used</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>3:20–4:00.</b> “That’s the whole set-up: my notes, and one question.”</p>
+    <p class="src">The notes card and the composer are drawn, and the caption says so. <code>data-type</code> types the prompt when the slide opens; <code>.tile.is-hit</code> lights up the page it will read.</p>
+  </aside>
+</section>
+
+<section class="slide" id="before-after" data-section="Demo" data-live="Your app" data-title="Click once, watch it change">
+  <div class="split split--hero">
+    <div class="text">
+      <div class="eyebrow">Before → after</div>
+      <h2 class="title">Click once. <em>Watch it change.</em></h2>
+      <p class="sub"><strong>Plan</strong> → nothing moves.</p>
+      <p class="sub" data-step="done"><strong>Do it</strong> → 8 becomes 5.</p>
+    </div>
+    <div class="swap">
+      <figure class="shot" style="--h:62vh"><img src="assets/sample/state-a.svg" alt="Sample app after planning: Planned, nothing has changed yet; three unchecked steps; 8 tasks open"><figcaption><b>Private app</b>Planned · 8 open</figcaption></figure>
+      <figure class="shot" style="--h:62vh" data-step="done"><img src="assets/sample/state-b.svg" alt="Sample app after doing it: Done, the numbers moved; three checked steps; 5 tasks open"><figcaption><b>Private app</b>Done · 5 open</figcaption></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE → click Plan, read the unchanged number, then click Do it.</p>
+    <p><b>4:00–5:00.</b> Space swaps the screenshot and reveals the second line together; they share one step.</p>
+    <p class="src">Elements with the same <code>data-step="name"</code> reveal together. Unnamed steps reveal one at a time.</p>
+  </aside>
+</section>
+
+<section class="slide" id="one-rule" data-section="Demo" data-title="Planning changes nothing">
+  <div class="eyebrow">The one rule</div>
+  <h2 class="title title--wide">Planning changes nothing. <em>Doing changes the numbers.</em></h2>
+  <div class="ledger" role="table" aria-label="Values at the start, after planning and after doing">
+    <span class="h" role="columnheader">This week</span><span class="h" role="columnheader">Start</span><span class="h" role="columnheader" data-step="planned">Planned</span><span class="h is-hot" role="columnheader" data-step="done">Done</span>
+    <span class="item">Tasks open</span><span class="num">8</span><span class="num" data-step="planned">8</span><span class="num is-hot" data-step="done">5</span>
+    <span class="item">Coffee</span><span class="num">250 g</span><span class="num" data-step="planned">250 g</span><span class="num is-hot" data-step="done">232 g</span>
+    <span class="item">Patience</span><span class="num">100%</span><span class="num" data-step="planned">100%</span><span class="num is-hot" data-step="done">64%</span>
+  </div>
+  <aside class="notes">
+    <p><b>5:00–5:40.</b> Space ×2: the Planned column appears (nothing changes), then Done (now it changes).</p>
+    <p class="src">Ledger columns reveal as named steps. Set <code>--cols</code> for a different column count.</p>
+  </aside>
+</section>
+
+<section class="slide" id="numbers" data-section="How it works" data-title="One evening">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How long it took</div>
+      <h2 class="title">One evening. <em>Mostly waiting.</em></h2>
+      <div class="stats">
+        <div class="stat"><strong><span data-count="83">83</span> min</strong><span>start to finish</span></div>
+        <div class="stat"><strong data-count="4">4</strong><span>approaches tried</span></div>
+        <div class="stat"><strong data-count="17">17</strong><span>tests passing</span></div>
+        <div class="stat"><strong>$0</strong><span>extra spend, on an existing plan</span></div>
+      </div>
+    </div>
+    <figure class="phone" style="justify-self:center"><img src="assets/sample/phone.svg" alt="Sample phone screen titled Today with three cards: review the draft, move the 2 pm (flagged, not guessed), and send the update"><figcaption>Same app, phone size</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p><b>5:40–6:20.</b> Numbers count up when the slide opens. Only quote numbers you measured.</p>
+    <p class="src"><code>data-count="83"</code> counts from zero; keep units outside the counting span.</p>
+  </aside>
+</section>
+
+<section class="slide" id="real-words" data-section="How it works" data-title="Real words beat paraphrase">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Quote the real thing</div>
+      <h2 class="title">Real words <em>beat paraphrase.</em></h2>
+      <blockquote class="quote"><p>“…move the 2 pm, unless it’s the client one. <b>Is it the client one?</b>”</p><cite>Voice note, transcribed as-is</cite></blockquote>
+    </div>
+    <div class="bubbles">
+      <p class="bubble">Which 2 pm?</p>
+      <p class="bubble bubble--me">The one with the designers.</p>
+      <p class="bubble">Two meetings match. <strong>Flagged, not guessed.</strong><small>assistant</small></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>6:20–6:50.</b> Read the quote in the speaker’s voice. The bubbles are the follow-up.</p>
+  </aside>
+</section>
+
+<section class="slide" id="messy-input" data-section="How it works" data-title="One voice note, three mistakes">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Messy input</div>
+      <h2 class="title">One voice note. <em>Three mistakes.</em></h2>
+      <p class="sub">The highlights get the laughs. <strong>Read them aloud.</strong></p>
+    </div>
+    <figure class="memo">
+      <div class="label"><span class="play">▶</span>Voice note · transcript</div>
+      <div class="wave" data-n="46"></div>
+      <p>so tomorrow I need to <mark>book the fairy<i>= ferry</i></mark> … and remind the team about <mark>the deck<i>which deck?</i></mark> … the groceries are in, <mark>market is done<i>= mark it as done</i></mark></p>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>6:50–7:20.</b> “Fairy” was the ferry. “Market is done” was “mark it as done”.</p>
+    <p class="src">The waveform is decorative (<code>.wave data-n</code> draws the bars). The words are the real transcript, trimmed; ellipses mark the cuts.</p>
+  </aside>
+</section>
+
+<section class="slide" id="how-its-made" data-section="How it works" data-title="Four steps, no magic">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it’s made</div>
+      <h2 class="title">Four steps. <em>No magic.</em></h2>
+      <ol class="pipe">
+        <li style="--i:0"><b>01</b>Write it down once</li>
+        <li style="--i:1"><b>02</b>Plug it in</li>
+        <li style="--i:2"><b>03</b>Ask in plain English</li>
+        <li style="--i:3"><b>04</b>Check the answer</li>
+      </ol>
+    </div>
+    <div class="fan">
+      <figure class="shot f1"><img src="assets/sample/app.svg" alt="Sample app overview with counts, an activity chart and a queue"></figure>
+      <figure class="shot f2"><img src="assets/sample/answer.svg" alt="Sample answer listing three changes"></figure>
+      <figure class="shot f3"><img src="assets/sample/state-b.svg" alt="Sample app after the action ran, with three steps checked"></figure>
+      <p class="fan-cap"><b>Real outputs</b>three of the screens</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>7:20–8:20.</b> Walk the four steps; the fan shows the evidence without a word on it.</p>
+  </aside>
+</section>
+
+<section class="slide" id="long-answer" data-section="How it works" data-title="Let long pages scroll themselves">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Long answers</div>
+      <h2 class="title">Let long pages <em>scroll themselves.</em></h2>
+      <p class="hint"><b>Tip</b>Crop the browser chrome and keep the content. Tall captures scroll slowly and loop.</p>
+    </div>
+    <div class="stage">
+      <figure class="scrollshot"><div class="scrollshot-view"><img src="assets/sample/tall.svg" alt="A long sample page with eight steps, from gather the inputs to ship the slides"></div><figcaption><b>Real run</b>the whole answer</figcaption></figure>
+      <figure class="shot inset"><img src="assets/sample/source.svg" alt="The notes page the answer was built from"></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>8:20–9:00.</b> Let it scroll while you talk; don’t narrate every line.</p>
+  </aside>
+</section>
+
+<section class="slide" id="push" data-section="Push for more" data-title="Then you can push for more">
+  <div class="eyebrow">Want more?</div>
+  <h2 class="title title--wide">Then you can <em>push for more.</em></h2>
+  <div class="cols" style="--n:2;gap:3vw">
+    <div class="card" style="--c:var(--a2)"><h3><b>1</b>A no-code app</h3><figure class="shot" style="--h:42vh;--accent:var(--a2)"><img src="assets/sample/app.svg" alt="Sample no-code app overview"><figcaption>About ten minutes</figcaption></figure></div>
+    <div class="card" style="--c:var(--a3)"><h3><b>2</b>Code it properly</h3><figure class="shot" style="--h:42vh;--accent:var(--a3)"><img src="assets/sample/state-b.svg" alt="Sample coded app after the action ran"><figcaption>About an hour, with tests</figcaption></figure></div>
+  </div>
+  <aside class="notes">
+    <p><b>9:00–10:00.</b> “If you want more control, there’s a next step.” Details live in the extras (H).</p>
+  </aside>
+</section>
+
+<section class="slide" id="recipe" data-section="Takeaway" data-title="Which one should you reach for?">
+  <div class="eyebrow">The recipe</div>
+  <h2 class="title title--wide">Which one should <em>you</em> reach for?</h2>
+  <div class="recipe">
+    <div class="recipe-row" style="--c:var(--a1)"><b>01</b><strong>Start with the annoyance</strong><span>Something you’d fix tonight.</span></div>
+    <div class="recipe-row" style="--c:var(--a2)"><b>02</b><strong>Write it down</strong><span>Notes or a sheet.</span></div>
+    <div class="recipe-row" style="--c:var(--a4)"><b>03</b><strong>Plug it in and ask</strong><span>Plain English.</span></div>
+    <div class="recipe-row" style="--c:var(--a3)"><b>04</b><strong>Want buttons?</strong><span>A no-code app.</span></div>
+    <div class="recipe-row" style="--c:var(--a5)"><b>05</b><strong>Want control?</strong><span>Code it.</span></div>
+  </div>
+  <i class="mascot mascot--corner mascot--top m-hexagon"></i>
+  <aside class="notes">
+    <p><b>10:00–11:00.</b> One row per breath. This is the slide people photograph.</p>
+  </aside>
+</section>
+
+<section class="slide slide--close" id="close" data-section="Takeaway" data-chrome="off" data-title="Thank you">
+  <div class="fx">
+    <div class="orb" style="--c:var(--a1);right:8vw;top:-14vh"></div>
+    <div class="orb" style="--c:var(--a3);--size:34vw;right:-8vw;bottom:-16vh;animation-delay:-4s"></div>
+    <div class="sparks" data-n="16"></div>
+  </div>
+  <div class="close-grid">
+    <div class="close-text">
+      <div class="eyebrow">Thank you!</div>
+      <h2 class="title close-title">Big words. Real demos. <em>Honest fallbacks.</em></h2>
+      <p class="sticker" data-step>Thanks for staying for the demo ✓</p>
+      <nav class="close-socials" aria-label="Speaker links">
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://x.com/"><b>X</b>@your-handle</a>
+        <a href="https://www.linkedin.com/"><b>LinkedIn</b>your-handle</a>
+      </nav>
+    </div>
+    <a class="close-qr" href="https://example.com/slides" data-slides-url>
+      <span class="qr-ring"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></span>
+      <span class="qr-label">Grab the slides</span>
+      <span class="qr-url">example.com/slides</span>
+      <i class="mascot m-pentagon qm1"></i>
+      <i class="mascot m-hexagon qm2"></i>
+      <i class="mascot m-diamond qm3"></i>
+      <i class="mascot m-octagon qm4"></i>
+      <i class="mascot m-triangle qm5"></i>
+    </a>
+  </div>
+  <img class="pet close-pet" src="assets/pet.svg" alt="">
+  <aside class="notes">
+    <p><b>11:00–15:00.</b> Land the key line. Space → the sticker. “The slides are on that QR code, with all the links.” Leave this up for questions.</p>
+    <p>Likely questions have extras: “How long did it take?” → One evening, logged. “What didn’t work?” → Honest limits.</p>
+  </aside>
+</section>
+
+<!-- Presenter extras -->
+
+<section class="slide" id="x-timeline" data-hidden data-section="Extras" data-title="Extra: One evening, logged">
+  <div class="eyebrow">Presenter extra · build log</div>
+  <h2 class="title title--wide title--small">One evening, <em>about 83 minutes.</em></h2>
+  <ol class="timeline">
+    <li><time>22:46</time><span>Read the plan. Start.</span></li>
+    <li><time>22:48</time><span>Mock inputs made, clearly fake</span></li>
+    <li><time>22:52</time><span>No-code build started</span></li>
+    <li><time>22:54</time><span>Notes and instructions written</span></li>
+    <li><time>23:00</time><span>First build done</span></li>
+    <li><time>23:04</time><span>Plan → do it works</span></li>
+    <li><time>23:24</time><span>Verified against the real data</span></li>
+    <li><time>23:29</time><span>One feature fails; repair attempted</span></li>
+    <li><time>23:41</time><span>Coded version answers in 6 s</span></li>
+    <li><time>23:46</time><span>17 tests pass</span></li>
+    <li><time>23:49</time><span>One install path blocked</span></li>
+    <li><time>00:09</time><span>Final checks done</span></li>
+  </ol>
+  <aside class="notes"><p>For “how long did it take?”. Copy the times from your build log; don’t round them into a better story.</p></aside>
+</section>
+
+<section class="slide" id="x-compare" data-hidden data-section="Extras" data-title="Extra: Side by side">
+  <div class="eyebrow">Presenter extra · comparison</div>
+  <h2 class="title title--wide title--small">Side by side.</h2>
+  <table class="compare">
+    <thead><tr><th scope="col"></th><th scope="col">Just ask</th><th scope="col" class="is-hero">No-code app</th><th scope="col">Code it</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Set-up</th><td>Minutes</td><td class="is-hero">About ten minutes</td><td>About an hour</td></tr>
+      <tr><th scope="row">Control</th><td>Low</td><td class="is-hero">Buttons and rules</td><td>Everything</td></tr>
+      <tr><th scope="row">Runs where</th><td>In the chat</td><td class="is-hero">A private page</td><td>Your machine or server</td></tr>
+      <tr><th scope="row">Best for</th><td>Questions</td><td class="is-hero">Daily use</td><td>Anything that must not break</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes"><p>Condensed comparison. Keep the full version in your own notes, not here; notes ship with the slides.</p></aside>
+</section>
+
+<section class="slide" id="x-ladder" data-hidden data-section="Extras" data-title="Extra: From just ask to real code">
+  <div class="eyebrow">Presenter extra · four ways</div>
+  <h2 class="title title--wide">From “just ask” to <em>real code.</em></h2>
+  <ol class="ladder">
+    <li style="--c:var(--a4)"><b>01 · NO CODE</b><strong>Just ask</strong><span>A chat that reads your notes.</span><span class="tag">Minutes</span></li>
+    <li style="--c:var(--a2)"><b>02 · NO CODE</b><strong>Buttons</strong><span>A private app built from a chat.</span><span class="tag">About ten minutes</span></li>
+    <li style="--c:var(--a3)"><b>03 · CODE</b><strong>Your app</strong><span>A coding agent builds it, with tests.</span><span class="tag">About an hour</span></li>
+    <li style="--c:var(--a1)"><b>04 · CODE</b><strong>Your plan</strong><span>Your app signs in with your own AI plan.</span><span class="tag">A spike</span></li>
+  </ol>
+  <aside class="notes"><p>The map of every approach, for someone who wants the whole picture.</p></aside>
+</section>
+
+<section class="slide" id="x-limits" data-hidden data-section="Extras" data-title="Extra: Honest limits">
+  <div class="eyebrow">Presenter extra · honest limits</div>
+  <h2 class="title title--wide title--small">What didn’t work. <em>Yet.</em></h2>
+  <div class="split split--even split--auto">
+    <div class="text">
+      <ul class="facts">
+        <li><strong>One feature</strong> failed inside the app and needed a workaround.</li>
+        <li><strong>One install path</strong> was blocked; the local version works.</li>
+        <li><strong>Costs</strong> weren’t measured per run, so no dollar figure.</li>
+      </ul>
+      <div class="chips"><span>Works offline</span><span>Every live beat has a screenshot</span><span>Mock data only</span></div>
+    </div>
+    <figure class="shot" style="--h:46vh"><img src="assets/sample/state-a.svg" alt="Sample app in its planned state"><figcaption><b>Fallback</b>the screenshot path</figcaption></figure>
+  </div>
+  <aside class="notes"><p>For “does it really work?”. Say the limit plainly before anyone has to ask twice.</p></aside>
+</section>
+
+<section class="slide" id="x-cost" data-hidden data-section="Extras" data-title="Extra: What it cost">
+  <div class="eyebrow">Presenter extra · what it cost</div>
+  <h2 class="title title--wide title--small">Mostly time. <em>Not much of it.</em></h2>
+  <div class="counters">
+    <div style="--c:var(--a4)"><strong><span data-count="10">10</span> min</strong><span>first set-up</span></div>
+    <div style="--c:var(--a2)"><strong><span data-count="8">8</span> min</strong><span>first no-code build</span></div>
+    <div style="--c:var(--a3)"><strong><span data-count="60">60</span> min</strong><span>coded version, alongside</span></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--a4)">Existing plan</span>
+    <span style="--c:var(--a2)">No API key</span>
+    <span style="--c:var(--a1)">No billing set-up <small>this time</small></span>
+  </div>
+  <p class="lede">Dollar cost wasn’t measured separately, so there’s no figure to quote.</p>
+  <aside class="notes"><p>For “did it cost money?”. Don’t invent a dollar figure.</p></aside>
+</section>
+
+</main>
+
+<nav class="deck-nav" aria-label="Slide controls">
+  <button type="button" class="nav-arrow" data-action="prev" aria-label="Previous slide">‹</button>
+  <button type="button" class="nav-arrow" data-action="next" aria-label="Next slide">›</button>
+  <button type="button" data-action="overview" aria-haspopup="dialog">Slides<kbd>O</kbd></button>
+  <button type="button" data-action="notes" aria-controls="notes-panel" aria-pressed="false">Notes<kbd>N</kbd></button>
+  <button type="button" data-action="extras" aria-pressed="false">Extras<kbd>H</kbd></button>
+  <button type="button" data-action="close">To close<kbd>C</kbd></button>
+  <button type="button" data-action="fullscreen">Full<kbd>F</kbd></button>
+</nav>
+<div id="badge" class="badge" hidden>Extras on</div>
+<div id="progress" class="progress"></div>
+
+<section id="notes-panel" class="notes-panel" aria-label="Speaker notes">
+  <div class="notes-head"><span id="notes-title"></span><span>N to hide</span></div>
+  <div id="notes-body" class="notes-body"></div>
+</section>
+
+<dialog id="image-viewer" class="overlay image-viewer" aria-labelledby="image-viewer-title">
+  <div class="dialog-head"><h2 id="image-viewer-title">Screenshot</h2><button type="button" class="btn" data-close>Close · Esc</button></div>
+  <img id="image-viewer-img" alt="">
+  <p id="image-viewer-caption"></p>
+</dialog>
+
+<dialog id="overview" class="overlay" aria-labelledby="overview-title">
+  <div class="dialog-head"><h2 id="overview-title">All slides</h2><button type="button" class="btn" data-close>Close</button></div>
+  <p class="dialog-hint">Presenter extras are skipped in the main flow. Choosing one turns extras on. Esc closes.</p>
+  <ol id="overview-list" class="overview-list"></ol>
+</dialog>
+
+<script src="engine/deck.js"></script>
+</body>
+</html>
