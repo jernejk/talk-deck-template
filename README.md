@@ -1,6 +1,6 @@
 # <img src="slides/assets/favicon.svg" alt="" width="36" align="top"> Talk deck template
 
-![Polished talks in hours. Not weeks. Plain HTML decks your coding agent can build, restyle and fix, right up until you walk on stage.](docs/hero.jpg)
+![AI-first talks, polished in hours. Three example decks from this repo, running live.](docs/hero.jpg)
 
 I used to spend 2–6 weeks getting a deck ready. Not writing it, mostly.
 

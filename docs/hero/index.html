@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>talk-deck-template · Polished talks in hours. Not weeks.</title>
+<title>talk-deck-template · AI-first talks, polished in hours</title>
 <meta name="description" content="Hero image for the README and social preview, built as a one-slide deck with the repo's own engine.">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../../core/deck.css">
@@ -21,7 +21,7 @@
 <style>
 #hero{padding:0 5.5vw;--accent:var(--a1)}
 #hero::before{--gx:78%;--gy:30%;--ax:22%;--ay:92%;--bx:62%;--by:110%;--gx2:2%;--gy2:98%}
-.hero{display:grid;grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);column-gap:3vw;align-items:center;height:100%}
+.hero{display:grid;grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr);column-gap:2vw;align-items:center;height:100%}
 .hero-text{min-width:0;display:flex;flex-direction:column;justify-content:center}
 
 .brand{--rise:1;display:flex;align-items:center;gap:.6em;font:600 clamp(.9rem,1.5vw,1.6rem)/1 var(--mono);letter-spacing:-.02em;color:var(--ink)}
@@ -29,26 +29,25 @@
 .brand span{opacity:.9}
 
 .hero .eyebrow{margin-top:4.2vh;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero .title{font-size:clamp(2.6rem,6vw,7rem);max-width:none;margin-top:1.4vh;line-height:.94}
-.hero .title em{display:block;background:linear-gradient(90deg,#59e3f5 0%,#b9a2ff 52%,#ff8bd3 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
-.hero .sub{font-size:clamp(1rem,2.2vw,2.4rem);max-width:28ch;margin-top:2.4vh;line-height:1.28;color:color-mix(in srgb,var(--ink) 78%,var(--muted))}
+.hero .title{font-size:clamp(3rem,7.4vw,9rem);max-width:none;margin-top:1.6vh;line-height:.92}
+.hero .title em{display:block;white-space:nowrap;background:linear-gradient(90deg,#59e3f5 0%,#b9a2ff 52%,#ff8bd3 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.08em}
 
-.track{--rise:1;position:relative;margin-top:4.4vh;height:.9vh;max-width:22ch;border-radius:999px;background:#605379}
+.track{--rise:1;position:relative;margin-top:5.2vh;height:.9vh;max-width:18ch;border-radius:999px;background:#605379}
 .track i{position:absolute;inset:0 auto 0 0;width:68%;border-radius:999px;background:linear-gradient(90deg,#59e3f5,#b9a2ff,#ff8bd3);box-shadow:0 0 18px rgba(185,162,255,.55)}
 
-.fan{position:relative;height:84vh;min-width:0}
-.card{position:absolute;aspect-ratio:16/9;border-radius:1.6vw;overflow:hidden;
+.fan{position:relative;height:88vh;min-width:0;margin-right:-4vw}
+.card{position:absolute;margin:0;aspect-ratio:16/9;border-radius:1.6vw;overflow:hidden;
   border:1px solid rgba(255,255,255,.26);
   background:#0b1026;
   box-shadow:0 40px 90px -30px rgba(3,6,24,.9),0 0 0 1px rgba(255,255,255,.05) inset}
 .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:linear-gradient(160deg,rgba(255,255,255,.16),transparent 38%)}
 .card iframe{position:absolute;left:0;top:0;width:1280px;height:720px;border:0;transform-origin:0 0;pointer-events:none;background:#000}
-.c1{width:60%;left:2%;top:4%;transform:rotate(-5deg);opacity:.72;filter:saturate(.9)}
-.c2{width:68%;left:13%;top:23%;transform:rotate(-2.5deg);opacity:.92}
-.c3{width:77%;left:21%;top:44%;
+.c1{width:64%;left:0;top:3%;transform:rotate(-5deg);opacity:.72;filter:saturate(.9)}
+.c2{width:72%;left:9%;top:20%;transform:rotate(-2.5deg);opacity:.92}
+.c3{width:80%;left:18%;top:38%;
   box-shadow:0 0 0 1px rgba(255,255,255,.1),0 60px 120px -30px rgba(3,6,24,1),0 0 120px -10px rgba(94,231,255,.35),0 0 160px -20px rgba(255,139,211,.3)}
-.glow{position:absolute;inset:auto -6% 0 10%;height:46%;pointer-events:none;
+.glow{position:absolute;inset:auto 0 0 10%;height:46%;pointer-events:none;
   background:radial-gradient(60% 60% at 60% 70%,rgba(94,231,255,.3),transparent 70%),radial-gradient(50% 50% at 85% 80%,rgba(255,139,211,.22),transparent 70%);filter:blur(10px)}
 
 @media (prefers-reduced-motion:reduce){.card,.track i{transition:none}}
@@ -63,8 +62,7 @@
     <div class="hero-text">
       <div class="brand"><img src="assets/mark.svg" alt=""><span>talk-deck-template</span></div>
       <div class="eyebrow">AI-first talks</div>
-      <h1 class="title">Polished talks in hours. <em>Not weeks.</em></h1>
-      <p class="sub">Plain HTML decks your coding agent can build, restyle and fix, right up until you walk on stage.</p>
+      <h1 class="title">Polished <em>in hours.</em></h1>
       <div class="track" aria-hidden="true"><i></i></div>
     </div>
     <div class="fan" aria-label="Three real slides from the example decks">
