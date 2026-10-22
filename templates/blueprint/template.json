@@ -1,0 +1,23 @@
+{
+  "name": "Blueprint",
+  "description": "Cyanotype blue with a drafting grid, white line work, condensed uppercase labels and a highlighter on the accent. For architecture and systems talks.",
+  "extends": null,
+  "slides": [
+    "cover",
+    "speaker",
+    "agenda",
+    "chapter",
+    "statement",
+    "rule",
+    "code",
+    "cli-run",
+    "how-its-made",
+    "long-page",
+    "numbers",
+    "takeaways",
+    "close",
+    "x-timeline",
+    "x-compare",
+    "x-limits"
+  ]
+}

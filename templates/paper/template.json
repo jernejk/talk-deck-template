@@ -1,0 +1,19 @@
+{
+  "name": "Paper",
+  "description": "Warm paper, serif headlines with italic accents, print-style offset shadows, tape stickers and cut-out mascots.",
+  "slides": [
+    "cover",
+    "speaker",
+    "agenda",
+    "chapter",
+    "statement",
+    "quote",
+    "transcript",
+    "rule",
+    "code",
+    "takeaways",
+    "close",
+    "x-compare",
+    "x-limits"
+  ]
+}

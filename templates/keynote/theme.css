@@ -1,0 +1,146 @@
+/* Keynote: a light stage, near-black ink, one vivid blue, system type and soft shadows. For work and product talks. */
+:root{
+  color-scheme:light;
+
+  --bg:#f5f5f7;
+  --panel:#fff;
+  --panel-2:#e9e9ee;
+  --ink:#1d1d1f;
+  --muted:#6e6e73;
+  --rule:#d2d2d7;
+
+  --a0:#6e6e73;
+  --a1:#0a5bd3;
+  --a2:#0b7a6b;
+  --a3:#6b3fcf;
+  --a4:#1b7a3e;
+  --a5:#c23f14;
+  --a6:#9a6400;
+  --m1:#0a5bd3;
+  --m2:#0b7a6b;
+  --m3:#6b3fcf;
+  --m4:#1b7a3e;
+  --m5:#c23f14;
+  --ok:#1b7a3e;
+  --signal:#bf4a00;
+  --on-accent:#fff;
+  --sticker:#0a5bd3;
+  --on-sticker:#fff;
+
+  --sans:-apple-system,BlinkMacSystemFont,system-ui,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --display:-apple-system,BlinkMacSystemFont,system-ui,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --title-weight:800;
+  --title-leading:.94;
+  --tight:-.045em;
+  --em-style:normal;
+
+  --radius:18px;
+  --shot-bg:#fff;
+  --shot-border:rgba(0,0,0,.08);
+  --shot-glow:0%;
+  --drop:0 36px 70px -24px rgba(0,0,0,.26),0 2px 6px rgba(0,0,0,.06);
+
+  --glow-1:0%;
+  --glow-2:0%;
+  --dots:transparent;
+  --ghost-ink:transparent;
+
+  --ui-font:var(--sans);
+  --ui-bg:#fff;
+  --ui-ink:#1d1d1f;
+  --ui-muted:#6e6e73;
+  --ui-border:#e2e2e7;
+  --ui-chip:#e6eefc;
+  --ui-chip-ink:#0a5bd3;
+  --ui-send:#0a5bd3;
+
+  --cli-bg:#1c1c1e;
+  --cli-ink:#f2f2f7;
+  --cli-muted:#98989f;
+  --cli-border:#3a3a3c;
+  --cli-bad:#ff6b5c;
+  --cli-radius:18px;
+  --code-radius:18px;
+  --code-bg:#1c1c1e;
+  --code-ink:#f2f2f7;
+  --code-muted:#98989f;
+  --code-border:#3a3a3c;
+  --code-k:#6cb4ff;
+  --code-s:#5fd68a;
+  --code-f:#64d2c8;
+  --code-n:#ffd166;
+}
+
+.slide::before,.slide::after{display:none}
+.ghost,.pet,.mascot{display:none}
+.orb,.sparks{display:none}
+
+.eyebrow{font-weight:600;letter-spacing:0}
+.title,.ask,.close-title,.about-name{font-feature-settings:"ss01" 0;text-wrap:balance}
+.sub{color:var(--muted);font-weight:400}
+
+/* Cover: the mascot cluster becomes a quiet set of soft rounded shapes */
+.mascots .mascot{
+  display:block;-webkit-mask:none;mask:none;border-radius:30%;
+  background:color-mix(in srgb,var(--mc) 16%,transparent);
+  animation:kn-in 1.1s var(--ease) both,bob var(--d,7s) ease-in-out 1.1s infinite;
+}
+.mascots .mascot:nth-child(1){--s:17vw;border-radius:50%}
+.mascots .mascot:nth-child(3){--s:14vw;border-radius:36%}
+.mascots .mascot:nth-child(4){--s:9vw;border-radius:50%}
+@keyframes kn-in{from{opacity:0;transform:translateY(2vh) scale(.94)}to{opacity:1;transform:none}}
+
+/* Screenshots and cards: soft shadows, no tinted glow */
+.cli,.code,.mock,.composer-box,.scrollshot-view,.qr-ring{box-shadow:var(--drop)}
+.about-portrait img{box-shadow:var(--drop);border-radius:24px}
+.phone{background:#1d1d1f;border-color:#1d1d1f;box-shadow:var(--drop)}
+.phone figcaption{color:#aeaeb2}
+.tilt{rotate:0deg;filter:drop-shadow(0 24px 40px rgba(0,0,0,.18))}
+.tilt img{border-radius:14px}
+.legend span::before{box-shadow:none}
+.mock{border-radius:18px}
+.composer-box{border-radius:24px}
+.composer-mode .on{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+/* Dark drawn components keep the slide's hue, lightened to read on charcoal */
+.cli{--cli-accent:color-mix(in srgb,var(--accent) 45%,#fff)}
+.code{--code-accent:color-mix(in srgb,var(--accent) 45%,#fff)}
+.cli-ok::before,.cli-line ins{color:#5fd68a}
+.code li.hl{background:color-mix(in srgb,var(--accent) 28%,transparent);box-shadow:inset 3px 0 0 color-mix(in srgb,var(--accent) 45%,#fff)}
+
+/* Stickers become a pill label */
+.sticker{rotate:0deg;border-radius:999px;padding:.6em 1.1em;font-weight:600;font-size:clamp(.95rem,1.35vw,1.5rem);box-shadow:0 10px 24px -12px color-mix(in srgb,var(--sticker) 60%,transparent)}
+.slide .sticker[data-step]{transition:opacity .4s var(--ease),transform .5s var(--ease)}
+.slide .sticker[data-step]:not(.is-shown){transform:translateY(8px)}
+.cover-art .sticker{rotate:0deg;left:-2vw;bottom:3vh}
+
+.chapter-num{color:color-mix(in srgb,var(--accent) 14%,transparent);-webkit-text-stroke:0}
+.card h3 b{border-radius:50%}
+.pipe li{border-color:transparent;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05),0 10px 30px -18px rgba(0,0,0,.2)}
+.pipe li:last-child{background:color-mix(in srgb,var(--accent) 10%,#fff);border-color:transparent}
+.bubble{background:#fff}
+.bubble--me{background:color-mix(in srgb,var(--accent) 14%,#fff);border-color:transparent}
+.memo,.ledger,.compare{background:#fff}
+.ledger .h,.compare thead th{background:#f0f0f4}
+.chips span,.ladder li > .tag{background:#fff;border:1px solid var(--rule)}
+.tags span,.legend span,.close-socials a{background:#fff;border-color:var(--rule)}
+.about-links a{background:#fff}
+
+/* Close: a plain white QR card with a soft shadow, no ring or shimmer */
+.close-title em{background:none;color:var(--accent);animation:none}
+.qr-ring{background:#fff;padding:0;border-radius:28px}
+.slide.is-active .qr-ring{animation:qr-in .8s var(--ease) .2s both}
+@keyframes qr-in{from{opacity:0;transform:translateY(2vh) scale(.96)}to{opacity:1;transform:none}}
+.qr-card{border-radius:28px;border:1px solid var(--rule)}
+
+.progress{height:3px}
+.deck-nav{border-radius:14px}
+.deck-nav button{border-radius:10px}
+dialog.overlay{border-radius:20px;box-shadow:var(--drop)}
+dialog.overlay::backdrop{background:rgba(29,29,31,.3)}
+
+@media (prefers-reduced-motion:reduce){
+  .mascots .mascot,.slide.is-active .qr-ring{animation:none}
+  .slide .sticker[data-step]:not(.is-shown){transform:none}
+}

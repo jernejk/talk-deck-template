@@ -1,0 +1,20 @@
+{
+  "name": "Keynote",
+  "description": "A light stage, near-black ink, one vivid blue, system type with heavy tight headlines, soft shadows and calm motion. For work and product talks.",
+  "extends": null,
+  "slides": [
+    "cover",
+    "photo",
+    "statement",
+    "agenda",
+    "chapter",
+    "question",
+    "before-after",
+    "numbers",
+    "quote",
+    "code",
+    "options",
+    "takeaways",
+    "close"
+  ]
+}

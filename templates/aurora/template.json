@@ -1,0 +1,21 @@
+{
+  "name": "Aurora",
+  "description": "A navy-to-indigo stage with slow aurora light, white type, a bright cyan–violet–pink palette and glass panels. Modern dark conference look.",
+  "extends": null,
+  "slides": [
+    "cover",
+    "speaker",
+    "agenda",
+    "chapter",
+    "statement",
+    "photo",
+    "cli-run",
+    "code",
+    "numbers",
+    "how-its-made",
+    "takeaways",
+    "close",
+    "x-compare",
+    "x-limits"
+  ]
+}

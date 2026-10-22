@@ -1,0 +1,28 @@
+{
+  "name": "Community",
+  "description": "Black canvas, a loud palette, mascots that pop in, glows and a dot grid. The reference style.",
+  "slides": [
+    "cover",
+    "speaker",
+    "statement",
+    "agenda",
+    "opener",
+    "question",
+    "prompt",
+    "before-after",
+    "rule",
+    "numbers",
+    "quote",
+    "transcript",
+    "how-its-made",
+    "long-page",
+    "options",
+    "takeaways",
+    "close",
+    "x-timeline",
+    "x-compare",
+    "x-ladder",
+    "x-limits",
+    "x-cost"
+  ]
+}

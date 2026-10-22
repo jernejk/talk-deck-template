@@ -1,0 +1,17 @@
+{
+  "name": "Terminal",
+  "description": "Phosphor on black, all mono: scanlines, a blinking cursor, ASCII mascots and dev glyphs.",
+  "slides": [
+    "cover",
+    "speaker",
+    "statement",
+    "cli-run",
+    "code",
+    "before-after",
+    "numbers",
+    "takeaways",
+    "close",
+    "x-timeline",
+    "x-limits"
+  ]
+}

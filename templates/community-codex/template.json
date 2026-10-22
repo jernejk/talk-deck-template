@@ -1,0 +1,20 @@
+{
+  "name": "Community Codex",
+  "extends": "community",
+  "description": "The Community look with the Codex Community mascots.",
+  "slides": [
+    "cover",
+    "speaker",
+    "statement",
+    "prompt",
+    "cli-run",
+    "before-after",
+    "numbers",
+    "how-its-made",
+    "takeaways",
+    "close",
+    "x-timeline",
+    "x-limits",
+    "x-cost"
+  ]
+}
