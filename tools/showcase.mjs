@@ -261,11 +261,16 @@ try {
     await page.goto(pathToFileURL(html).href, { waitUntil: "load" });
     await page.screenshot({ path: join(tmp, `${sheet.id}.jpg`), fullPage: true, type: "jpeg", quality: 82 });
   }
-  await mkdir(OUT, { recursive: true });
-  for (const sheet of chosen) await copyFile(join(tmp, `${sheet.id}.jpg`), join(OUT, `${sheet.id}.jpg`));
-  await writeFile(join(OUT, "README.md"), readme());
-  if (withHero) await renderHero(browser);
-  console.log(`Rendered ${shots.size} slides into ${chosen.length} sheets in docs/showcase/${withHero ? ", and docs/hero.jpg" : ""}.`);
+  if (chosen.length) {
+    await mkdir(OUT, { recursive: true });
+    for (const sheet of chosen) await copyFile(join(tmp, `${sheet.id}.jpg`), join(OUT, `${sheet.id}.jpg`));
+    await writeFile(join(OUT, "README.md"), readme());
+    console.log(`Rendered ${shots.size} slides into ${chosen.length} sheets in docs/showcase/.`);
+  }
+  if (withHero) {
+    await renderHero(browser);
+    console.log("Rendered docs/hero.jpg.");
+  }
 } catch (e) {
   console.error(e.message);
   process.exitCode = 1;

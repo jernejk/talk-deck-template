@@ -28,7 +28,7 @@ QA needs Playwright's browser once: `npx playwright install chromium`.
 
 ![A pixel-art rider on an e-scooter at dusk while a checklist ticks off a tighter title, a refreshed demo fallback, QA and a deploy](docs/scooter.jpg)
 
-**Figure: Still tweaking on the way to the venue. A slide made with this template; the rider and city were generated with gpt-image-2.**
+**Figure: Still tweaking on the way to the venue. A slide made with this template; the rider and city were generated with gpt-image-2, and the checklist is illustrative.**
 
 The scooter slide isn't a metaphor. When a talk lands with a few hours' notice, the deck is often still getting better on my way to the venue.
 
