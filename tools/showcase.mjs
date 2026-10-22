@@ -7,6 +7,7 @@ import { parseArgs } from "node:util";
 import { REPO, esc, exists, fail } from "./lib.mjs";
 
 const OUT = join(REPO, "docs/showcase");
+const HERO = join(REPO, "docs/hero/index.html");
 const WIDTH = 2000;
 
 const COLOURWAYS = {
@@ -219,10 +220,22 @@ ${sections.join("\n\n")}
 `;
 }
 
+// The hero's slides are live iframes of the example decks, so wait for each to open its slide.
+async function renderHero(browser) {
+  const page = await browser.newPage({ viewport: { width: 1000, height: 500 }, deviceScaleFactor: 2, reducedMotion: "reduce" });
+  await page.goto(pathToFileURL(HERO).href, { waitUntil: "load" });
+  for (const f of page.frames().filter(f => f !== page.mainFrame())) await f.waitForSelector(".slide.is-active", { timeout: 15000 });
+  for (const f of page.frames()) await f.addStyleTag({ content: ".deck-nav{display:none!important}" });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: join(REPO, "docs/hero.jpg"), type: "jpeg", quality: 88 });
+  await page.close();
+}
+
 const { positionals } = parseArgs({ allowPositionals: true });
-const unknown = positionals.filter(id => !SHEETS.some(s => s.id === id));
-if (unknown.length) fail(`Unknown sheets: ${unknown.join(", ")}. Pick from: ${SHEETS.map(s => s.id).join(", ")}`);
+const unknown = positionals.filter(id => id !== "readme" && !SHEETS.some(s => s.id === id));
+if (unknown.length) fail(`Unknown sheets: ${unknown.join(", ")}. Pick from: readme, ${SHEETS.map(s => s.id).join(", ")}`);
 const chosen = SHEETS.filter(s => !positionals.length || positionals.includes(s.id));
+const withHero = !positionals.length || positionals.includes("readme");
 
 const shots = new Map();
 for (const sheet of chosen) for (const row of rowsOf(sheet)) for (const t of row.tiles) if (!shots.has(t.key)) shots.set(t.key, { t });
@@ -251,7 +264,8 @@ try {
   await mkdir(OUT, { recursive: true });
   for (const sheet of chosen) await copyFile(join(tmp, `${sheet.id}.jpg`), join(OUT, `${sheet.id}.jpg`));
   await writeFile(join(OUT, "README.md"), readme());
-  console.log(`Rendered ${shots.size} slides into ${chosen.length} sheets in docs/showcase/.`);
+  if (withHero) await renderHero(browser);
+  console.log(`Rendered ${shots.size} slides into ${chosen.length} sheets in docs/showcase/${withHero ? ", and docs/hero.jpg" : ""}.`);
 } catch (e) {
   console.error(e.message);
   process.exitCode = 1;

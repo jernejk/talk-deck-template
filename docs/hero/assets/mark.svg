@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 64 64">
+<defs>
+ <linearGradient id="night" x2="1" y2="1"><stop stop-color="#102b43"/><stop offset=".52" stop-color="#19153d"/><stop offset="1" stop-color="#49316b"/></linearGradient>
+ <linearGradient id="light"><stop stop-color="#59e3f5"/><stop offset=".52" stop-color="#b9a2ff"/><stop offset="1" stop-color="#ff8bd3"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#3ca6b7" stop-opacity=".32"/><stop offset="1" stop-color="#3ca6b7" stop-opacity="0"/></radialGradient>
+ <clipPath id="tile"><rect x="1" y="1" width="62" height="62" rx="13"/></clipPath>
+ </defs><rect x="1" y="1" width="62" height="62" rx="13" fill="url(#night)" stroke="#7c7aab" stroke-width="0.6"/><g clip-path="url(#tile)"><circle cx="15" cy="9" r="28" fill="url(#glow)"/></g><rect x="12" y="15" width="40" height="9" rx="2.6" fill="#fff" /><path d="M17 29 H44 Q46 29 45 31 L41 40 Q40.5 41 39 41 H12 Q10 41 11 39 L15 30 Q15.5 29 17 29 Z" fill="url(#light)" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" /><rect x="12" y="49" width="40" height="3" rx="1.5" fill="#605379" /><rect x="12" y="49" width="29" height="3" rx="1.5" fill="url(#light)" />
+</svg>
