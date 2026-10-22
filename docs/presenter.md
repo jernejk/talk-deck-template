@@ -1,4 +1,4 @@
-# {{title}}: presenter guide
+# Presenter guide: {{title}}
 
 Target: {{url}}
 

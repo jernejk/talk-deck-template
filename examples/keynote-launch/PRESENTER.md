@@ -1,4 +1,4 @@
-# Meet Pantry. Lunch, sorted.: presenter guide
+# Presenter guide: Meet Pantry. Lunch, sorted.
 
 Target: not published yet; the QR and `.qr-url` still point at example.com/slides.
 
@@ -17,7 +17,7 @@ Speaker notes ship in the public HTML, so private links, IDs and anything you wo
 | 3 | Scan the shelf once | 0:50–1:20 | Slide | Space reveals the sub line |
 | 4 | Part two: the product | 1:20–1:30 | Slide | A breath |
 | 5 | Six weeks of beta | 1:30–2:10 | Illustration | Numbers count up |
-| 6 | Real words from the beta | 2:10–2:40 | Drawn chat | Read the quote in their voice |
+| 6 | Words from the beta | 2:10–2:40 | Drawn chat | Read the quote in their voice |
 | 7 | Pick a plan | 2:40–3:20 | Illustration | No prices on stage |
 | 8 | Three things to do tonight | 3:20–4:00 | Slide | One row per breath |
 | 9 | Thank you | 4:00–5:00 | Slide | Space shows the label, then questions |

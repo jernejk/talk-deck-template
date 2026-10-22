@@ -1,4 +1,4 @@
-# Build a small agent. Tonight.: presenter guide
+# Presenter guide: Build a small agent. Tonight.
 
 Target: not published yet; the QR and `.qr-url` still point at example.com/slides.
 

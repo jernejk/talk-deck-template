@@ -1,4 +1,4 @@
-# Big words. Real demos. Honest fallbacks.: presenter guide
+# Presenter guide: Big words. Real demos. Honest fallbacks.
 
 Target: not published yet; the QR and `.qr-url` still point at example.com/slides.
 
@@ -37,6 +37,8 @@ Every live beat has its screenshot on the slide. If a live step hasn't answered 
 ## What's real
 
 List every claim the deck makes and where it came from. The audience can't tell a real capture from a mock, so this list is how you stay honest.
+
+This sample deck has no real runs. Every image is a sample shipped with the template (`assets/sample/`), the cards are drawn, and every number is a placeholder. Replace them with your own, then fill in the list below.
 
 - **Real runs:** which screenshots are real captures, the date they were taken and any timings.
 - **Drawn illustrations:** which cards are drawn (`.mock`, `.composer`, `.memo`, `.cli`). Their captions and notes must say so.

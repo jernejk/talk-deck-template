@@ -1,4 +1,4 @@
-# How the ledger works. One event at a time.: presenter guide
+# Presenter guide: How the ledger works. One event at a time.
 
 Target: not published yet; the QR and `.qr-url` still point at example.com/slides.
 
@@ -30,7 +30,7 @@ Every live beat has its screenshot on the slide. If a live step hasn't answered 
 
 List every claim the deck makes and where it came from. The audience can't tell a real capture from a mock, so this list is how you stay honest.
 
-- **Real runs:** none. Every image in this deck is a sample illustration shipped with the template, and every caption says "Drawn".
+- **Real runs:** none. Every image in this deck is a sample illustration shipped with the template, and every caption or alt text says so.
 - **Drawn illustrations:** the fan of three screens (slide 6), the scrolling replay log and its inset (slide 7), the planned-state screen (extra: honest limits). The code on slide 5 is trimmed from a fictional `fold.ts`; the notes say what was cut.
 - **Gags, not measurements:** the ledger quantities on slide 4 and the incident times on the extra are made up for the story. Replace them with your own log before quoting any of them.
 

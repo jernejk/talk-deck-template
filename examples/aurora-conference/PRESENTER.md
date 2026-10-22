@@ -1,4 +1,4 @@
-# Agents in production. What actually broke.: presenter guide
+# Presenter guide: Agents in production. What actually broke.
 
 Target: not published yet; the QR and `.qr-url` still point at example.com/slides.
 
@@ -32,7 +32,7 @@ List every claim the deck makes and where it came from. The audience can't tell 
 
 - **Real runs:** none in this sample deck. When you adapt it, list each capture, the date it was taken and its timings here.
 - **Drawn illustrations:** the terminal session on slide 5 (`.cli`, reconstructed from a log) and the three fanned screens on slide 7 (sample SVGs standing in for a dashboard). Both captions say "Drawn".
-- **Gags, not measurements:** the sticker on the close slide. The "about a third slower" figure in the extra is presented as the team's own quarter-long measurement; replace it with yours.
+- **Gags, not measurements:** the sticker on the close slide. The "about a third slower" figure in the extra is a sample; replace it with one you measured.
 
 ## Extras (H to show, or pick from O)
 
