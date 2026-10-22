@@ -142,9 +142,20 @@ export async function vendorLib(siteDir) {
   await cp(join(REPO, "LICENSE"), join(siteDir, "lib", "LICENSE"));
 }
 
+async function standaloneGuide() {
+  const repo = JSON.parse(await readFile(join(REPO, "package.json"), "utf8")).repository.url.replace(/^git\+/, "").replace(/\.git$/, "");
+  const docs = `${repo}/blob/main/`;
+  return (await readFile(join(REPO, "AGENTS.md"), "utf8"))
+    .replace(/<!-- repo-only -->[\s\S]*?<!-- \/repo-only -->\n/g, "")
+    .replace(/In the template repo, [^\n]*?`examples\/`\. In a standalone deck the library/, "The library")
+    .replace(/`((?:docs\/[\w-]+\.md)|docs\/showcase\/|examples\/catalog\/index\.html)`/g, (_, f) => `[\`${f}\`](${docs}${f})`)
+    .replaceAll("<deck folder>", "site");
+}
+
 export async function writeTooling(root, name) {
   await mkdir(join(root, "tools"), { recursive: true });
-  for (const f of ["tools/qa.mjs", "tools/qr.swift", "AGENTS.md", "package-lock.json"]) await cp(join(REPO, f), join(root, f));
+  for (const f of ["tools/qa.mjs", "tools/qr.swift", "package-lock.json"]) await cp(join(REPO, f), join(root, f));
+  await writeFile(join(root, "AGENTS.md"), await standaloneGuide());
   await symlink("AGENTS.md", join(root, "CLAUDE.md"));
   const { type, scripts, devDependencies } = JSON.parse(await readFile(join(REPO, "package.json"), "utf8"));
   const pkg = { name: name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "talk-deck", private: true, type, scripts: { qa: scripts.qa }, devDependencies };

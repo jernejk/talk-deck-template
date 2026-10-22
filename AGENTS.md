@@ -17,7 +17,9 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 - Likely questions get a presenter extra (`data-hidden`) and a row in PRESENTER.md.
 - Colour slides with palette slots (`var(--a1)` … `var(--a6)`) so every template can recolour them. Fixed colours belong only inside drawn mock-ups.
 - Slide text uses curly quotes and apostrophes.
+<!-- repo-only -->
 - Don't edit generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`); run `npm run build`. `docs/showcase/` is generated too, by `npm run showcase`.
+<!-- /repo-only -->
 
 ## Slide anatomy
 
@@ -54,12 +56,14 @@ Component classes and options are in `docs/components.md`, slide patterns in `do
 - Add a reusable slide with `npm run add -- <deck> <pattern>` from the template repo rather than hand-copying; it keeps ids unique and copies assets.
 - After editing notes or timings, update the route table in PRESENTER.md.
 
+<!-- repo-only -->
 ## Changing the library
 
 - **Component:** a folder in `components/`, root class named after it, theme tokens with fallbacks for anything new, `--rise:1` to enter with the slide, reduced-motion and portrait rules, behaviour through `Deck.use`. Use it in a slide pattern and add a row to `docs/components.md`.
 - **Slide pattern:** `slides/<name>.html` plus an entry in `slides/index.json` and a row in `docs/slides.md`.
 - **Template:** `templates/<name>/theme.css` and `template.json`; follow `docs/styles.md`.
 - Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template. If a pattern or template looks different, run `npm run showcase` too.
+<!-- /repo-only -->
 
 ## Before calling a deck done
 
