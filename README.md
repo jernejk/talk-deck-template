@@ -14,6 +14,8 @@ This template is the setup behind that. Decks are plain HTML and CSS with a smal
 
 People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
+You can click through every example deck, and every pattern in all seven templates, in the [live gallery](https://talk-deck-template.surge.sh).
+
 ## Quickstart
 
 You need Node.js 20 or later.
