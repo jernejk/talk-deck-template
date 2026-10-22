@@ -1,20 +1,23 @@
 # Talk deck: agent guide
 
-A self-contained HTML deck. `site/index.html` holds the slides, `site/engine/` the behaviour and layout, `site/themes/` the look. There is no build step, no CDN and no web font, so the deck runs from `file://` and from any static host. `PRESENTER.md` is the talk's route, timings and honesty ledger.
+Talk decks in plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts. A deck is one `index.html` of `<section class="slide">` elements that loads the core, the components and one template; the engine adds the controls. `PRESENTER.md` beside a deck is its route, timings and honesty ledger.
+
+In the template repo, `core/`, `components/`, `slides/` and `templates/` are the library, and decks live in `examples/`. In a standalone deck the library is copied into `site/lib/`, and `site/` is the folder you publish.
 
 ## Rules
 
-- `site/` is the only publish directory. Keep it self-contained: no external scripts, styles, fonts or images.
+- Keep decks self-contained: no external scripts, styles, fonts or images.
 - Speaker notes (`aside.notes`) ship in the public HTML. Keep private links, IDs, emails and anything you wouldn't show on a slide out of them.
 - One idea per slide: an eyebrow, then a title of one or two lines with a single `<em>` on the payoff. If it needs a third line, make two slides.
-- Prefer real captures, and label them in the caption: `<figcaption><b>Real run</b>names hidden</figcaption>`. Drawn illustrations (`.mock`, `.composer`, `.memo`) are fine when the caption or notes say they're drawn.
+- Prefer real captures, and label them in the caption: `<figcaption><b>Real run</b>names hidden</figcaption>`. Drawn illustrations (`.mock`, `.composer`, `.memo`, `.cli`) are fine when the caption or notes say they're drawn. Generated images (`<b>Generated</b> by gpt-image-2`) are fine for backgrounds and illustrations, never for screenshots or results; keep the prompt in the notes. Sources and credits: `docs/images.md`.
 - Every live beat gets `data-live="App name"`, its screenshot on the same slide, and a 20-second cap in the notes.
 - Quote only numbers someone measured. Gags must read as gags, and PRESENTER.md lists which is which.
-- Crop screenshots before they go into `site/assets/`: tab strip and URL bar, sidebars with chat or project titles, avatars, emails, IDs and private prices. Keep originals outside `site/`.
-- Notes open with the clock (`<b>2:20–3:20.</b>`), then the line to say. Use `p.live` for live cues and `p.src` for provenance.
+- Crop screenshots before they go into `assets/`: tab strip and URL bar, sidebars with chat or project titles, avatars, emails, IDs and private prices. Keep originals outside the deck.
+- Notes open with the clock (`<b>2:20–3:20.</b>`), then the line to say. Use `p.live` for live cues and `p.src` for provenance. Keep the clocks in talk order, because the rehearsal timer (T) reads them; patterns arrive with sample clocks.
 - Likely questions get a presenter extra (`data-hidden`) and a row in PRESENTER.md.
-- Use palette slots (`var(--a1)` … `var(--a6)`) for colour in slides so every theme can recolour them. Fixed colours belong only inside drawn mock-ups.
+- Colour slides with palette slots (`var(--a1)` … `var(--a6)`) so every template can recolour them. Fixed colours belong only inside drawn mock-ups.
 - Slide text uses curly quotes and apostrophes.
+- Don't edit generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`); run `npm run build`. `docs/showcase/` is generated too, by `npm run showcase`.
 
 ## Slide anatomy
 
@@ -38,34 +41,30 @@ A self-contained HTML deck. `site/index.html` holds the slides, `site/engine/` t
 | `data-step`, `data-step="name"` | Reveal on Space; elements sharing a name reveal together |
 | `data-count="83"` | Counts up from zero when the slide opens |
 | `data-type="…"` | Types the text when shown (`data-delay` ms, `data-ph` placeholder) |
+| `data-pose` on `.pet` | Which pet pose the template shows: `wave`, `coding`, `thinking`, `facepalm` |
+| `data-agenda-current="Demo"` | Lights that agenda part on this slide, instead of the part its section belongs to |
 | `style="--accent:var(--a3)"` | Overrides the slot colour for a slide or one element |
 
-The `#deck-config` block in the head sets `title`, footer `brand` and `sections`, which map section names to slots 1–6 (0 is muted). Unlisted sections cycle through slots 1–5, the ones with a ghost shape. The close slide's id must be `close`; C jumps to it.
+The `#deck-config` block in the head sets `title`, footer `brand` and `sections`, which map section names to slots 1–6 (0 is muted). Unlisted sections cycle through slots 1–5, the ones with a ghost shape. Optional keys: `agenda`, the parts (`section`, `title`, `note`, `time`) behind agenda lists and footer dots, which otherwise come from the sections in slide order; `"agendaDots": false` to hide the dots; `duration` (`"15:00"`) for the rehearsal timer; and `"petWalk": true` to walk the template's pet along the progress bar. The close slide's id must be `close`; C jumps to it.
 
-## Components
+Component classes and options are in `docs/components.md`, slide patterns in `docs/slides.md`, and template tokens in `docs/styles.md`. The catalog (`examples/catalog/index.html`) shows every pattern, and its notes say how each works. For pictures, open `docs/showcase/`: every pattern in a mix of templates, six example talks and six colourways, labelled pattern · template.
 
-| Area | Classes |
-|---|---|
-| Type | `.eyebrow` (`.n` number), `.title` (`em`, `--wide`, `--small`), `.ask` (quoted question), `.sub`, `.lede`, `.hint` (`b` label), `.callout`, `.quote` (`cite`, `--small`) |
-| Layout | `.split` (`--wide`, `--even`, `--hero`, `--auto`) with `.text` and media, `.cols` with `.card` (`--n`, `h3 b` badge), `.flow` with `.flow-arrow`, `.stage` |
-| Media | `.shot` (`--h`; click to zoom), `.swap` (stacked shots swapped by a step), `.phone` (`--ph`), `.tilt` in `.cover-art` (`--rh`), `.fan` (`.f1`–`.f3`, `.fan-cap`), `.scrollshot` with `.scrollshot-view` and `.inset` |
-| Numbers | `.stats` > `.stat` (`--n`, `--w`), `.counters`, `.pillars` > `.pillar` (`--c`), `.recipe` > `.recipe-row` (`--c`), `.ladder` (`--n`), `.timeline` (`--rows`) |
-| Lists | `.pipe` (`--text`), `.facts`, `.tags`, `.chips`, `.legend` |
-| Tables | `.ledger` (`--cols`; `.h`, `.item`, `.num`, `.is-hot`; columns reveal by named step), `.compare` (`.is-hero` column) |
-| Drawn UI | `.composer` (`-box`, `-chips`, `-chip`, `-text`, `-bar`, `-label`, `-mode`), `.mock` with `.tiles` > `.tile` (`.is-hit`), `.memo` (`.label`, `.play`, `.wave data-n`, `mark` with an `i` note), `.bubbles` > `.bubble` (`--me`) |
-| Personality | `.mascot` + `.m-pentagon`, `.m-octagon`, `.m-diamond`, `.m-hexagon` or `.m-triangle` (`--s` size, `--r` tilt, `--mc` colour), `.mascots` (cover cluster of five), `.mascot--corner`, `.mascot--top`, `.pet` (`--corner`, `--pw`), `.sticker` (`small`), `.fx` with `.orb` (`--c`, `--size`) and `.sparks data-n` |
-| Slide types | `.slide--cover`, `.slide--opener`, `.slide--about` (`.about-*`), `.slide--close` (`.close-grid`, `.close-title`, `.close-socials`, `.close-qr`, `.qr-ring`, `.qr-card`, `.qr-label`, `.qr-url`, `.qm1`–`.qm5`, `.close-pet`) |
+## Changing a deck
 
-The sample deck in `site/index.html` shows the components in use, and its notes say how each one works.
+- Add a reusable slide with `npm run add -- <deck> <pattern>` from the template repo rather than hand-copying; it keeps ids unique and copies assets.
+- After editing notes or timings, update the route table in PRESENTER.md.
 
-## Themes
+## Changing the library
 
-A theme is one CSS file in `site/themes/` that sets every token `community.css` sets, then overrides components below the tokens. `paper.css` shows a light theme with print shadows; `terminal.css` restyles mascots, ghosts, cursor and progress bar with CSS alone. Preview any theme with `index.html?theme=paper`. Composite tokens can't follow per-slide accents, so engine rules use `var(--accent)` directly; a theme that needs a different shape of shadow overrides the rule instead.
+- **Component:** a folder in `components/`, root class named after it, theme tokens with fallbacks for anything new, `--rise:1` to enter with the slide, reduced-motion and portrait rules, behaviour through `Deck.use`. Use it in a slide pattern and add a row to `docs/components.md`.
+- **Slide pattern:** `slides/<name>.html` plus an entry in `slides/index.json` and a row in `docs/slides.md`.
+- **Template:** `templates/<name>/theme.css` and `template.json`; follow `docs/styles.md`.
+- Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template. If a pattern or template looks different, run `npm run showcase` too.
 
 ## Before calling a deck done
 
-1. `npm run qa` reports no problems. It covers every theme in `site/themes/`; delete themes the talk won't use, or pass `--theme <name>`.
-2. Look at the `qa/` screenshots of every slide you touched, in each theme you ship.
-3. If the slides URL changed, regenerate the QR (`swift tools/qr.swift <url> site/assets/qr-slides.png`; it decodes what it wrote and fails on a mismatch) and update `.qr-url` and `site/CNAME`.
-4. Read the notes as a stranger would: nothing private, every drawn illustration disclosed.
+1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one.
+2. Look at the `qa/` screenshots of every slide you touched, in each template you ship.
+3. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
+4. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
 5. Update PRESENTER.md: route table, timings, what's real, extras.
