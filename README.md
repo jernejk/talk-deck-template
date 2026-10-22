@@ -14,6 +14,10 @@ This template is the setup behind that. Decks are plain HTML and CSS with a smal
 
 People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
+https://github.com/user-attachments/assets/ad6484c9-9126-4f3a-be60-9d4764f5c0e8
+
+**Figure: A minute of templates, slide patterns, live demos and presenter tools, with slides from my own talks. The opening is illustrated, and the scooter scene was generated with gpt-image-2.**
+
 You can click through every example deck, and every pattern in all seven templates, in the [live gallery](https://talk-deck-template.surge.sh).
 
 ## Quickstart
@@ -197,6 +201,7 @@ AGENTS.md      authoring guide; CLAUDE.md links here
 - **Big Buck Bunny** (the `youtube` pattern's sample) © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). It plays from YouTube; the poster is drawn.
 - **`docs/generated-example.jpg`** was generated with gpt-image-2; the prompt is in `docs/images.md`.
 - **`docs/scooter.jpg`:** the rider and city were generated with gpt-image-2. The hero image is a render of `docs/hero/index.html`, which shows the example decks live.
+- **"Laserpack"** (the teaser video's music) by Kevin MacLeod ([incompetech.com](https://incompetech.com)), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), trimmed to fit.
 - **Playwright** ([Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE)) runs QA and the showcase as a dev dependency.
 - **Codex pets:** this repo doesn't bundle other people's pets from Codex or community galleries such as [Petdex](https://petdex.crafter.run), because their artwork isn't licensed for redistribution. Make your own in the Codex app and add its spritesheet to your template (`docs/styles.md`, "The pet").
 
