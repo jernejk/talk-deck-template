@@ -53,6 +53,7 @@ async function galleryHtml() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Talk deck examples</title>
+<link rel="icon" href="catalog/assets/favicon.svg" type="image/svg+xml">
 <style>
 body{margin:0;padding:48px 56px 72px;background:#111214;color:#e9e9e6;font:16px/1.45 -apple-system,"Helvetica Neue",Arial,sans-serif}
 h1{margin:0;font-size:40px;letter-spacing:-.03em}
