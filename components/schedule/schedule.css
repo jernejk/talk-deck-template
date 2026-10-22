@@ -1,0 +1,13 @@
+.schedule{--rise:1;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:1.4vw;margin:4.4vh 0 0;max-width:86vw}
+.slot{--c:var(--accent);display:flex;flex-direction:column;min-width:0;padding:1.8vh 1.2vw 2vh;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule)}
+.slot time{font:500 clamp(.72rem,.95vw,1rem)/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.slot strong{display:block;margin-top:1.2vh;font:var(--title-weight) clamp(1.1rem,1.65vw,1.8rem)/1.12 var(--display);letter-spacing:-.025em}
+.slot > span{display:block;margin-top:1vh;font-size:clamp(.82rem,1.1vw,1.2rem);line-height:1.35;color:var(--muted)}
+.slot.is-now{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,var(--panel));box-shadow:0 18px 50px -24px color-mix(in srgb,var(--c) var(--shot-glow),transparent)}
+.slot.is-now time{color:var(--c)}
+.slot.is-now time::after{content:" · now";font-weight:700}
+
+@media screen and (max-aspect-ratio:1/1){
+  .schedule{grid-template-columns:1fr;gap:1.6vh;max-width:none}
+  .slot{padding:1.6vh 4vw}
+}

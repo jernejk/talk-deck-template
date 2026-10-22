@@ -1,0 +1,15 @@
+.findings{--rise:1;list-style:none;margin:3.4vh 0 0;padding:0;display:grid;gap:1.4vh;max-width:70vw}
+.findings li{--sev:var(--muted);display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:1.2vw;align-items:start;padding:1.7vh 1.4vw;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--sev)}
+.findings li::before{content:"";grid-row:1 / span 2;width:.8em;height:.8em;margin-top:.45em;border-radius:50%;background:var(--sev);box-shadow:0 0 12px color-mix(in srgb,var(--sev) calc(var(--shot-glow) * 2),transparent);font-size:clamp(.9rem,1.3vw,1.4rem)}
+.findings .is-high{--sev:var(--bad,#e5484d)}
+.findings .is-med{--sev:var(--a6)}
+.findings .is-low{--sev:var(--a2)}
+.findings .is-ok{--sev:var(--ok)}
+.findings strong{font:600 clamp(1.05rem,1.55vw,1.7rem)/1.25 var(--sans);letter-spacing:-.015em}
+.findings .sev{margin-right:.6em;padding:.2em .6em;border-radius:999px;font:700 .55em/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;vertical-align:.15em;color:var(--sev);background:color-mix(in srgb,var(--sev) 14%,transparent);border:1px solid color-mix(in srgb,var(--sev) 45%,transparent)}
+.findings li > span{display:block;margin-top:.5vh;font-size:clamp(.88rem,1.2vw,1.3rem);line-height:1.35;color:var(--muted)}
+.findings code{font:500 .92em var(--mono);color:var(--ink)}
+
+@media screen and (max-aspect-ratio:1/1){
+  .findings{max-width:none}
+}

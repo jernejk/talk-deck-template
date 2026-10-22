@@ -1,0 +1,22 @@
+.stages{--rise:1;list-style:none;margin:5vh 0 0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2.4vw;counter-reset:stage}
+.stages li{position:relative;counter-increment:stage;padding:2.2vh 1.4vw 2.4vh;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);transition:border-color .45s var(--ease),background .45s var(--ease),box-shadow .45s var(--ease),opacity .45s var(--ease),transform .45s var(--ease)}
+.stages li::before{content:counter(stage,decimal-leading-zero);display:block;margin-bottom:1.2vh;font:500 clamp(.72rem,.95vw,1rem)/1 var(--mono);color:var(--muted)}
+.stages li:not(:last-child)::after{content:"";position:absolute;top:50%;left:100%;width:2.4vw;height:2px;background:var(--rule)}
+.stages strong{display:block;font:var(--title-weight) clamp(1.15rem,1.9vw,2.1rem)/1.1 var(--display);letter-spacing:-.03em}
+.stages span{display:block;margin-top:.8vh;font-size:clamp(.85rem,1.15vw,1.25rem);line-height:1.35;color:var(--muted)}
+.stages li.is-current,.stages li.is-shown:not(:has(~ li.is-shown)){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel));box-shadow:0 18px 50px -24px color-mix(in srgb,var(--accent) var(--shot-glow),transparent)}
+.stages li.is-current::before,.stages li.is-shown:not(:has(~ li.is-shown))::before{color:var(--accent)}
+.stages li.is-current::after,.stages li.is-shown:not(:has(~ li.is-shown))::after{background:var(--accent)}
+.stages li.is-current:last-child::after,.stages li.is-shown:last-child::after{content:none}
+.stages li.is-current strong,.stages li.is-shown:not(:has(~ li.is-shown)) strong{color:var(--accent)}
+.stages .pin{position:absolute;top:-1.1em;left:1.4vw;width:.9em;height:.9em;background:var(--accent);clip-path:polygon(0 0,100% 0,50% 100%);opacity:0;transform:translateY(-4px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.stages li.is-current .pin,.stages li.is-shown:not(:has(~ li.is-shown)) .pin{opacity:1;transform:none}
+
+@media screen and (max-aspect-ratio:1/1){
+  .stages{grid-auto-flow:row;gap:2vh}
+  .stages li:not(:last-child)::after{content:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .stages li,.stages .pin{transition:none}
+}

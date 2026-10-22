@@ -1,0 +1,18 @@
+<section class="slide" id="try-it" data-section="Demo" data-title="Click it yourself">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · in the slide</div>
+      <h2 class="title">Click it <em>yourself.</em></h2>
+      <p class="hint">A real page runs in the frame. Click it on stage, or let the room call the clicks.</p>
+    </div>
+    <figure class="embed">
+      <div class="embed-bar"><span class="embed-url">bucket.html</span></div>
+      <div class="embed-view"><iframe class="embed-frame" data-src="assets/sample/bucket.html" title="Token-bucket rate limiter, live"></iframe></div>
+      <figcaption><b>Sample demo</b>runs in the slide</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>10:00–10:40.</b> “Five tokens, one back every second. Send a few… now burst. Two get through; the rest get a 429.”</p>
+    <p class="src">The frame loads <code>data-src</code> when the slide opens and goes back to <code>about:blank</code> when you leave, so its timers and sound stop. To use your own, put one self-contained HTML file in <code>assets/</code> and point <code>data-src</code> and the URL pill at it. Expand fills the slide; Reload starts it fresh. Clicks inside the frame keep the keyboard, so click the slide edge before pressing Space.</p>
+  </aside>
+</section>

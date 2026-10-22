@@ -1,0 +1,28 @@
+.slide--about{padding:0;display:block;overflow:hidden}
+.about-panel{position:relative;z-index:2;height:100%;width:min(56%,860px);padding:6vh 0 8vh 7vw;display:flex;flex-direction:column;justify-content:center}
+.about-logo{--rise:1;width:clamp(56px,5.4vw,84px);height:auto;margin-bottom:2.4vh}
+.about-name{--rise:1;font-family:var(--display);font-size:clamp(2.4rem,4.4vw,4.6rem);font-weight:var(--title-weight);letter-spacing:var(--tight);line-height:.95;margin:1.2vh 0 0}
+.about-name span{color:var(--muted);font-weight:400}
+.about-name b{font-weight:inherit}
+.about-summary{--rise:1;margin:2vh 0 0;max-width:38ch;font-size:clamp(1.1rem,1.6vw,1.7rem);line-height:1.35;color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.about-summary strong{color:var(--ink);font-weight:600}
+.about-links{--rise:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8vw;max-width:min(620px,38vw);margin-top:3.2vh}
+.about-links a{display:grid;gap:4px;padding:1.1vh 1vw;text-decoration:none;background:color-mix(in srgb,var(--bg) 60%,transparent);border:1px solid var(--rule);border-radius:10px;font-size:clamp(.95rem,1.3vw,1.3rem);font-weight:600}
+.about-links a span{color:var(--accent);font:500 .74rem/1 var(--sans)}
+.about-portrait{position:absolute;right:7vw;top:50%;width:36vw;margin:0;transform:translateY(-52%);z-index:1}
+.about-portrait img{display:block;width:100%;height:auto;border-radius:28px;box-shadow:0 40px 90px -40px color-mix(in srgb,var(--a2) calc(var(--shot-glow) * 1.55),transparent),var(--drop)}
+.slide.is-active .about-portrait{animation:portrait-in 1s var(--ease) .15s both}
+@keyframes portrait-in{from{opacity:0;transform:translateY(-48%) scale(.97)}to{opacity:1;transform:translateY(-52%)}}
+.about-pet{left:auto;right:39.5vw;bottom:28vh;--pw:7.5vw;z-index:2}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .about-portrait{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .slide--about{overflow-y:auto}
+  .about-panel{width:92%;padding:7vh 6vw 4vh;height:auto}
+  .about-portrait{position:static;width:auto;transform:none;margin:0 6vw 6vh}
+  .slide.is-active .about-portrait{animation:none}
+  .about-links{grid-template-columns:1fr;max-width:none}
+  .about-pet{display:none}
+}

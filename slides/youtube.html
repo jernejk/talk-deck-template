@@ -1,0 +1,21 @@
+<section class="slide" id="youtube" data-section="Demo" data-title="Show the talk, load it on play">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · YouTube</div>
+      <h2 class="title">Show the talk. <em>Load it on play.</em></h2>
+      <p class="sub">A local poster until you press play, so <strong>nothing loads early</strong>.</p>
+    </div>
+    <figure class="player" data-youtube="aqz-KE-bpKQ" data-start="0">
+      <div class="player-stage">
+        <img class="player-poster" src="assets/sample/video-poster.svg" alt="Drawn poster of a rabbit silhouette in a meadow at sunrise">
+        <p class="player-meta"><b>Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film</b><span>Blender · about 10 min</span><span class="player-note" hidden></span></p>
+        <button type="button" class="player-big" aria-label="Play Big Buck Bunny"></button>
+      </div>
+      <figcaption><b>Sample</b>Big Buck Bunny, CC BY 3.0 © Blender Foundation · drawn poster · <a class="player-link" href="https://www.youtube.com/watch?v=aqz-KE-bpKQ" target="_blank" rel="noopener noreferrer">Open on YouTube</a></figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>6:20–7:10.</b> Press play and let it run for the beat you came for. Leave the slide and it unloads.</p>
+    <p class="src">Set <code>data-youtube</code> to the video id and <code>data-start</code> to the second to begin at. Before you press play the slide makes no request to YouTube. On http(s) the poster becomes a privacy-enhanced embed; opened from disk or offline it opens the watch page in a new tab instead, because YouTube refuses embeds that send no referrer. “Open on YouTube” is always there as a fallback. Credit: Big Buck Bunny, © Blender Foundation, CC BY 3.0 (peach.blender.org).</p>
+  </aside>
+</section>

@@ -1,0 +1,24 @@
+.fan{position:relative;height:64vh}
+.fan .shot{--rise:0;position:absolute;width:58%}
+.fan .shot img{width:100%;max-height:none}
+.fan .f1{left:0;top:7vh;rotate:-5deg;z-index:1}
+.fan .f2{left:21%;top:0;rotate:1.5deg;z-index:2}
+.fan .f3{left:42%;top:11vh;rotate:5deg;z-index:3}
+.slide.is-active .fan .shot{animation:card-in .9s var(--ease) both,float-a 9s ease-in-out infinite}
+.slide.is-active .fan .f1{animation-delay:.3s,1.2s}
+.slide.is-active .fan .f2{animation-delay:.5s,1.4s;animation-name:card-in,float-b}
+.slide.is-active .fan .f3{animation-delay:.7s,1.6s}
+@keyframes card-in{from{opacity:0;transform:translateY(6vh) scale(.94)}to{opacity:1;transform:none}}
+@keyframes float-a{0%,100%{translate:0 0}50%{translate:0 -1.2vh}}
+@keyframes float-b{0%,100%{translate:0 0}50%{translate:0 1.1vh}}
+.fan-cap{position:absolute;left:0;bottom:-3vh;margin:0;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);color:var(--muted)}
+.fan-cap b{color:var(--accent);font-weight:600;margin-right:.6em}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .fan .shot{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .fan{height:auto;display:flex;flex-direction:column;gap:3vh}
+  .fan .shot{position:relative;width:100%;left:auto;top:auto;rotate:none}
+  .fan-cap{position:static}
+}

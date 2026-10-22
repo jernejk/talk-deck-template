@@ -1,0 +1,15 @@
+.log{--rise:1;width:100%;max-width:84vw;margin-top:3vh;border-collapse:separate;border-spacing:0;font-size:clamp(.85rem,1.25vw,1.35rem);line-height:1.35;background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.log th,.log td{padding:1.3vh 1.1vw;text-align:left;vertical-align:top;border-top:1px solid var(--rule)}
+.log thead th{border-top:0;background:var(--panel-2);font:600 clamp(.7rem,.95vw,1rem)/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.log time,.log td:first-child{width:1%;white-space:nowrap;font:500 .95em var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.log code{font:500 .92em var(--mono);color:var(--ink)}
+.log tr[data-step]{transition:opacity .45s var(--ease)}
+.slide .log tr[data-step]:not(.is-shown){transform:none}
+.log .is-bad{background:color-mix(in srgb,var(--bad,#e5484d) 12%,transparent);box-shadow:inset 4px 0 0 var(--bad,#e5484d)}
+.log .is-bad td{border-top-color:color-mix(in srgb,var(--bad,#e5484d) 40%,transparent)}
+.log .is-bad td:first-child{color:var(--bad,#e5484d);font-weight:700}
+.log .is-bad td:last-child{font-weight:600}
+
+@media screen and (max-aspect-ratio:1/1){
+  .log{max-width:none}
+}

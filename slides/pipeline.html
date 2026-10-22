@@ -1,0 +1,14 @@
+<section class="slide" id="pipeline" data-section="How it works" data-title="An order moves through four stages">
+  <div class="eyebrow">Order flow</div>
+  <h2 class="title title--wide">An order moves through <em>four stages</em></h2>
+  <ol class="stages">
+    <li data-step="s1"><i class="pin" aria-hidden="true"></i><strong>Receive</strong><span>Take the message off the queue and find who sent it.</span></li>
+    <li data-step="s2"><i class="pin" aria-hidden="true"></i><strong>Guess</strong><span>Work out which items the message is asking for.</span></li>
+    <li data-step="s3"><i class="pin" aria-hidden="true"></i><strong>Confirm</strong><span>Reply with the order read back, in plain words.</span></li>
+    <li data-step="s4"><i class="pin" aria-hidden="true"></i><strong>Pick</strong><span>Put it on the packing list for the morning.</span></li>
+  </ol>
+  <aside class="notes">
+    <p><b>6:00–7:00.</b> Press Space once per stage and say one sentence for it; the marker moves to the stage you’re on.</p>
+    <p class="src">Stages are numbered by CSS. With <code>data-step</code> the last revealed card is the current one, via <code>:has()</code>. Without steps, add <code>is-current</code> to the card to light.</p>
+  </aside>
+</section>

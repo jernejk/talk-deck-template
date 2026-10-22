@@ -1,0 +1,29 @@
+.shot{--rise:1;margin:0;display:flex;flex-direction:column;align-items:center;min-width:0;min-height:0}
+.shot img{
+  display:block;max-width:100%;max-height:var(--h,64vh);width:auto;height:auto;
+  border-radius:var(--radius);background:var(--shot-bg);border:1px solid var(--shot-border);
+  box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) var(--shot-glow),transparent),var(--drop);
+}
+.shot figcaption{margin-top:1.4vh;max-width:100%;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);color:var(--muted);text-align:center}
+.shot figcaption b{color:var(--accent);font-weight:600;margin-right:.6em}
+.slide.is-active .shot[data-r]{animation-name:shot-in;animation-duration:.9s}
+.card .shot{--h:46vh}
+
+.swap{display:grid;justify-items:center}
+.swap > .shot{grid-area:1/1}
+.swap > [data-step]{transition:opacity .5s var(--ease)}
+.swap > .shot[data-step]:not(.is-shown){transform:none}
+.swap:has(> .shot[data-step].is-shown) > .shot:not([data-step]) figcaption{visibility:hidden}
+
+.inset{position:absolute;right:-1vw;bottom:4vh;width:15vw;rotate:4deg;z-index:3}
+.inset img{width:100%;max-height:none}
+
+.image-zoom{display:block;padding:0;border:0;background:none;color:inherit;cursor:zoom-in;max-width:100%;border-radius:var(--radius);position:relative}
+.image-zoom:focus-visible{outline-offset:4px}
+.image-viewer{width:96vw;max-width:1700px;max-height:96vh;padding:18px 24px}
+.image-viewer img{display:block;max-width:100%;width:auto;height:auto;max-height:80vh;object-fit:contain;margin:12px auto 0;border-radius:10px}
+.image-viewer p{color:var(--muted);text-align:center;font-size:14px;margin:12px 0 0}
+
+@media screen and (max-aspect-ratio:1/1){
+  .inset{position:relative;right:auto;bottom:auto;width:70%;rotate:none}
+}

@@ -1,0 +1,33 @@
+<section class="slide" id="demo-map" data-section="Demo" data-live="Your terminal" data-title="Live demo map">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Live demo · the map</div>
+      <h2 class="title">Five checkpoints. <em>Then I stop.</em></h2>
+      <ol class="facts">
+        <li>Show the failing test</li>
+        <li>Paste the prompt</li>
+        <li>Watch it read the code</li>
+        <li>Check the diff</li>
+        <li>Run the tests again</li>
+      </ol>
+    </div>
+    <figure class="cli">
+      <div class="cli-head"><b>agent</b> ~/projects/pantry</div>
+      <div class="cli-body">
+        <p class="cli-line cli-user">1 · <code>npm test</code></p>
+        <p class="cli-line cli-out">1 failed: low-stock badge missing</p>
+        <p class="cli-line cli-user">2 · Add a low-stock badge under 2 units.</p>
+        <p class="cli-line cli-run">3 · Read <code>src/views/</code></p>
+        <p class="cli-line cli-run">4 · <code>git diff --stat</code></p>
+        <p class="cli-line cli-out">3 files changed</p>
+        <p class="cli-line cli-ok">5 · <code>npm test</code> passes</p>
+      </div>
+      <figcaption><b>Drawn</b>the plan, not a recording</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE → your terminal. Follow the five numbers in order; if a step stalls for 20 s, skip to the screenshot slide and say so.</p>
+    <p><b>8:00–10:00.</b> “Five checkpoints. If any one fails, I stop and show you the backup.”</p>
+    <p class="src">A numbered <code>.facts</code> list beside a drawn <code>.cli</code>. The numbers in the terminal match the list, so the audience can find their place.</p>
+  </aside>
+</section>

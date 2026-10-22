@@ -1,0 +1,10 @@
+.ladder{margin:4vh 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:1.4vw}
+.ladder li{--rise:1;position:relative;padding:2vh 0 2.4vh;border-top:3px solid var(--c);min-height:26vh}
+.ladder b{display:block;font:500 clamp(.74rem,.95vw,1rem)/1 var(--mono);color:var(--c)}
+.ladder strong{display:block;margin-top:1.6vh;font-family:var(--display);font-size:clamp(1.3rem,2.3vw,2.5rem);line-height:1;letter-spacing:-.035em;color:var(--c)}
+.ladder li > span{display:block;margin-top:1.4vh;color:var(--ink);font-size:clamp(.9rem,1.3vw,1.4rem);line-height:1.3}
+.ladder li > .tag{display:inline-block;margin-top:2vh;padding:.45em .7em;border-radius:999px;background:var(--panel-2);font:500 clamp(.66rem,.85vw,.9rem)/1 var(--sans);color:var(--muted)}
+
+@media screen and (max-aspect-ratio:1/1){
+  .ladder{grid-template-columns:1fr 1fr}
+}

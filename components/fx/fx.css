@@ -1,0 +1,11 @@
+.fx{position:absolute;inset:0;overflow:clip;pointer-events:none;z-index:-1}
+.orb{position:absolute;width:var(--size,36vw);aspect-ratio:1;border-radius:50%;filter:blur(60px);opacity:.35;pointer-events:none;background:radial-gradient(circle,var(--c,var(--accent)),transparent 65%);animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.28}50%{transform:scale(1.12);opacity:.42}}
+.sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparks i{position:absolute;bottom:-2vh;left:var(--x);width:var(--z,5px);height:var(--z,5px);border-radius:50%;background:var(--c,var(--ink));opacity:0;box-shadow:0 0 10px var(--c,var(--ink));animation:drift var(--t,11s) linear var(--dl,0s) infinite}
+@keyframes drift{0%{transform:translate(0,0);opacity:0}12%{opacity:.85}80%{opacity:.5}100%{transform:translate(var(--dx,3vw),-96vh);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  .orb{animation:none!important}
+  .sparks{display:none}
+}

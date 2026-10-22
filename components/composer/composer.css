@@ -1,0 +1,24 @@
+.composer{--rise:1;width:100%;max-width:40vw;font-family:var(--ui-font);color:var(--ui-ink)}
+.composer-box{background:var(--ui-bg);border:1px solid var(--ui-border);border-radius:28px;padding:1.6vh 1.2vw 1.3vh;box-shadow:0 24px 60px -24px color-mix(in srgb,var(--accent) calc(var(--shot-glow) * 1.2),transparent),var(--drop)}
+.composer-chips{display:flex;flex-wrap:wrap;gap:.5vw;margin-bottom:1.1vh}
+.composer-chip{display:inline-flex;align-items:center;gap:.4em;padding:.4em .75em;border-radius:999px;background:var(--ui-chip);color:var(--ui-chip-ink);font-size:clamp(.8rem,1.05vw,1.1rem);font-weight:500}
+.composer-chip i{display:inline-grid;place-items:center;width:1.2em;height:1.2em;border-radius:4px;background:var(--ui-ink);color:var(--ui-bg);font:700 .7em/1 var(--sans);font-style:normal}
+.composer-text{min-height:1.4em;font-size:clamp(1.05rem,1.55vw,1.7rem);line-height:1.35}
+.composer-text:empty::before{content:attr(data-ph);color:var(--ui-muted)}
+.composer-bar{display:flex;align-items:center;gap:.8vw;margin-top:1.4vh;color:var(--ui-muted);font-size:clamp(.78rem,1vw,1.05rem)}
+.composer-bar .plus{font-size:1.5em;line-height:1;margin-right:auto}
+.composer-bar .send{display:grid;place-items:center;width:2.2em;height:2.2em;border-radius:50%;background:var(--ui-send);color:var(--ui-send-ink,#fff);font-weight:700}
+.composer:has(.is-typed) .send{animation:send-pulse 1.6s ease-out 1}
+@keyframes send-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ui-send) 60%,transparent)}100%{box-shadow:0 0 0 1.4vw transparent}}
+.composer-label{margin-top:1.3vh;font:500 clamp(.72rem,.92vw,.98rem)/1.3 var(--sans);color:var(--muted);text-align:center}
+.composer-label b{color:var(--accent);font-weight:600;margin-right:.5em}
+.composer-mode{display:flex;width:fit-content;margin:0 auto 1.4vh;padding:.35vh .25vw;border-radius:999px;background:color-mix(in srgb,var(--ui-ink) 8%,var(--ui-bg));font:500 clamp(.78rem,1vw,1.05rem)/1 var(--ui-font);color:var(--ui-muted)}
+.composer-mode span{padding:.9vh 1.4vw;border-radius:999px}
+.composer-mode .on{background:var(--ui-bg);color:var(--ui-ink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+
+@media (prefers-reduced-motion:reduce){
+  .composer:has(.is-typed) .send{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .composer{max-width:none}
+}

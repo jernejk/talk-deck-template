@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+<defs>
+<linearGradient id="room" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17345e"/><stop offset="1" stop-color="#0f2240"/></linearGradient>
+<linearGradient id="window" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f87c9"/><stop offset="1" stop-color="#1d4f86"/></linearGradient>
+<radialGradient id="lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd48a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd48a" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1920" height="1080" fill="url(#room)"/>
+<rect x="1180" y="80" width="520" height="500" rx="18" fill="url(#window)"/>
+<rect x="1180" y="80" width="520" height="500" rx="18" fill="none" stroke="#0b1a30" stroke-width="22"/>
+<path d="M1440 80 V580 M1180 330 H1700" stroke="#0b1a30" stroke-width="16"/>
+<circle cx="1590" cy="250" r="54" fill="#fff3d1" opacity=".9"/>
+<path d="M1200 470 q90 -70 170 -10 q80 60 150 -20 q60 -70 160 10 V 560 H1200z" fill="#163f6e"/>
+<rect x="1100" y="720" width="820" height="24" rx="6" fill="#0b1a30"/>
+<g>
+<rect x="1500" y="620" width="46" height="100" rx="6" fill="#d9472b"/>
+<rect x="1552" y="600" width="36" height="120" rx="6" fill="#f2c94c"/>
+<rect x="1594" y="640" width="54" height="80" rx="6" fill="#2f8f6a"/>
+<rect x="1654" y="610" width="40" height="110" rx="6" fill="#5aa9ff"/>
+<rect x="1700" y="652" width="48" height="68" rx="6" fill="#f3e9d2"/>
+</g>
+<rect x="1240" y="644" width="110" height="76" rx="12" fill="#5b4636"/>
+<g fill="#4f9d5c"><path d="M1295 644 q-70 -90 -20 -170 q40 80 20 170z"/><path d="M1300 644 q20 -110 100 -140 q-20 90 -100 140z"/><path d="M1290 644 q-110 -30 -130 -120 q90 20 130 120z"/></g>
+<circle cx="420" cy="420" r="300" fill="url(#lamp)"/>
+<path d="M330 300 h180 l40 120 h-260z" fill="#f2c94c"/>
+<rect x="414" y="420" width="12" height="320" fill="#0b1a30"/>
+<ellipse cx="420" cy="748" rx="70" ry="14" fill="#0b1a30"/>
+<rect x="0" y="740" width="1920" height="340" fill="#0b1a30"/>
+<rect x="0" y="740" width="1920" height="6" fill="#2a4e7e"/>
+<g fill="none" stroke="#5aa9ff" stroke-width="6" stroke-linecap="round" opacity=".45"><path d="M140 740 V560 l40 -40 M190 740 V600 l50 -50 M90 740 V640"/><circle cx="180" cy="520" r="14"/><circle cx="240" cy="550" r="14"/><circle cx="90" cy="626" r="14"/></g>
+</svg>

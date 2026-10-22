@@ -5,8 +5,18 @@ import UniformTypeIdentifiers
 import Foundation
 
 let args = CommandLine.arguments
+if args.count > 2 && args[1] == "--read" {
+  let ctx = CIContext()
+  let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: ctx, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])!
+  for path in args.dropFirst(2) {
+    let found = CIImage(contentsOf: URL(fileURLWithPath: path)).map { detector.features(in: $0).compactMap { ($0 as? CIQRCodeFeature)?.messageString } } ?? []
+    let data = try! JSONSerialization.data(withJSONObject: ["file": path, "found": found])
+    print(String(data: data, encoding: .utf8)!)
+  }
+  exit(0)
+}
 guard args.count == 3 else {
-  FileHandle.standardError.write("usage: swift tools/qr.swift <url> <out.png>\n".data(using: .utf8)!)
+  FileHandle.standardError.write("usage: swift tools/qr.swift <url> <out.png> | --read <png>...\n".data(using: .utf8)!)
   exit(2)
 }
 let text = args[1], out = args[2]

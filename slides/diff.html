@@ -1,0 +1,56 @@
+<section class="slide" id="diff" data-section="How it works" data-title="The agent changed four lines">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">How it works · the change</div>
+      <h2 class="title">The agent changed <em>four&nbsp;lines.</em></h2>
+      <p class="sub">One guard in <code>reserve()</code>, plus a test. The rest is context you can expand.</p>
+    </div>
+    <figure class="diff">
+      <details class="diff-file" open>
+        <summary><b>src/stock.ts</b><span class="diff-stat"><ins>+3</ins><del>−1</del></span></summary>
+        <div class="diff-hunk">@@ -12,4 +12,6 @@ export function reserve</div>
+        <ol>
+          <li data-o="12" data-n="12"><code><span class="k">export function</span> <span class="f">reserve</span>(stock: Stock, item: <span class="k">string</span>, qty: <span class="k">number</span>) {</code></li>
+          <li data-o="13" data-n="13"><code>  <span class="k">const</span> have = stock[item] ?? <span class="n">0</span></code></li>
+          <li class="del" data-o="14"><code>  <span class="k">return</span> { ...stock, [item]: have - qty }</code></li>
+          <li class="add" data-n="14" data-step="guard"><code>  <span class="k">const</span> left = have - qty</code></li>
+          <li class="add" data-n="15" data-step="guard"><code>  <span class="k">if</span> (left &lt; <span class="n">0</span>) <span class="k">throw new</span> <span class="f">RangeError</span>(<span class="s">`only ${have} ${item} left`</span>)</code></li>
+          <li class="add" data-n="16" data-step="use"><code>  <span class="k">return</span> { ...stock, [item]: left }</code></li>
+          <li data-o="15" data-n="17"><code>}</code></li>
+          <li class="diff-fold">
+            <details>
+              <summary>8 unchanged lines</summary>
+              <ol>
+                <li data-o="16" data-n="18"><code><span class="k">export function</span> <span class="f">release</span>(stock: Stock, item: <span class="k">string</span>, qty: <span class="k">number</span>) {</code></li>
+                <li data-o="17" data-n="19"><code>  <span class="k">const</span> have = stock[item] ?? <span class="n">0</span></code></li>
+                <li data-o="18" data-n="20"><code>  <span class="k">return</span> { ...stock, [item]: have + qty }</code></li>
+                <li data-o="19" data-n="21"><code>}</code></li>
+                <li data-o="20" data-n="22"><code><span class="c">// items the low-stock badge should flag</span></code></li>
+                <li data-o="21" data-n="23"><code><span class="k">export function</span> <span class="f">lowStock</span>(stock: Stock, limit = <span class="n">2</span>) {</code></li>
+                <li data-o="22" data-n="24"><code>  <span class="k">return</span> Object.keys(stock).filter(k =&gt; stock[k] &lt; limit)</code></li>
+                <li data-o="23" data-n="25"><code>}</code></li>
+              </ol>
+            </details>
+          </li>
+        </ol>
+      </details>
+      <details class="diff-file">
+        <summary><b>test/stock.test.ts</b><span class="diff-stat"><ins>+6</ins></span></summary>
+        <div class="diff-hunk">@@ -0,0 +1,6 @@</div>
+        <ol>
+          <li class="add" data-n="1"><code><span class="k">import</span> { reserve } <span class="k">from</span> <span class="s">"../src/stock"</span></code></li>
+          <li class="add" data-n="2"><code><span class="f">describe</span>(<span class="s">"reserve"</span>, () =&gt; {</code></li>
+          <li class="add" data-n="3"><code>  <span class="f">it</span>(<span class="s">"never takes stock below zero"</span>, () =&gt; {</code></li>
+          <li class="add" data-n="4"><code>    <span class="f">expect</span>(() =&gt; reserve({ rice: <span class="n">2</span> }, <span class="s">"rice"</span>, <span class="n">3</span>)).<span class="f">toThrow</span>(RangeError)</code></li>
+          <li class="add" data-n="5"><code>  })</code></li>
+          <li class="add" data-n="6"><code>})</code></li>
+        </ol>
+      </details>
+      <figcaption><b>Drawn</b>from the real PR, trimmed</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>2:20–3:00.</b> “That’s the whole change.” Press Space to add the guard, then the line that uses it. Click “8 unchanged lines” only if someone asks what’s around it.</p>
+    <p class="src">Drawn from a real PR and trimmed. Each line is <code>li.add</code>, <code>li.del</code> or plain context, with <code>data-o</code> and <code>data-n</code> for the old and new line numbers; give added lines <code>data-step</code> to reveal them on Space. A <code>li.diff-fold</code> holds a nested <code>details</code> of unchanged lines, and a second <code>details.diff-file</code> without <code>open</code> starts collapsed.</p>
+  </aside>
+</section>

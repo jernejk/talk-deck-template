@@ -1,0 +1,254 @@
+[
+  {
+    "name": "cover",
+    "summary": "Title, event and speaker, with the mascot cluster"
+  },
+  {
+    "name": "cover-image",
+    "summary": "Title beside the framed thing you made"
+  },
+  {
+    "name": "cover-photo",
+    "summary": "Full-bleed photo, title on a scrim, links"
+  },
+  {
+    "name": "cover-center",
+    "summary": "One centred statement"
+  },
+  {
+    "name": "cover-split",
+    "summary": "A coloured title panel beside an “In this talk” agenda"
+  },
+  {
+    "name": "title-styles",
+    "summary": "Kicker, numeral and stacked lines on one title"
+  },
+  {
+    "name": "speaker",
+    "summary": "Who you are: portrait, logo, a one-line summary and links"
+  },
+  {
+    "name": "speaker-card",
+    "summary": "Circle portrait, badge, topic coins and a current-focus card"
+  },
+  {
+    "name": "speaker-banner",
+    "summary": "Wide image fading into your details"
+  },
+  {
+    "name": "speaker-facts",
+    "summary": "Portrait and three fact bubbles revealed on Space"
+  },
+  {
+    "name": "speakers",
+    "summary": "Two or three co-presenters as cards"
+  },
+  {
+    "name": "agenda",
+    "summary": "Three numbered parts with their clock times"
+  },
+  {
+    "name": "agenda-list",
+    "summary": "The numbered-parts agenda, filled from the deck’s sections"
+  },
+  {
+    "name": "agenda-schedule",
+    "summary": "The day as time blocks, with the current block lit"
+  },
+  {
+    "name": "chapter",
+    "summary": "A part divider with a huge outlined number"
+  },
+  {
+    "name": "chapter-agenda",
+    "summary": "Up next: a part divider with the code path and the agenda sidebar"
+  },
+  {
+    "name": "statement",
+    "summary": "One big idea, with a line held back for Space"
+  },
+  {
+    "name": "pets",
+    "summary": "The pet’s four poses, each with the line it might say"
+  },
+  {
+    "name": "photo",
+    "summary": "A full-bleed image with the title on a scrim"
+  },
+  {
+    "name": "opener",
+    "summary": "Messy input on a tilted card, with a sticker reveal"
+  },
+  {
+    "name": "question",
+    "summary": "The exact question, and the real answer as a screenshot"
+  },
+  {
+    "name": "prompt",
+    "summary": "A drawn source card flowing into a prompt that types itself"
+  },
+  {
+    "name": "cli-run",
+    "summary": "A drawn terminal session whose lines stream in"
+  },
+  {
+    "name": "demo-map",
+    "summary": "Numbered live-demo checkpoints beside a drawn terminal"
+  },
+  {
+    "name": "try-it",
+    "summary": "A live HTML demo in a browser frame that you can use during the talk"
+  },
+  {
+    "name": "live-demo",
+    "summary": "A screenshot that goes live on L, with a 20-second cap"
+  },
+  {
+    "name": "before-after",
+    "summary": "Two screenshots swapped by one step"
+  },
+  {
+    "name": "zoom",
+    "summary": "One screenshot, zoomed to two regions on Space"
+  },
+  {
+    "name": "video",
+    "summary": "A muted screen recording that plays when the slide opens"
+  },
+  {
+    "name": "player",
+    "summary": "A clip with sound and controls, trimmed to the part you need"
+  },
+  {
+    "name": "youtube",
+    "summary": "A YouTube video behind a local poster, loaded only when you press play"
+  },
+  {
+    "name": "versus",
+    "summary": "A weak and a useful prompt side by side, with a verdict line"
+  },
+  {
+    "name": "pipeline",
+    "summary": "Stage cards with a marker that moves to the current stage"
+  },
+  {
+    "name": "agents",
+    "summary": "Agents working one task, their states and pets changing on Space"
+  },
+  {
+    "name": "get-the-code",
+    "summary": "A mid-talk QR to the repo, with the path and steps"
+  },
+  {
+    "name": "exercise",
+    "summary": "A workshop task with a countdown timer"
+  },
+  {
+    "name": "rule",
+    "summary": "A table whose columns reveal one step at a time"
+  },
+  {
+    "name": "at-a-glance",
+    "summary": "KPI cards that build up one at a time, with a note"
+  },
+  {
+    "name": "numbers",
+    "summary": "Count-up stats next to a phone capture"
+  },
+  {
+    "name": "poll",
+    "summary": "Poll results as big percentages, with who answered"
+  },
+  {
+    "name": "quote",
+    "summary": "A real quote, with the chat that followed"
+  },
+  {
+    "name": "transcript",
+    "summary": "A voice-note transcript with its mistakes annotated"
+  },
+  {
+    "name": "findings",
+    "summary": "Review findings with coloured severity dots, building up"
+  },
+  {
+    "name": "log-trace",
+    "summary": "An event log whose bad row is highlighted"
+  },
+  {
+    "name": "matrix",
+    "summary": "A feature matrix with yes, no and partial cells"
+  },
+  {
+    "name": "milestones",
+    "summary": "A horizontal timeline whose dots reveal one by one"
+  },
+  {
+    "name": "how-its-made",
+    "summary": "Numbered steps beside a fan of screenshots"
+  },
+  {
+    "name": "code",
+    "summary": "A code card with the line that matters highlighted"
+  },
+  {
+    "name": "diff",
+    "summary": "What changed: added and removed lines, with the context folded"
+  },
+  {
+    "name": "fold",
+    "summary": "Long output folded away, opened on Space"
+  },
+  {
+    "name": "long-page",
+    "summary": "A tall capture that scrolls itself, with its source inset"
+  },
+  {
+    "name": "photo-strip",
+    "summary": "Four photos with captions and a metric row"
+  },
+  {
+    "name": "iterations",
+    "summary": "Rounds of an attempt as images with counts"
+  },
+  {
+    "name": "options",
+    "summary": "Two side-by-side cards for the next step up"
+  },
+  {
+    "name": "takeaways",
+    "summary": "The recipe: five coloured rows people photograph"
+  },
+  {
+    "name": "questions",
+    "summary": "A prompt question, a QR to the slides and links"
+  },
+  {
+    "name": "follow-up",
+    "summary": "Project cards with a stat, a QR and a handle line"
+  },
+  {
+    "name": "close",
+    "summary": "The key line, links and a QR code to the slides"
+  },
+  {
+    "name": "x-timeline",
+    "summary": "Extra: the build log as a timeline"
+  },
+  {
+    "name": "x-compare",
+    "summary": "Extra: a comparison table"
+  },
+  {
+    "name": "x-ladder",
+    "summary": "Extra: four approaches as a ladder"
+  },
+  {
+    "name": "x-limits",
+    "summary": "Extra: honest limits, with the fallback screenshot"
+  },
+  {
+    "name": "x-cost",
+    "summary": "Extra: what it cost, as counters"
+  }
+]

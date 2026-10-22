@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1f4b"/><stop offset="1" stop-color="#3a2a6e"/></linearGradient>
+<linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e3f7a"/><stop offset="1" stop-color="#101a3a"/></linearGradient>
+</defs>
+<rect width="900" height="1200" fill="#f3e9d2"/>
+<rect x="60" y="60" width="780" height="1080" fill="url(#sky)"/>
+<circle cx="450" cy="420" r="230" fill="#f2b44c"/>
+<circle cx="450" cy="420" r="170" fill="#ef7d4a"/>
+<circle cx="450" cy="420" r="105" fill="#f3e9d2"/>
+<g fill="#1b1f4b" opacity=".9">
+<rect x="60" y="560" width="780" height="26"/>
+<rect x="60" y="620" width="780" height="14"/>
+<rect x="60" y="668" width="780" height="8"/>
+</g>
+<path d="M60 760 C 200 700 320 820 450 760 S 700 700 840 760 V1140 H60Z" fill="url(#sea)"/>
+<path d="M60 820 C 220 770 330 870 450 820 S 680 770 840 820" fill="none" stroke="#5ab0ff" stroke-width="7" opacity=".6"/>
+<path d="M60 900 C 220 850 330 950 450 900 S 680 850 840 900" fill="none" stroke="#5ab0ff" stroke-width="5" opacity=".35"/>
+<g fill="#f3e9d2">
+<path d="M250 760 l60 -120 60 120z" opacity=".95"/>
+<path d="M560 760 l50 -90 50 90z" opacity=".8"/>
+</g>
+<path d="M310 640 l-18 120 h36z" fill="#ef7d4a"/>
+<g fill="#f3e9d2" opacity=".85">
+<circle cx="180" cy="180" r="5"/><circle cx="260" cy="130" r="3"/><circle cx="720" cy="150" r="4"/><circle cx="650" cy="230" r="3"/><circle cx="130" cy="300" r="3"/><circle cx="780" cy="330" r="5"/>
+</g>
+<rect x="60" y="960" width="780" height="180" fill="#f3e9d2"/>
+<rect x="110" y="1004" width="300" height="22" rx="4" fill="#1b1f4b"/>
+<rect x="110" y="1046" width="190" height="12" rx="3" fill="#1b1f4b" opacity=".55"/>
+<rect x="110" y="1072" width="240" height="12" rx="3" fill="#1b1f4b" opacity=".55"/>
+<circle cx="760" cy="1050" r="40" fill="#ef7d4a"/>
+<circle cx="760" cy="1050" r="18" fill="#f3e9d2"/>
+</svg>

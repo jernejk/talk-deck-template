@@ -1,0 +1,3 @@
+.timeline{--rise:1;margin:3vh 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(var(--rows,6),auto);grid-auto-flow:column;gap:.9vh 3vw;max-width:84vw}
+.timeline li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:1vw;padding:1vh 0;border-top:1px solid var(--rule);font-size:clamp(.8rem,1.12vw,1.22rem);line-height:1.35}
+.timeline time{font:500 .95em/1.4 var(--mono);color:var(--accent)}

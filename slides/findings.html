@@ -1,0 +1,14 @@
+<section class="slide" id="findings" data-section="Push for more" data-title="What the review found">
+  <div class="eyebrow">Review · four findings</div>
+  <h2 class="title title--wide">The review found <em>one real problem</em></h2>
+  <ul class="findings">
+    <li class="is-high" data-step="f1"><strong><span class="sev">High</span>Out-of-stock items can still be ordered</strong><span>The check runs after the order is saved, so the stock count can go negative.</span></li>
+    <li class="is-med" data-step="f2"><strong><span class="sev">Med</span>Two orders can claim the last item</strong><span>No lock around the stock update; rare, but possible.</span></li>
+    <li class="is-low" data-step="f3"><strong><span class="sev">Low</span>Badge colour is hard to read on white</strong><span>Contrast is under the recommended ratio.</span></li>
+    <li class="is-ok" data-step="f4"><strong><span class="sev">OK</span>Tests cover the new path</strong><span>Four new tests, all deterministic.</span></li>
+  </ul>
+  <aside class="notes">
+    <p><b>10:00–11:00.</b> One finding per Space, worst first. Say what you checked before believing each one.</p>
+    <p class="src">Each <code>li</code> takes a severity class (<code>is-high</code>, <code>is-med</code>, <code>is-low</code>, <code>is-ok</code>) that colours the dot and rule. The <code>.sev</code> word keeps it readable without colour.</p>
+  </aside>
+</section>

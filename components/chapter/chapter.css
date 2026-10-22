@@ -1,0 +1,8 @@
+.chapter{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:4vw}
+.chapter-num{--rise:1;font:var(--title-weight) clamp(8rem,26vw,28rem)/.8 var(--display);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:max(2px,.25vw) var(--accent);font-variant-numeric:tabular-nums}
+.chapter .title{max-width:14ch}
+
+@media screen and (max-aspect-ratio:1/1){
+  .chapter{grid-template-columns:1fr;gap:2vh}
+  .chapter-num{font-size:40vw}
+}

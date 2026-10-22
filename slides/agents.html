@@ -1,0 +1,59 @@
+<section class="slide" id="agents" data-section="How it works" data-title="Four agents, one pull request">
+  <div class="eyebrow">How it works · the agents</div>
+  <h2 class="title title--wide">Four agents. <em>One pull request.</em></h2>
+  <ol class="agents">
+    <li class="agent" style="--accent:var(--a1)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Planner</strong><span class="agent-model">big model</span></div>
+      </div>
+      <p class="agent-task">Turns the issue into a plan.</p>
+      <ol class="agent-log">
+        <li data-state="thinking">Reading the issue</li>
+        <li data-state="done" data-step="s1">Plan: 3 tasks, 12 tests</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a2)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Builder</strong><span class="agent-model">fast model</span></div>
+      </div>
+      <p class="agent-task">Writes the change.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for the plan</li>
+        <li data-state="coding" data-step="s1">Writing the date parser</li>
+        <li data-state="thinking" data-step="s2">Reading the failure</li>
+        <li data-state="done" data-step="s3">Fix pushed: time zones</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a3)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Tester</strong><span class="agent-model">small model</span></div>
+      </div>
+      <p class="agent-task">Writes and runs the tests.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for the plan</li>
+        <li data-state="coding" data-step="s1">Writing 12 tests</li>
+        <li data-state="blocked" data-step="s2">1 of 12 fails: time zones</li>
+        <li data-state="done" data-step="s3">12 of 12 pass</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a5)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Reviewer</strong><span class="agent-model">other lab</span></div>
+      </div>
+      <p class="agent-task">Reads the diff cold.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for green tests</li>
+        <li data-state="thinking" data-step="s3">Reading the diff</li>
+        <li data-state="done" data-step="s4">Approved, one nit</li>
+      </ol>
+    </li>
+  </ol>
+  <aside class="notes">
+    <p><b>7:00–8:00.</b> One task, four agents. Space moves the story on: the plan, building and testing side by side, a failing test and its fix, then the review.</p>
+    <p class="src">Drawn: no agents ran. <code>ol.agents &gt; li.agent</code>, coloured with <code>--accent</code>, holds <code>.agent-head</code> (<code>.agent-avatar &gt; i.pet</code>, <code>.agent-name</code>, <code>.agent-model</code>), <code>p.agent-task</code> and <code>ol.agent-log &gt; li[data-state]</code>: queued, thinking, coding, blocked or done. Lines that share a <code>data-step</code> name reveal together. The script sets each card’s state chip and pet pose from its last visible line; <code>data-pose</code> on a line overrides the pose.</p>
+  </aside>
+</section>

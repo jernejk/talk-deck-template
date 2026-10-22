@@ -1,0 +1,17 @@
+<section class="slide" id="log-trace" data-section="How it works" data-title="One order, traced">
+  <div class="eyebrow">Event log · order 1042</div>
+  <h2 class="title title--wide">The order was paid. <em>The stock never moved.</em></h2>
+  <table class="log">
+    <thead><tr><th scope="col">Time (UTC)</th><th scope="col">What happened</th></tr></thead>
+    <tbody>
+      <tr data-step><td>09:14:02.10</td><td>Order <code>1042</code> placed for 3 items</td></tr>
+      <tr data-step><td>09:14:02.35</td><td>Payment accepted</td></tr>
+      <tr data-step class="is-bad"><td>09:14:02.41</td><td>Stock update dropped: queue full</td></tr>
+      <tr data-step><td>09:14:02.90</td><td>Confirmation sent anyway</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p><b>11:00–12:00.</b> Walk the rows in order. When the red row arrives, stop talking for a beat.</p>
+    <p class="src">A plain table of timestamps and events. Add <code>is-bad</code> to the row where it went wrong; rows can be <code>data-step</code>s so the story builds. Trim real logs and hide IDs.</p>
+  </aside>
+</section>

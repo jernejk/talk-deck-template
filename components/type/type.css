@@ -1,0 +1,2 @@
+[data-type].is-typing::after{content:"";display:inline-block;width:2px;height:1.1em;margin-left:2px;vertical-align:-.15em;background:currentColor;animation:type-caret 1s steps(1) infinite}
+@keyframes type-caret{50%{opacity:0}}

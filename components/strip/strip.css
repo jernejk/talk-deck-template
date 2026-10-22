@@ -1,0 +1,15 @@
+.strip{--rise:1;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:1.2vw;margin:4vh 0 0;padding:0;max-width:86vw}
+.strip figure{position:relative;margin:0;min-width:0}
+.strip img{display:block;width:100%;height:var(--h,34vh);object-fit:cover;border-radius:var(--radius);background:var(--shot-bg);border:1px solid var(--shot-border);box-shadow:0 24px 60px -30px color-mix(in srgb,var(--accent) var(--shot-glow),transparent),var(--drop)}
+.strip figcaption{margin-top:1.1vh;font:500 clamp(.74rem,.98vw,1.05rem)/1.3 var(--sans);color:var(--muted)}
+.strip figcaption b{display:block;margin-bottom:.25em;font:500 .86em/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.strip-badge{position:absolute;left:.7vw;top:.7vw;padding:.4em .7em;border-radius:999px;background:var(--accent);color:var(--on-accent);font:700 clamp(.68rem,.85vw,.92rem)/1 var(--sans)}
+.strip-metrics{--rise:1;display:flex;flex-wrap:wrap;gap:1.4vh 3vw;margin-top:3.4vh;padding-top:1.8vh;border-top:2px solid var(--accent);max-width:86vw}
+.strip-metrics div{min-width:7em}
+.strip-metrics b{display:block;font:var(--title-weight) clamp(1.7rem,3vw,3.4rem)/1 var(--display);letter-spacing:-.04em;color:var(--accent);font-variant-numeric:tabular-nums}
+.strip-metrics span{display:block;margin-top:.6vh;font-size:clamp(.8rem,1.08vw,1.15rem);color:var(--muted)}
+
+@media screen and (max-aspect-ratio:1/1){
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:2vh 3vw;max-width:none}
+  .strip img{height:22vh}
+}

@@ -1,0 +1,13 @@
+.ledger{--rise:1;margin-top:4vh;display:grid;grid-template-columns:auto repeat(var(--cols,3),minmax(0,1fr));border-radius:16px;overflow:hidden;border:1px solid var(--rule);background:var(--panel);max-width:74vw}
+.ledger > *{padding:2vh 1.8vw;border-top:1px solid var(--rule);font-size:clamp(1.1rem,2vw,2.2rem);display:flex;align-items:center}
+.ledger .h{border-top:0;background:var(--panel-2);font:600 clamp(.78rem,1vw,1.05rem)/1.2 var(--sans);color:var(--muted)}
+.ledger .item{font-weight:600}
+.ledger .num{white-space:nowrap;font:700 clamp(1.3rem,2.4vw,2.7rem)/1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ledger .is-hot{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.ledger .is-hot.num,.ledger .h.is-hot{color:var(--accent)}
+.ledger [data-step]{transition:opacity .45s var(--ease)}
+.ledger [data-step]:not(.is-shown){transform:none}
+
+@media screen and (max-aspect-ratio:1/1){
+  .ledger{max-width:none}
+}

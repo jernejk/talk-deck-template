@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Token bucket</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  --ink:#16181d;--muted:#5d6470;--rule:#e3e6eb;--panel:#f6f7f9;--ok:#13804b;--ok-bg:#e3f5ea;--bad:#c4321f;--bad-bg:#fde8e4;--blue:#2457d6;
+  display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1.38fr);grid-template-rows:auto minmax(0,1fr);gap:3.2vmin 5vmin;
+  padding:4.5vmin 5vmin;background:#fff;color:var(--ink);
+  font:400 max(12px,3.3vmin)/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;
+}
+header{grid-column:1/-1;display:flex;align-items:baseline;gap:1em;flex-wrap:wrap}
+h1{margin:0;font-size:1.6em;letter-spacing:-.02em;line-height:1.1}
+header p{margin:0;color:var(--muted)}
+.bucket{display:flex;flex-direction:column;gap:2.4vmin;min-height:0}
+.tank{flex:1;min-height:0;display:flex;flex-direction:column-reverse;align-items:center;gap:1.4vmin;padding:2.2vmin;border:.5vmin solid var(--ink);border-top:0;border-radius:0 0 3vmin 3vmin;background:var(--panel)}
+.token{flex:0 1 auto;height:9vmin;min-height:0;aspect-ratio:1;border-radius:50%;border:.4vmin solid var(--rule);background:#fff;position:relative;overflow:hidden}
+.token i{position:absolute;inset:0;background:var(--blue);transform-origin:bottom;transform:scaleY(var(--f,0));transition:transform .18s ease-out}
+.token.full{border-color:var(--blue)}
+.token.full i{transition:transform .25s cubic-bezier(.2,.9,.3,1.3)}
+.level{display:flex;justify-content:space-between;align-items:baseline;color:var(--muted)}
+.level b{font-size:1.5em;color:var(--ink);font-variant-numeric:tabular-nums}
+.side{display:flex;flex-direction:column;gap:2.6vmin;min-height:0}
+.actions{display:flex;gap:2vmin;flex-wrap:wrap}
+button{font:inherit;font-weight:600;padding:.6em 1.1em;border-radius:.6em;border:.3vmin solid var(--blue);background:var(--blue);color:#fff;cursor:pointer}
+button.alt{background:#fff;color:var(--blue)}
+button:active{transform:translateY(1px)}
+button:focus-visible{outline:.5vmin solid var(--ink);outline-offset:.4vmin}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:2vmin}
+.counts div{padding:1.4vmin 2vmin;border-radius:1.4vmin;background:var(--ok-bg)}
+.counts div + div{background:var(--bad-bg)}
+.counts b{display:block;font-size:1.6em;line-height:1.1;font-variant-numeric:tabular-nums}
+.counts span{color:var(--muted);font-size:.85em}
+.log{list-style:none;margin:0;padding:0;min-height:0;overflow:hidden;font-size:.85em}
+.log li{display:grid;grid-template-columns:3em auto 1fr;gap:1em;align-items:center;padding:.45em 0;border-top:1px solid var(--rule);font-variant-numeric:tabular-nums;animation:in .25s ease-out}
+.log .n{color:var(--muted)}
+.log .s{font-weight:600;padding:.15em .55em;border-radius:.4em;white-space:nowrap}
+.log .ok .s{color:var(--ok);background:var(--ok-bg)}
+.log .no .s{color:var(--bad);background:var(--bad-bg)}
+.log .t{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log .empty{display:block;color:var(--muted)}
+@keyframes in{from{opacity:0;transform:translateY(-.4em)}}
+@media (prefers-reduced-motion:reduce){
+  .token i,.token.full i{transition:none}
+  .log li{animation:none}
+}
+@media (max-aspect-ratio:1/1){
+  body{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr)}
+  .tank{flex-direction:row;flex:none;border:.5vmin solid var(--ink);border-left:0;border-radius:0 3vmin 3vmin 0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Token bucket</h1>
+  <p>Capacity 5 · refills 1 token a second</p>
+</header>
+<section class="bucket" aria-label="Bucket">
+  <div class="tank" id="tank" role="img" aria-label="5 of 5 tokens"></div>
+  <div class="level"><span>Tokens</span><b id="level">5.0 / 5</b></div>
+</section>
+<section class="side">
+  <div class="actions">
+    <button type="button" id="send">Send request</button>
+    <button type="button" id="burst" class="alt">Burst ×5</button>
+  </div>
+  <div class="counts" aria-live="polite">
+    <div><b id="ok">0</b><span>200 OK</span></div>
+    <div><b id="no">0</b><span>429 rejected</span></div>
+  </div>
+  <ol class="log" id="log" aria-label="Last requests"><li class="empty">No requests yet. Send one.</li></ol>
+</section>
+<script>
+class TokenBucket {
+  constructor(capacity, perSecond, now) {
+    this.capacity = capacity;
+    this.perSecond = perSecond;
+    this.tokens = capacity;
+    this.at = now;
+  }
+  level(now) {
+    return Math.min(this.capacity, this.tokens + (now - this.at) / 1000 * this.perSecond);
+  }
+  take(now) {
+    this.tokens = this.level(now);
+    this.at = now;
+    if (this.tokens < 1) return { ok: false, retryAfter: (1 - this.tokens) / this.perSecond };
+    this.tokens -= 1;
+    return { ok: true };
+  }
+}
+
+const CAPACITY = 5, KEEP = 5;
+const started = performance.now();
+const bucket = new TokenBucket(CAPACITY, 1, started);
+const $ = id => document.getElementById(id);
+const tokens = Array.from({ length: CAPACITY }, () => {
+  const t = document.createElement("div");
+  t.className = "token";
+  t.append(document.createElement("i"));
+  $("tank").append(t);
+  return t;
+});
+let sent = 0, accepted = 0, rejected = 0;
+
+function handle() {
+  const now = performance.now();
+  const r = bucket.take(now);
+  sent++;
+  r.ok ? accepted++ : rejected++;
+  const li = document.createElement("li");
+  li.className = r.ok ? "ok" : "no";
+  li.innerHTML = `<span class="n"></span><span class="s"></span><span class="t"></span>`;
+  li.querySelector(".n").textContent = `#${sent}`;
+  li.querySelector(".s").textContent = r.ok ? "200 OK" : "429 Too Many Requests";
+  li.querySelector(".t").textContent = r.ok ? `t = ${((now - started) / 1000).toFixed(1)} s` : `retry in ${r.retryAfter.toFixed(1)} s`;
+  const log = $("log");
+  log.querySelector(".empty")?.remove();
+  log.prepend(li);
+  while (log.children.length > KEEP) log.lastElementChild.remove();
+  $("ok").textContent = accepted;
+  $("no").textContent = rejected;
+  render();
+}
+
+function render() {
+  const level = bucket.level(performance.now());
+  tokens.forEach((t, i) => {
+    const f = Math.max(0, Math.min(1, level - i));
+    t.style.setProperty("--f", f.toFixed(3));
+    t.classList.toggle("full", f >= 1);
+  });
+  $("level").textContent = `${level.toFixed(1)} / ${CAPACITY}`;
+  $("tank").setAttribute("aria-label", `${Math.floor(level)} of ${CAPACITY} tokens`);
+}
+
+$("send").addEventListener("click", handle);
+$("burst").addEventListener("click", () => { for (let i = 0; i < 5; i++) handle(); });
+setInterval(render, 100);
+render();
+</script>
+</body>
+</html>

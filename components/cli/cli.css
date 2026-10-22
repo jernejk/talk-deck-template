@@ -1,0 +1,29 @@
+.cli{--rise:1;--cli-accent:var(--accent);margin:0;width:100%;max-width:var(--w,44vw);border-radius:var(--cli-radius,14px);overflow:hidden;background:var(--cli-bg,#0b0d10);color:var(--cli-ink,#e8eaed);border:1px solid var(--cli-border,#2a2d33);font:500 clamp(.85rem,1.22vw,1.32rem)/1.5 var(--mono);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) var(--shot-glow),transparent),var(--drop)}
+.cli-head{display:flex;align-items:center;gap:.8em;padding:1vh 1vw;border-bottom:1px solid var(--cli-border,#2a2d33);color:var(--cli-muted,#8b9099);font-size:.86em}
+.cli-head::before{content:"";width:.7em;height:.7em;border-radius:50%;background:#ff5f57;box-shadow:1.1em 0 0 #febc2e,2.2em 0 0 #28c840;margin-right:2.6em}
+.cli-head b{color:var(--cli-ink,#e8eaed);font-weight:600}
+.cli-body{padding:1.6vh 1.2vw 1.8vh}
+.cli-line{margin:0;padding:.15vh 0 .15vh 1.6em;text-indent:-1.6em;white-space:pre-wrap}
+.cli-line::before{display:inline-block;width:1.6em;text-indent:0;color:var(--cli-muted,#8b9099)}
+.cli-user{margin-bottom:.8vh;color:var(--cli-ink,#e8eaed);font-weight:600}
+.cli-user::before{content:"›";color:var(--cli-accent)}
+.cli-run::before{content:"•";color:var(--cli-accent)}
+.cli-out{color:var(--cli-muted,#8b9099)}
+.cli-out::before{content:"└"}
+.cli-ok::before{content:"✓";color:var(--ok)}
+.cli-meta{margin-top:.8vh;color:var(--cli-muted,#8b9099);font-size:.88em}
+.cli-meta::before{content:"—"}
+.cli-line code{font:inherit;color:var(--cli-accent)}
+.cli-line ins{text-decoration:none;color:var(--ok)}
+.cli-line del{text-decoration:none;color:var(--cli-bad,#ff6a4d)}
+.cli figcaption{padding:1vh 1vw;border-top:1px solid var(--cli-border,#2a2d33);font:500 clamp(.72rem,.92vw,.98rem)/1.3 var(--sans);color:var(--cli-muted,#8b9099)}
+.cli figcaption b{color:var(--cli-accent);font-weight:600;margin-right:.6em}
+.slide.is-active .cli-line{animation:cli-in .35s var(--ease) both;animation-delay:calc(var(--li,0) * 420ms + 500ms)}
+@keyframes cli-in{from{opacity:0;transform:translateY(.6vh)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .cli-line{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .cli{max-width:none}
+}

@@ -1,0 +1,46 @@
+<section class="slide" id="fold" data-section="How it works" data-title="Keep the log, fold it">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it works · the run, folded</div>
+      <h2 class="title">Keep the log. <em>Fold&nbsp;it.</em></h2>
+      <p class="sub">The full output stays one click away. Open only the part you’re talking about.</p>
+    </div>
+    <div class="folds">
+      <details class="fold" open>
+        <summary><b>The plan</b><span>4 steps</span></summary>
+        <div class="fold-body is-prose">
+          <ol>
+            <li>Read <code>src/stock.ts</code> and its tests</li>
+            <li>Reject negative quantities in <code>reserve()</code></li>
+            <li>Add a test for the empty-shelf case</li>
+            <li>Run <code>npm test</code> and report</li>
+          </ol>
+        </div>
+      </details>
+      <details class="fold">
+        <summary><b>Test output</b><span>212 lines · 3.1 s</span></summary>
+        <div class="fold-body" data-step>
+          <p>$ npm test</p>
+          <p class="is-dim">… 204 passing lines folded</p>
+          <p class="is-bad">✗ reserve › never takes stock below zero</p>
+          <p class="is-bad">    expected 0, received -2</p>
+          <p class="is-bad">✗ reserve › refuses a negative quantity</p>
+          <p>Fixed in <b>src/stock.ts</b>, ran again</p>
+          <p class="is-ok">✓ 17 passed, 0 failed (3.1 s)</p>
+        </div>
+      </details>
+      <details class="fold">
+        <summary><b>Diff summary</b><span>2 files · +9 −1</span></summary>
+        <div class="fold-body">
+          <p><b>src/stock.ts</b>  <ins>+3</ins> <del>−1</del></p>
+          <p><b>test/stock.test.ts</b>  <ins>+6</ins> (new)</p>
+        </div>
+      </details>
+      <p class="fold-cap"><b>Drawn</b>from one agent run, trimmed</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>2:00–2:20.</b> “The agent logs everything. I keep all of it and show you almost none of it.” Press Space: the test output opens on the failing lines and ends on the green summary.</p>
+    <p class="src">Drawn from one agent run, trimmed. Each <code>details.fold</code> is a title, a meta label and a scrolling body. A <code>data-step</code> inside a fold opens it on Space and closes it when you go back; folds without one open on click. Add <code>is-prose</code> to the body for plain text, and <code>is-ok</code>, <code>is-bad</code> and <code>is-dim</code> to log lines.</p>
+  </aside>
+</section>

@@ -1,0 +1,15 @@
+.matrix{--rise:1;font-size:clamp(.95rem,1.5vw,1.7rem);--yes:var(--ok);--no:var(--bad,#e5484d);--part:var(--a6)}
+.matrix thead th:not(:first-child),.matrix td{text-align:center;vertical-align:middle}
+.matrix td,.matrix th{padding-top:1.8vh;padding-bottom:1.8vh}
+.matrix .yes,.matrix .no,.matrix .part{white-space:nowrap;font-weight:600}
+.matrix .yes::before,.matrix .no::before,.matrix .part::before{display:inline-block;width:1.5em;height:1.5em;margin-right:.35em;border-radius:50%;line-height:1.5em;text-align:center;font:700 .85em/1.75em var(--sans)}
+.matrix .yes{color:var(--yes)}
+.matrix .yes::before{content:"✓";background:color-mix(in srgb,var(--yes) 16%,transparent)}
+.matrix .no{color:var(--no)}
+.matrix .no::before{content:"✕";background:color-mix(in srgb,var(--no) 16%,transparent)}
+.matrix .part{color:var(--part)}
+.matrix .part::before{content:"◐";background:color-mix(in srgb,var(--part) 16%,transparent)}
+.matrix .yes small,.matrix .no small,.matrix .part small{font:400 .82em var(--sans);color:var(--muted)}
+.matrix .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.matrix td{position:relative}
+.matrix tbody th{width:24%}

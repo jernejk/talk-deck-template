@@ -1,0 +1,15 @@
+.title.title--stack > span,.title.title--stack > em{display:block;width:fit-content}
+.title.title--center > span,.title.title--center > em{margin-inline:auto}
+.title.title--xl{font-size:clamp(3rem,7.6vw,8.6rem);max-width:none;line-height:.92}
+.title.title--center{text-align:center;margin-inline:auto;text-wrap:balance}
+.title.title--kicker > small{display:block;margin-bottom:.45em;font:600 clamp(.95rem,1.35vw,1.45rem)/1.2 var(--sans);letter-spacing:0;color:var(--accent)}
+.title.title--number{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.25em}
+.title.title--number > b{grid-column:1;grid-row:1/span 6;align-self:start;font-size:2.1em;line-height:.8;font-weight:inherit;color:transparent;-webkit-text-stroke:max(2px,.18vw) var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.title.title--number > :not(b){grid-column:2}
+.title.title--number > small{grid-row:1}
+
+@media screen and (max-aspect-ratio:1/1){
+  .title.title--xl{font-size:clamp(2.4rem,11vw,5rem)}
+  .title.title--number{display:block}
+  .title.title--number > b{display:block;margin-bottom:.1em}
+}

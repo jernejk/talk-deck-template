@@ -1,0 +1,8 @@
+.quote{
+  --rise:1;margin:3vh 0 0;padding:.3vh 0 .3vh 1.3vw;border-left:3px solid var(--accent);max-width:34ch;
+  font-size:clamp(1.25rem,2.1vw,2.3rem);line-height:1.22;font-weight:600;letter-spacing:-.02em;
+}
+.quote p{margin:0}
+.quote b{color:var(--accent)}
+.quote cite{display:block;margin-top:1.2vh;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);font-style:normal;color:var(--muted);letter-spacing:0}
+.quote--small{font-size:clamp(1rem,1.45vw,1.6rem);max-width:40ch;font-weight:500}

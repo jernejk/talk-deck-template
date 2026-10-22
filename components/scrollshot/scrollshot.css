@@ -1,0 +1,14 @@
+.scrollshot{--rise:1;margin:0;width:31vw;display:flex;flex-direction:column;align-items:center}
+.scrollshot-view{--vh:66vh;width:100%;height:var(--vh);overflow:hidden;border-radius:16px;background:var(--shot-bg);border:1px solid var(--shot-border);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) calc(var(--shot-glow) * 1.2),transparent),var(--drop)}
+.scrollshot-view img{display:block;width:100%;height:auto}
+.slide.is-active .scrollshot-view img{animation:autoscroll 18s ease-in-out 1.2s infinite alternate}
+@keyframes autoscroll{0%,8%{transform:translateY(0)}92%,100%{transform:translateY(calc(-100% + var(--vh)))}}
+.scrollshot figcaption{margin-top:1.4vh;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);color:var(--muted)}
+.scrollshot figcaption b{color:var(--accent);font-weight:600;margin-right:.6em}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .scrollshot-view img{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .scrollshot{width:100%}
+}

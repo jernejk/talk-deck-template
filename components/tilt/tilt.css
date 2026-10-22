@@ -1,0 +1,9 @@
+.cover-art{position:relative;display:flex;justify-content:center;align-items:center;height:100%}
+.tilt{--rise:1;margin:0;rotate:3deg;filter:drop-shadow(0 30px 40px color-mix(in srgb,var(--accent) calc(var(--shot-glow) * .4),transparent))}
+.tilt img{display:block;height:var(--rh,70vh);width:auto;border-radius:4px}
+.slide.is-active .tilt[data-r]{animation-name:shot-in;animation-duration:.9s}
+
+@media screen and (max-aspect-ratio:1/1){
+  .cover-art{height:auto}
+  .tilt img{width:100%;height:auto}
+}

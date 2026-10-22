@@ -1,0 +1,17 @@
+<section class="slide" id="zoom" data-section="Demo" data-title="Zoom to the number that matters">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · zoom</div>
+      <h2 class="title">Zoom to the number <em>that matters.</em></h2>
+      <ol class="zoom-steps">
+        <li data-step data-zoom="46% 67% 1.7"><span><strong>The busy day.</strong> The orange bar is the one to read out.</span></li>
+        <li data-step data-zoom="50% 31% 3.8"><span><strong>The number.</strong> 17 done this week, close enough to read from the back.</span></li>
+      </ol>
+    </div>
+    <figure class="zoom"><div class="zoom-frame"><img src="assets/sample/app.svg" alt="Sample app overview: number tiles across the top, an activity bar chart and a task queue below"></div><figcaption><b>Sample image</b>swap in your own capture</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p><b>2:00–2:40.</b> Space zooms to the chart, Space again to the number; Left steps back out. Say what to look at before the zoom lands.</p>
+    <p class="src">Each <code>data-zoom="x% y% scale"</code> moves that point of the image towards the centre of the frame at that scale. It clamps at the edges, so a point near a corner stays in the corner instead of showing empty space. Keep the image the same shape as the frame (16:10 unless you set <code>--ar</code>).</p>
+  </aside>
+</section>

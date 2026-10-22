@@ -1,0 +1,4 @@
+.phone{--rise:1;margin:0;flex:0 0 auto;width:fit-content;padding:1.1vh .7vh;border-radius:3.2vh;background:var(--panel-2);border:1px solid var(--rule);box-shadow:0 30px 60px -24px rgba(0,0,0,.8)}
+.phone img{display:block;height:var(--ph,62vh);width:auto;border-radius:2.4vh}
+.phone figcaption{margin-top:1vh;text-align:center;font:500 clamp(.66rem,.85vw,.92rem)/1.3 var(--sans);color:var(--phone-caption,var(--muted))}
+.slide.is-active .phone[data-r]{animation-name:shot-in;animation-duration:.9s}

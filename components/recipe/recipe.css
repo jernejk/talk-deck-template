@@ -1,0 +1,6 @@
+.recipe{--rise:1;margin-top:3.6vh;display:grid;max-width:80vw}
+.recipe-row{display:grid;grid-template-columns:4em minmax(0,1fr) minmax(0,1.1fr);gap:1.6vw;align-items:baseline;padding:1.9vh 0;border-top:1px solid var(--rule)}
+.recipe-row:last-child{border-bottom:1px solid var(--rule)}
+.recipe-row b{font:500 clamp(.9rem,1.2vw,1.3rem)/1 var(--mono);color:var(--c,var(--accent))}
+.recipe-row strong{font-family:var(--display);font-weight:var(--title-weight);font-size:clamp(1.25rem,2.2vw,2.4rem);line-height:1.05;letter-spacing:-.035em;color:var(--c,var(--accent))}
+.recipe-row > span{color:var(--ink);font-size:clamp(.95rem,1.35vw,1.45rem);line-height:1.3}

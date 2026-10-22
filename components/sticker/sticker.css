@@ -1,0 +1,9 @@
+.sticker{
+  --rise:1;display:inline-block;width:fit-content;margin:3.4vh 0 0;padding:1.2vh 1.4vw;border-radius:12px;background:var(--sticker);color:var(--on-sticker);
+  font:700 clamp(1rem,1.6vw,1.8rem)/1.1 var(--sans);letter-spacing:-.01em;rotate:-3deg;
+  box-shadow:0 16px 36px -12px color-mix(in srgb,var(--sticker) 60%,transparent);
+}
+.sticker small{display:block;font-weight:500;font-size:.7em;margin-top:.3em}
+.slide .sticker[data-step]{transition:opacity .4s var(--ease),transform .6s cubic-bezier(.34,1.56,.64,1)}
+.slide .sticker[data-step]:not(.is-shown){transform:scale(.6)}
+.cover-art .sticker{position:absolute;left:-3vw;bottom:2vh;margin:0;rotate:-7deg}

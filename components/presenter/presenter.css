@@ -1,0 +1,77 @@
+.slide--presenter{padding:0;display:block;overflow:hidden}
+.presenter-panel{position:relative;z-index:2;height:100%;width:min(56%,860px);padding:6vh 0 8vh 7vw;display:flex;flex-direction:column;justify-content:center}
+.presenter-logo{--rise:1;width:clamp(48px,4.6vw,72px);height:auto;margin-bottom:2vh}
+.presenter-name{--rise:1;font-family:var(--display);font-size:clamp(2.2rem,4.2vw,4.4rem);font-weight:var(--title-weight);letter-spacing:var(--tight);line-height:.95;margin:1vh 0 0}
+.presenter-name span{color:var(--muted);font-weight:400}
+.presenter-name b{font-weight:inherit}
+.presenter-summary{--rise:1;margin:1.8vh 0 0;max-width:40ch;font-size:clamp(1.05rem,1.5vw,1.6rem);line-height:1.35;color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.presenter-summary strong{color:var(--ink);font-weight:600}
+.presenter-tags{--rise:1;display:flex;flex-wrap:wrap;gap:.6vw;margin-top:2.4vh}
+.presenter-tags span{padding:.55em .85em;border-radius:var(--radius);background:color-mix(in srgb,var(--ink) 6%,transparent);border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);font:600 clamp(.8rem,1.05vw,1.15rem)/1 var(--sans)}
+.presenter-tags span:first-child{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.presenter-links{--rise:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8vw;max-width:min(620px,38vw);margin-top:2.6vh}
+.presenter-links a{display:grid;gap:4px;padding:1vh 1vw;text-decoration:none;background:color-mix(in srgb,var(--bg) 60%,transparent);border:1px solid var(--rule);border-radius:var(--radius);font-size:clamp(.9rem,1.2vw,1.25rem);font-weight:600}
+.presenter-links a span{color:var(--accent);font:500 .74rem/1 var(--sans)}
+
+/* Card: circle portrait, badge, coins and a focus card on a cut panel */
+.presenter--card .presenter-side{position:absolute;inset:0 0 0 auto;width:48%;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.6vh;padding:6vh 6vw 8vh 8vw;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 26%,var(--panel)),color-mix(in srgb,var(--a2) 16%,var(--panel)));clip-path:polygon(16% 0,100% 0,100% 100%,0 100%)}
+.presenter-portrait{--rise:1;position:relative;width:min(26vw,40vh);aspect-ratio:1;margin:0;flex:0 0 auto}
+.presenter-portrait img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;border:max(3px,.3vw) solid var(--accent);box-shadow:0 0 0 max(6px,.6vw) color-mix(in srgb,var(--accent) 22%,transparent),0 30px 70px -30px color-mix(in srgb,var(--accent) calc(var(--shot-glow) * 1.5),transparent),var(--drop)}
+.presenter-badge{position:absolute;right:-8%;top:-4%;padding:.7em 1em;border-radius:var(--radius);background:var(--sticker);color:var(--on-sticker);font:800 clamp(1.1rem,1.9vw,2.1rem)/1 var(--display);letter-spacing:-.02em;box-shadow:var(--drop);rotate:3deg}
+.presenter-badge small{display:block;margin-bottom:.3em;font:700 .42em/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.slide.is-active .presenter-badge{animation:pop .7s cubic-bezier(.34,1.56,.64,1) .6s both}
+.presenter-coins{--rise:1;display:flex;gap:.8vw;margin:0;padding:0;list-style:none}
+.presenter-coins li{display:grid;place-items:center;width:clamp(44px,4vw,64px);aspect-ratio:1;border-radius:50%;background:var(--panel);border:2px solid color-mix(in srgb,var(--accent) 60%,transparent);font:700 clamp(.7rem,.85vw,.95rem)/1 var(--sans);color:var(--ink);box-shadow:var(--drop)}
+.presenter-focus{--rise:1;width:100%;max-width:30vw;padding:2vh 1.6vw;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);border-top:max(3px,.3vw) solid var(--accent);box-shadow:var(--drop)}
+.presenter-focus b{display:block;font:700 clamp(.7rem,.85vw,.92rem)/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.presenter-focus strong{display:block;margin-top:1vh;font:var(--title-weight) clamp(1.2rem,1.9vw,2.1rem)/1.1 var(--display);letter-spacing:var(--tight)}
+.presenter-focus p{margin:.8vh 0 0;font-size:clamp(.85rem,1.1vw,1.2rem);line-height:1.35;color:var(--muted)}
+.presenter--card .presenter-pet{left:auto;right:44%;bottom:10vh;--pw:6.5vw;z-index:2}
+
+/* Banner: a wide image fading into the panel */
+.presenter-banner{position:absolute;inset:0;margin:0;z-index:0;overflow:hidden}
+.presenter-banner img{display:block;width:100%;height:100%;object-fit:cover;object-position:right center}
+.presenter-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 97%,transparent) 46%,color-mix(in srgb,var(--bg) 50%,transparent) 64%,color-mix(in srgb,var(--bg) 6%,transparent) 100%)}
+.slide.is-active .presenter-banner img{animation:banner-in 22s ease-out both}
+@keyframes banner-in{from{transform:scale(1.06)}to{transform:none}}
+.presenter--banner .presenter-pet{left:auto;right:7vw;bottom:9vh;--pw:7vw;z-index:2}
+
+/* Facts: a portrait and three speech bubbles */
+.presenter--facts{padding:8vh 7vw 10vh;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto minmax(0,1fr);row-gap:3vh;column-gap:5vw;align-items:center}
+.presenter--facts .presenter-head{grid-column:1/-1;align-self:end}
+.presenter-portrait--wide{--rise:1;position:relative;width:100%;margin:0}
+.presenter-portrait--wide img{display:block;width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--shot-border);box-shadow:var(--drop)}
+.presenter-facts{display:grid;gap:2.2vh;margin:0;padding:0;list-style:none}
+.presenter-fact{--rise:1;position:relative;padding:1.8vh 1.6vw;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);box-shadow:var(--drop);font-size:clamp(.95rem,1.35vw,1.5rem);line-height:1.3;max-width:34ch}
+.presenter-fact::before{content:"";position:absolute;left:-.9vw;top:50%;width:1.6vw;height:1.6vw;background:var(--panel);border-left:1px solid var(--rule);border-bottom:1px solid var(--rule);transform:translateY(-50%) rotate(45deg)}
+.presenter-fact b{display:block;margin-bottom:.3em;font:700 clamp(.7rem,.85vw,.92rem)/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.presenter-fact:nth-child(2){margin-left:2vw;--accent:var(--a2)}
+.presenter-fact:nth-child(3){margin-left:4vw;--accent:var(--a4)}
+.presenter--facts .presenter-pet{right:auto;left:33vw;bottom:14vh;--pw:6vw}
+
+/* Team: two or three co-presenters */
+.presenter-team{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:2.4vw;margin-top:5vh}
+.presenter-card{--rise:1;position:relative;padding:4vh 1.6vw 3.6vh;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);border-top:max(3px,.3vw) solid var(--c,var(--accent));box-shadow:var(--drop);text-align:center;min-width:0}
+.presenter-card img{display:block;width:min(12vw,21vh);aspect-ratio:1;object-fit:cover;margin:0 auto;border-radius:50%;border:max(3px,.25vw) solid var(--c,var(--accent))}
+.presenter-card h3{margin:2vh 0 0;font:var(--title-weight) clamp(1.3rem,2.1vw,2.3rem)/1.05 var(--display);letter-spacing:var(--tight)}
+.presenter-card .role{margin:.6vh 0 0;font:600 clamp(.8rem,1.05vw,1.15rem)/1.2 var(--sans);color:var(--c,var(--accent))}
+.presenter-card p{margin:1.4vh 0 0;font-size:clamp(.9rem,1.2vw,1.3rem);line-height:1.35;color:var(--muted)}
+.presenter-card .handle{display:inline-block;margin-top:1.6vh;padding:.5em .8em;border-radius:999px;background:color-mix(in srgb,var(--ink) 6%,transparent);border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);font:500 clamp(.8rem,1vw,1.1rem)/1 var(--mono);color:var(--ink)}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .presenter-badge,.slide.is-active .presenter-banner img{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .slide--presenter{overflow-y:auto}
+  .presenter-panel{width:92%;padding:7vh 6vw 4vh;height:auto}
+  .presenter-links{grid-template-columns:1fr;max-width:none}
+  .presenter--card .presenter-side{position:static;width:auto;clip-path:none;padding:4vh 6vw 6vh}
+  .presenter-portrait{width:50vw}
+  .presenter-focus{max-width:none}
+  .presenter-banner{position:static;height:40vh}
+  .presenter--facts{display:flex;flex-direction:column;align-items:stretch;gap:3vh;padding:9vh 6vw 14vh}
+  .presenter-fact,.presenter-fact:nth-child(2),.presenter-fact:nth-child(3){margin-left:0;max-width:none}
+  .presenter-team{display:flex;flex-direction:column;gap:3vh}
+  .presenter-card img{width:30vw}
+  .presenter-pet{display:none}
+}

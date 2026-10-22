@@ -1,0 +1,24 @@
+<section class="slide" id="live-demo" data-section="Demo" data-live="Sample app" data-title="Screenshot first, live if it answers">
+  <div class="eyebrow">Demo · live on L</div>
+  <h2 class="title title--stack title--wide"><span>Screenshot first.</span> <em>Live if it answers.</em></h2>
+  <div class="split split--auto">
+    <ul class="facts">
+      <li><strong>L</strong> or Go live loads the real app over the slide.</li>
+      <li>The ring counts down 20&nbsp;s. At zero it says so, and stays open.</li>
+      <li><strong>L</strong> again, or Back, returns to the screenshot.</li>
+    </ul>
+    <figure class="embed" data-cap="20" style="--h:42vh">
+      <div class="embed-bar"><span class="embed-url">bucket.html</span></div>
+      <div class="embed-view">
+        <img class="embed-shot" src="assets/sample/bucket.png" alt="The sample rate limiter after a burst: five requests accepted, two rejected with 429">
+        <iframe class="embed-frame" data-src="assets/sample/bucket.html" title="Sample app, live"></iframe>
+      </div>
+      <figcaption><b>Sample</b>screenshot now, the real page on L</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE (optional) → Sample app. Press L; cap it at 20 s, then L again for the screenshot.</p>
+    <p><b>10:40–11:40.</b> “This is what it looked like this morning. If the Wi-Fi’s kind, here it is live.”</p>
+    <p class="src">The screenshot shows until you press L or Go live; then the frame loads <code>data-src</code> and fills the slide. Point <code>data-src</code> and the URL pill at your dev server, such as <code>http://localhost:5173</code>, and replace bucket.png with a 16:9 capture of the same screen. <code>data-cap</code> sets the countdown in seconds. While the frame has focus, keys go to the app: click Back instead of pressing L. Leaving the slide also goes back.</p>
+  </aside>
+</section>

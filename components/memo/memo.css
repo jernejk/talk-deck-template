@@ -1,0 +1,13 @@
+.memo{--rise:1;margin:3vh 0 0;padding:2.4vh 2vw;border-radius:16px;background:var(--panel-2);border:1px solid var(--rule);font:400 clamp(.95rem,1.4vw,1.55rem)/1.55 var(--sans);color:color-mix(in srgb,var(--ink) 84%,transparent);max-width:48ch}
+.memo .label{display:flex;align-items:center;gap:1vw;margin-bottom:1vh;font:600 clamp(.72rem,.9vw,.95rem)/1 var(--sans);color:var(--accent)}
+.memo .play{display:grid;place-items:center;width:2.4em;height:2.4em;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:.9em}
+.memo mark{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink);padding:0 .2em;border-radius:4px;box-shadow:inset 0 -2px 0 var(--accent)}
+.memo mark i{font-style:normal;font-weight:600;color:var(--accent);font-size:.78em;margin-left:.3em}
+.memo p{margin:0}
+.wave{display:flex;align-items:center;gap:3px;height:6vh;margin:1.6vh 0 2vh}
+.wave i{flex:1;height:calc(var(--h) * 1%);min-height:8%;border-radius:2px;background:color-mix(in srgb,var(--accent) 70%,var(--ink));opacity:.85;transform-origin:center;animation:wave 1.6s ease-in-out infinite;animation-delay:calc(var(--i) * -70ms)}
+@keyframes wave{50%{transform:scaleY(.55)}}
+
+@media (prefers-reduced-motion:reduce){
+  .wave i{animation:none!important}
+}

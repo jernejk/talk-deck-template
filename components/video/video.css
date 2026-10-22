@@ -1,0 +1,5 @@
+.video{--rise:1;margin:0;display:flex;flex-direction:column;align-items:center;min-width:0}
+.video video{display:block;max-width:100%;max-height:var(--h,64vh);width:auto;height:auto;border-radius:var(--radius);background:var(--shot-bg);border:1px solid var(--shot-border);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) var(--shot-glow),transparent),var(--drop)}
+.video figcaption{margin-top:1.4vh;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);color:var(--muted);text-align:center}
+.video figcaption b{color:var(--accent);font-weight:600;margin-right:.6em}
+.slide.is-active .video[data-r]{animation-name:shot-in;animation-duration:.9s}

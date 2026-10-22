@@ -1,0 +1,24 @@
+<section class="slide" id="code" data-section="How it works" data-title="The one line that matters">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it works</div>
+      <h2 class="title">The one line <em>that matters.</em></h2>
+      <div class="callout" data-step><b>The rule</b><p>Planning never changes stock. Eating does, once.</p></div>
+    </div>
+    <figure class="code">
+      <figcaption>src/pantry.ts</figcaption>
+      <ol>
+        <li><span class="k">export function</span> <span class="f">apply</span>(stock, e) {</li>
+        <li class="c">  // planned events never touch stock</li>
+        <li class="hl">  <span class="k">if</span> (e.kind === <span class="s">"planned"</span>) <span class="k">return</span> stock</li>
+        <li>  <span class="k">const</span> qty = stock[e.item] ?? <span class="n">0</span></li>
+        <li>  <span class="k">return</span> { ...stock, [e.item]: qty - e.qty }</li>
+        <li>}</li>
+      </ol>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>8:20–9:00.</b> Point at the highlighted line, read it, and stop. Nobody reads code on a slide past the first line.</p>
+    <p class="src">Six lines at most. Wrap tokens in <code>.k</code>, <code>.s</code>, <code>.f</code>, <code>.n</code>; mark comment lines <code>.c</code> and the key line <code>.hl</code>.</p>
+  </aside>
+</section>

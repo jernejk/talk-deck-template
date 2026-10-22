@@ -1,0 +1,25 @@
+.timer{--rise:1;--left:1;--d:min(26vw,48vh);--timer-color:var(--accent);display:flex;flex-direction:column;align-items:center;gap:3vh;margin:0}
+.timer-ring{position:relative;width:var(--d);height:var(--d);display:grid;place-items:center;border-radius:50%;background:conic-gradient(from 0deg,var(--timer-color) calc(var(--left) * 1turn),var(--rule) 0);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--timer-color) var(--shot-glow),transparent),var(--drop)}
+.timer-face{width:calc(100% - var(--d) * .1);height:calc(100% - var(--d) * .1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--d) * .02);border-radius:50%;background:var(--panel)}
+.timer-digits{font:600 calc(var(--d) * .24)/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.04em;color:var(--ink)}
+.timer-label{font:600 calc(var(--d) * .062)/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.timer-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:.8vw}
+.timer-buttons .btn{font-size:clamp(.9rem,1.1vw,1.25rem);padding:.75em 1.3em}
+.timer-buttons [data-timer="toggle"]{border-color:var(--timer-color)}
+.timer.is-running .timer-label{color:var(--timer-color)}
+.timer.is-done{--timer-color:var(--signal)}
+.timer.is-done .timer-ring{background:var(--signal)}
+.timer.is-done .timer-digits,.timer.is-done .timer-label{color:var(--signal)}
+.timer.is-done .timer-label{font-size:calc(var(--d) * .08)}
+.slide.is-active .timer.is-done .timer-ring{animation:timer-pulse 1.4s ease-in-out infinite}
+@keyframes timer-pulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 calc(var(--d) * .05) color-mix(in srgb,var(--signal) var(--shot-glow),transparent)}
+  50%{transform:scale(1.03);box-shadow:0 0 calc(var(--d) * .14) color-mix(in srgb,var(--signal) var(--shot-glow),transparent)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .timer.is-done .timer-ring{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .timer{--d:min(60vw,34vh)}
+}

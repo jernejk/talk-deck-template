@@ -1,0 +1,12 @@
+.slide--cover{padding-right:4vw}
+.slide--cover .split{grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr)}
+.slide--cover .title{font-size:clamp(3rem,7.6vw,8.6rem);max-width:none;line-height:.92}
+.slide--cover .title span,.slide--cover .title em{display:block}
+.slide--opener .title{font-size:clamp(2.4rem,5.4vw,6rem);max-width:13ch;line-height:.98}
+.slide--opener .split{grid-template-columns:minmax(0,1.35fr) minmax(0,.8fr)}
+.cover-meta{--rise:1;display:flex;flex-wrap:wrap;gap:.6em 2em;margin-top:5vh;font-size:clamp(.95rem,1.3vw,1.45rem);color:var(--muted)}
+.cover-meta b{color:var(--ink);font-weight:600}
+
+@media screen and (max-aspect-ratio:1/1){
+  .slide--cover .split,.slide--opener .split{display:flex;flex-direction:column;align-items:stretch;gap:3vh;height:auto}
+}

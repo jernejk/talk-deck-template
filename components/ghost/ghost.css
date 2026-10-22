@@ -1,0 +1,11 @@
+.backdrop{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.ghost{
+  position:absolute;right:-5vw;bottom:-9vh;width:30vw;aspect-ratio:1;pointer-events:none;
+  background:var(--ghost-ink);-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;--m:var(--outline-diamond);
+}
+.slide:nth-of-type(3n) .ghost{right:auto;left:-6vw;bottom:-10vh}
+.slide[data-slot="1"] .ghost{--m:var(--outline-pentagon)}
+.slide[data-slot="2"] .ghost{--m:var(--outline-octagon)}
+.slide[data-slot="3"] .ghost{--m:var(--outline-diamond)}
+.slide[data-slot="4"] .ghost{--m:var(--outline-hexagon)}
+.slide[data-slot="5"] .ghost{--m:var(--outline-triangle)}

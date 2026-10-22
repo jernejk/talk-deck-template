@@ -1,0 +1,49 @@
+.diff{--rise:1;--diff-accent:color-mix(in srgb,var(--accent) 65%,var(--code-ink,#e6e6e6));--diff-add:var(--code-s,var(--ok,#2ea043));--diff-del:var(--cli-bad,#ff6a4d);interpolate-size:allow-keywords;margin:0;width:100%;max-width:var(--w,46vw);border-radius:var(--code-radius,14px);overflow:hidden;background:var(--code-bg,#0d0f12);color:var(--code-ink,#e6e6e6);border:1px solid var(--code-border,#2a2d33);font:500 clamp(.8rem,1.14vw,1.26rem)/1.55 var(--mono);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) calc(var(--shot-glow) * .9),transparent),var(--drop)}
+.diff summary{display:flex;align-items:center;gap:.8em;cursor:pointer;list-style:none}
+.diff summary::-webkit-details-marker{display:none}
+.diff summary:focus-visible{outline-offset:-3px}
+.diff summary::before{content:"";flex:none;width:.42em;height:.42em;margin:0 .2em 0 .1em;border:solid var(--code-muted,#8b9099);border-width:0 .15em .15em 0;transform:rotate(-45deg);transition:transform .25s var(--ease)}
+.diff details[open]>summary::before{transform:rotate(45deg) translate(-.08em,-.08em)}
+.diff-file>summary{padding:1.1vh 1.2vw;font-size:.9em;border-bottom:1px solid transparent}
+.diff-file[open]>summary{border-bottom-color:var(--code-border,#2a2d33)}
+.diff-file+.diff-file{border-top:1px solid var(--code-border,#2a2d33)}
+.diff-file summary b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.diff-stat{margin-left:auto;display:flex;gap:.7em;flex:none;font-size:.92em}
+.diff-stat ins{color:var(--diff-add)}
+.diff-stat del{color:var(--diff-del)}
+.diff ins,.diff del{text-decoration:none}
+.diff-hunk{padding:.5vh 1.2vw;background:color-mix(in srgb,var(--diff-accent) 12%,transparent);color:var(--code-muted,#8b9099);font-size:.88em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.diff ol{margin:0;padding:.6vh 0;list-style:none}
+.diff li{display:grid;grid-template-columns:3em 3em minmax(0,1fr);padding-right:1.2vw}
+.diff li::before,.diff li::after{padding-right:.8em;text-align:right;color:var(--code-muted,#8b9099);opacity:.6;font-size:.88em}
+.diff li::before{content:attr(data-o);grid-column:1;grid-row:1}
+.diff li::after{content:attr(data-n);grid-column:2;grid-row:1}
+.diff li code{grid-column:3;grid-row:1;padding-left:1.7em;text-indent:-1.7em;font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}
+.diff li code::before{display:inline-block;width:1.7em;text-indent:0;color:var(--code-muted,#8b9099)}
+.diff li.add{background:color-mix(in srgb,var(--diff-add) 17%,transparent);box-shadow:inset 3px 0 0 var(--diff-add)}
+.diff li.del{background:color-mix(in srgb,var(--diff-del) 17%,transparent);box-shadow:inset 3px 0 0 var(--diff-del)}
+.diff li.add code::before{content:"+";color:var(--diff-add)}
+.diff li.del code::before{content:"−";color:var(--diff-del)}
+.diff li.diff-fold{display:block;padding:0;background:none;box-shadow:none}
+.diff li.diff-fold::before,.diff li.diff-fold::after{content:none}
+.diff-fold>details>summary{padding:.5vh 1.2vw .5vh 6.4em;background:color-mix(in srgb,var(--diff-accent) 9%,transparent);color:var(--code-muted,#8b9099);font-size:.88em}
+.diff-fold>details>summary::before{margin-left:-1.6em}
+.diff-fold>details>ol{max-height:var(--fold-h,16vh);overflow:auto;overscroll-behavior:contain}
+.diff .k{color:var(--code-k,var(--diff-accent))}
+.diff .s{color:var(--code-s,var(--ok))}
+.diff .f{color:var(--code-f,var(--a2))}
+.diff .n{color:var(--code-n,var(--a6))}
+.diff .c{color:var(--code-muted,#8b9099);font-style:italic}
+.diff figcaption{padding:1vh 1.2vw;border-top:1px solid var(--code-border,#2a2d33);font:500 clamp(.72rem,.92vw,.98rem)/1.3 var(--sans);color:var(--code-muted,#8b9099)}
+.diff figcaption b{margin-right:.6em;color:var(--diff-accent);font-weight:600}
+
+@supports (interpolate-size:allow-keywords) and selector(::details-content){
+  .diff details::details-content{block-size:0;overflow:clip;transition:block-size .3s var(--ease),content-visibility .3s allow-discrete}
+  .diff details[open]::details-content{block-size:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .diff details::details-content,.diff summary::before{transition:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .diff{max-width:none}
+}
