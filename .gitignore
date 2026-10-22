@@ -1,3 +1,6 @@
 node_modules/
 qa/
 .DS_Store
+.env
+.env.*
+*.log

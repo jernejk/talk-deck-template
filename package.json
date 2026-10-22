@@ -1,10 +1,39 @@
 {
   "name": "talk-deck-template",
   "private": true,
+  "description": "Talk decks in plain HTML and CSS: one idea per slide, presenter tools, live-demo fallbacks and seven templates. No build step to present, runs offline.",
+  "license": "MIT",
+  "author": "Jernej Kavka",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jernejk/talk-deck-template.git"
+  },
+  "homepage": "https://github.com/jernejk/talk-deck-template#readme",
+  "bugs": {
+    "url": "https://github.com/jernejk/talk-deck-template/issues"
+  },
+  "keywords": [
+    "presentation",
+    "slides",
+    "slide-deck",
+    "talk",
+    "html",
+    "css",
+    "speaker-notes",
+    "template",
+    "coding-agents"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
+    "build": "node tools/build.mjs",
     "qa": "node tools/qa.mjs",
-    "new": "node tools/new-deck.mjs"
+    "new": "node tools/new.mjs",
+    "add": "node tools/add.mjs",
+    "export": "node tools/export.mjs",
+    "showcase": "node tools/showcase.mjs"
   },
   "devDependencies": {
     "playwright": "1.64.1"
