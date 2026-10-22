@@ -67,7 +67,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | Task | Command |
 |---|---|
 | List slide patterns | `npm run add -- --list` |
-| Add one to a deck | `npm run add -- ~/talks/my-talk ledger` (or `--before <id>`, `--after <id>`) |
+| Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
 | Check a deck | `cd ~/talks/my-talk && npm install && npm run qa` |
 | Publish | `npx surge ~/talks/my-talk/site my-talk.surge.sh` |
@@ -146,7 +146,7 @@ npm run qa -- examples/catalog --theme paper  # one deck in one template
 npm run qa -- examples/starter --sizes 1280x720,430x932 --motion
 ```
 
-QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into `qa/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each close slide's QR code and checks it matches the link. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion.
+QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into `qa/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each QR code that has a link and checks it matches. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion.
 
 ## Layout
 
@@ -154,7 +154,7 @@ QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and s
 core/          deck.js, deck.css, theme.js
 components/    one folder per component; components.css and components.js are generated
 slides/        slide patterns, index.json and sample assets
-templates/     one folder per style: theme.css, template.json, assets/
+templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
 tools/         build, new, add, export, qa, showcase, qr.swift (macOS QR generator that decodes what it writes)
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
@@ -169,6 +169,6 @@ AGENTS.md      authoring guide; CLAUDE.md links here
 - **Big Buck Bunny** (the `youtube` pattern's sample) © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). It plays from YouTube; the poster is drawn.
 - **`docs/generated-example.jpg`** was generated with gpt-image-2; the prompt is in `docs/images.md`.
 - **Playwright** ([Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE)) runs QA and the showcase as a dev dependency.
-- **Codex pets:** this repo doesn't bundle pets from Codex or community galleries such as [Petdex](https://petdex.crafter.run), because their artwork isn't licensed for redistribution. Make your own in the Codex app and add its spritesheet to your template (`docs/styles.md`, "The pet").
+- **Codex pets:** this repo doesn't bundle other people's pets from Codex or community galleries such as [Petdex](https://petdex.crafter.run), because their artwork isn't licensed for redistribution. Make your own in the Codex app and add its spritesheet to your template (`docs/styles.md`, "The pet").
 
 Codex is a trademark of OpenAI. The `community-codex` template follows the look of a Codex community meetup; this project isn't affiliated with or endorsed by OpenAI.
