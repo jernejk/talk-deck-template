@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 3200" width="1200" height="3200" font-family="-apple-system,'Helvetica Neue',Arial,sans-serif">
+<rect width="1200" height="3200" fill="#f7f7f5"/>
+<text x="60" y="110" font-size="56" font-weight="800" fill="#141414">The long answer</text>
+<rect x="60" y="180" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="250" font-size="38" font-weight="700" fill="#141414">Step 1 · Gather the inputs</text>
+<rect x="100" y="290" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="334" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="378" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="422" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="456" width="180" height="32" rx="16" fill="#ffedd5"/>
+<rect x="60" y="550" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="620" font-size="38" font-weight="700" fill="#141414">Step 2 · Write it down once</text>
+<rect x="100" y="660" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="704" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="748" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="792" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="826" width="220" height="32" rx="16" fill="#e0e7ff"/>
+<rect x="60" y="920" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="990" font-size="38" font-weight="700" fill="#141414">Step 3 · Plug it in</text>
+<rect x="100" y="1030" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1074" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1118" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1162" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1196" width="160" height="32" rx="16" fill="#dcfce7"/>
+<rect x="60" y="1290" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="1360" font-size="38" font-weight="700" fill="#141414">Step 4 · Ask in plain English</text>
+<rect x="100" y="1400" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1444" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1488" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1532" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1566" width="240" height="32" rx="16" fill="#fef3c7"/>
+<rect x="60" y="1660" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="1730" font-size="38" font-weight="700" fill="#141414">Step 5 · Check the answer</text>
+<rect x="100" y="1770" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1814" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1858" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1902" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="1936" width="200" height="32" rx="16" fill="#f3e8ff"/>
+<rect x="60" y="2030" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="2100" font-size="38" font-weight="700" fill="#141414">Step 6 · Show the real run</text>
+<rect x="100" y="2140" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2184" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2228" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2272" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2306" width="190" height="32" rx="16" fill="#ffe4e6"/>
+<rect x="60" y="2400" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="2470" font-size="38" font-weight="700" fill="#141414">Step 7 · Keep a fallback</text>
+<rect x="100" y="2510" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2554" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2598" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2642" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2676" width="230" height="32" rx="16" fill="#e0f2fe"/>
+<rect x="60" y="2770" width="1080" height="330" rx="24" fill="#fff" stroke="#e4e4e0"/>
+<text x="100" y="2840" font-size="38" font-weight="700" fill="#141414">Step 8 · Ship the slides</text>
+<rect x="100" y="2880" width="980" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2924" width="900" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="2968" width="940" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="3012" width="620" height="18" rx="9" fill="#e9e9e6"/>
+<rect x="100" y="3046" width="170" height="32" rx="16" fill="#dcfce7"/>
+</svg>

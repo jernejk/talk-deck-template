@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img" aria-label="Drawn poster: a friendly rabbit silhouette in a meadow with a tree at sunrise">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d3a7a"/><stop offset=".4" stop-color="#8a5fa0"/><stop offset=".68" stop-color="#f08a5d"/><stop offset=".82" stop-color="#ffd39a"/></linearGradient>
+<radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3d1"/><stop offset=".55" stop-color="#ffd38a"/><stop offset="1" stop-color="#ffd38a" stop-opacity="0"/></radialGradient>
+<linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b5a9a"/><stop offset="1" stop-color="#4a4a86"/></linearGradient>
+<linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f8a6e"/><stop offset="1" stop-color="#1f5a52"/></linearGradient>
+<linearGradient id="near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a6b4c"/><stop offset="1" stop-color="#10382f"/></linearGradient>
+</defs>
+<rect width="1920" height="1080" fill="url(#sky)"/>
+<g fill="#ffffff" opacity=".55"><circle cx="220" cy="120" r="2.2"/><circle cx="470" cy="80" r="1.8"/><circle cx="700" cy="170" r="1.6"/><circle cx="1500" cy="110" r="2"/><circle cx="1720" cy="190" r="1.6"/><circle cx="1180" cy="70" r="1.6"/></g>
+<circle cx="1010" cy="640" r="340" fill="url(#sun)"/>
+<circle cx="1010" cy="640" r="104" fill="#fff1c9"/>
+<path d="M0 640 C220 560 420 600 640 570 S1020 560 1240 590 S1700 560 1920 600 V1080 H0Z" fill="url(#far)" opacity=".85"/>
+<path d="M0 700 C260 640 480 700 760 668 S1260 640 1540 690 S1800 680 1920 660 V1080 H0Z" fill="url(#mid)"/>
+<g>
+<path d="M356 700 C362 640 354 590 340 540 L384 540 C376 590 384 640 392 700Z" fill="#1b3a30"/>
+<path d="M366 600 C330 590 300 570 282 540" fill="none" stroke="#1b3a30" stroke-width="14" stroke-linecap="round"/>
+<g fill="#1b3a30"><circle cx="360" cy="440" r="118"/><circle cx="270" cy="500" r="82"/><circle cx="452" cy="496" r="86"/><circle cx="336" cy="372" r="74"/><circle cx="420" cy="396" r="70"/></g>
+<g fill="#2a6b4c" opacity=".7"><circle cx="318" cy="420" r="26"/><circle cx="400" cy="458" r="20"/><circle cx="290" cy="486" r="16"/></g>
+</g>
+<path d="M0 790 C300 730 560 800 880 770 S1440 730 1920 780 V1080 H0Z" fill="url(#near)"/>
+<g fill="#10382f">
+<ellipse cx="1330" cy="780" rx="150" ry="22" opacity=".55"/>
+<g transform="translate(1330 0)">
+<path d="M-96 740 C-120 640 -70 560 0 560 S120 640 96 740 C80 790 -80 790 -96 740Z"/>
+<circle cx="0" cy="528" r="74"/>
+<ellipse cx="-34" cy="400" rx="32" ry="104" transform="rotate(-9 -34 400)"/>
+<ellipse cx="38" cy="402" rx="32" ry="104" transform="rotate(11 38 402)"/>
+<circle cx="112" cy="742" r="34"/>
+<ellipse cx="-54" cy="778" rx="58" ry="20"/>
+<ellipse cx="58" cy="778" rx="58" ry="20"/>
+</g>
+</g>
+<g transform="translate(1330 0)" fill="#4a7a68" opacity=".9"><ellipse cx="-30" cy="410" rx="12" ry="68" transform="rotate(-9 -30 410)"/><ellipse cx="34" cy="412" rx="12" ry="68" transform="rotate(11 34 412)"/></g>
+<g transform="translate(1330 0)" fill="#ffe2b0"><circle cx="-26" cy="520" r="6"/><circle cx="26" cy="520" r="6"/></g>
+<g fill="#ffe2b0" opacity=".85"><circle cx="160" cy="880" r="9"/><circle cx="520" cy="930" r="7"/><circle cx="780" cy="860" r="8"/><circle cx="1620" cy="900" r="9"/><circle cx="1790" cy="850" r="7"/><circle cx="960" cy="960" r="8"/></g>
+<g fill="#ff9a7a" opacity=".85"><circle cx="300" cy="910" r="8"/><circle cx="1100" cy="900" r="7"/><circle cx="1480" cy="950" r="8"/></g>
+<g stroke="#10382f" stroke-width="6" stroke-linecap="round" fill="none"><path d="M60 1010 l-10 -50 M80 1010 l6 -60 M100 1010 l18 -46"/><path d="M1740 1020 l-10 -50 M1760 1020 l6 -60 M1780 1020 l18 -46"/><path d="M880 1010 l-8 -40 M898 1010 l4 -50 M916 1010 l14 -38"/></g>
+</svg>

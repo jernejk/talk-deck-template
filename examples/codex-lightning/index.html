@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompt it. Run it. Ship it.</title>
+<meta name="description" content="A Codex lightning talk: one plan, one prompt, one run, and the real diff.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../core/deck.css">
+<link rel="stylesheet" href="../../components/components.css">
+<link rel="stylesheet" href="../../templates/community-codex/theme.css" id="theme">
+<script src="../../core/theme.js"></script>
+<script type="application/json" id="deck-config">
+{
+  "title": "Prompt it. Run it. Ship it.",
+  "brand": "Your Name · Codex Community Brisbane · Lightning talk",
+  "petWalk": true,
+  "sections": {
+    "Welcome": 1,
+    "The hook": 1,
+    "Demo": 2,
+    "How it works": 4,
+    "Takeaway": 1,
+    "Extras": 0
+  }
+}
+</script>
+</head>
+<body>
+
+<main id="deck">
+
+<section class="slide slide--cover" id="cover" data-section="Welcome" data-chrome="off" data-title="Prompt it. Run it. Ship it.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Codex Community Brisbane · Lightning talk</div>
+      <h1 class="title" data-fill="title"><span>Prompt it.</span><span>Run it.</span><em>Ship it.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 17 November 2026</span></div>
+    </div>
+    <div class="mascots">
+      <i class="mascot m-pentagon" aria-hidden="true"></i>
+      <i class="mascot m-octagon" aria-hidden="true"></i>
+      <i class="mascot m-hexagon" aria-hidden="true"></i>
+      <i class="mascot m-diamond" aria-hidden="true"></i>
+      <i class="mascot m-triangle" aria-hidden="true"></i>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00–0:20.</b> Say the promise in one breath: what the audience will see, and that it’s real.</p>
+    <p>“Everything tonight is a real run. Where something is drawn, I’ll say so.”</p>
+  </aside>
+</section>
+
+<section class="slide slide--about" id="speaker" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <figure class="about-portrait"><img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk"></figure>
+  <i class="pet about-pet" data-pose="wave" aria-hidden="true"></i>
+  <div class="about-panel">
+    <svg class="about-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Builder · Speaker · Your city</p>
+    <h2 class="about-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="about-summary">I build small tools with Codex after hours. <strong>Tonight: one evening, one app, one honest diff.</strong></p>
+    <div class="about-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:20–0:40.</b> One breath. Swap in your portrait (<code>assets/portrait.svg</code>), logo and pixel pet.</p>
+  </aside>
+</section>
+
+<section class="slide" id="statement" data-section="The hook" data-title="Give it one evening">
+  <div class="eyebrow">The hook</div>
+  <h2 class="title title--wide">Give it one evening. <em>Get your weekend back.</em></h2>
+  <p class="sub" data-step>Codex took the boring half. <strong>I kept the fun half.</strong></p>
+  <i class="pet pet--corner" data-pose="thinking" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>0:40–1:10.</b> The key line. Pause after it, then Space for the sub line.</p>
+  </aside>
+</section>
+
+<section class="slide" id="prompt" data-section="Demo" data-title="Write the plan, let Codex read it">
+  <div class="eyebrow"><span class="n">02</span>Demo</div>
+  <h2 class="title title--wide">Write the plan. <em>Let Codex read it.</em></h2>
+  <div class="flow">
+    <div class="mock" role="img" aria-label="Drawn illustration of a plan file with eight sections">
+      <div class="mock-title">📝 PLAN.md</div>
+      <div class="mock-sub">The brief Codex reads first</div>
+      <div class="tiles">
+        <div class="tile" style="--i:0;--t:#d3e5ef"><em>🎯</em><strong>Goal</strong><span>One line</span></div>
+        <div class="tile is-hit" style="--i:1;--t:#dbeddb"><em>📱</em><strong>Phone view</strong><span>Build</span></div>
+        <div class="tile" style="--i:2;--t:#fdecc8"><em>🧪</em><strong>Tests</strong><span>Must pass</span></div>
+        <div class="tile" style="--i:3;--t:#fadec9"><em>🚫</em><strong>Data model</strong><span>Don’t touch</span></div>
+        <div class="tile" style="--i:4;--t:#e8deee"><em>🗂️</em><strong>Files</strong><span>Where to look</span></div>
+        <div class="tile" style="--i:5;--t:#d3e5ef"><em>✅</em><strong>Done when</strong><span>Checks</span></div>
+        <div class="tile" style="--i:6;--t:#e8deee"><em>📸</em><strong>Screenshot</strong><span>Proof</span></div>
+        <div class="tile" style="--i:7;--t:#fdecc8"><em>❓</em><strong>Questions</strong><span>Ask first</span></div>
+      </div>
+    </div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="composer">
+      <div class="composer-mode"><span class="on">Local</span><span>Cloud</span></div>
+      <div class="composer-box">
+        <div class="composer-chips"><span class="composer-chip"><i>›_</i>Codex</span><span class="composer-chip">PLAN.md</span></div>
+        <div class="composer-text" data-type="Read PLAN.md and build the phone view. Run the tests before you stop." data-ph="Ask Codex to do anything">Read PLAN.md and build the phone view. Run the tests before you stop.</div>
+        <div class="composer-bar"><span class="plus">+</span><span>Medium ⌄</span><span class="send">↑</span></div>
+      </div>
+      <p class="composer-label"><b>Drawn</b>the prompt I really used</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>1:10–1:50.</b> “The plan is the prompt. Goal, what to build, what not to touch, and what done looks like.”</p>
+    <p class="src">The plan card and the composer are drawn; the prompt is the one I really used.</p>
+  </aside>
+</section>
+
+<section class="slide" id="cli-run" data-section="Demo" data-live="Your terminal" data-title="One prompt, one run">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>Demo · the run</div>
+      <h2 class="title">One prompt. <em>One run.</em></h2>
+      <div class="tags"><span><b>6 m 12 s</b></span><span>17 tests</span><span>4 files</span></div>
+    </div>
+    <figure class="cli">
+      <div class="cli-head"><b>codex</b> ~/projects/pantry</div>
+      <div class="cli-body">
+        <p class="cli-line cli-user">Add a phone view to the pantry app, with tests. Don’t touch the data model.</p>
+        <p class="cli-line cli-run">Read <code>src/pantry.ts</code> and <code>src/views/</code></p>
+        <p class="cli-line cli-run">Edited 4 files</p>
+        <p class="cli-line cli-out"><ins>+ src/views/phone.tsx</ins>  <ins>+ test/phone.test.ts</ins></p>
+        <p class="cli-line cli-run">Ran <code>npm test</code></p>
+        <p class="cli-line cli-out">17 passed, 0 failed</p>
+        <p class="cli-line cli-ok">Phone view added. Data model unchanged.</p>
+        <p class="cli-line cli-meta">Worked for 6m 12s</p>
+      </div>
+      <figcaption><b>Drawn</b>from the real session, trimmed</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE (optional) → your terminal. Paste the prompt from the slide; cap the wait at 20 s, then come back here.</p>
+    <p><b>1:50–3:00.</b> “One prompt, one run. It read the plan and the code, changed four files and ran the tests.”</p>
+    <p class="src">The session is drawn from a real run and trimmed.</p>
+  </aside>
+</section>
+
+<section class="slide" id="before-after" data-section="Demo" data-live="Your app" data-title="Before the run, after the run">
+  <div class="split split--hero">
+    <div class="text">
+      <div class="eyebrow">Before → after</div>
+      <h2 class="title">Before. <em>After.</em></h2>
+      <p class="sub"><strong>Before</strong> → 8 open tasks.</p>
+      <p class="sub" data-step="done"><strong>After</strong> → 5, and a phone view.</p>
+    </div>
+    <div class="swap">
+      <figure class="shot" style="--h:62vh"><img src="assets/sample/state-a.svg" alt="Sample app after planning: Planned, nothing has changed yet; three unchecked steps; 8 tasks open"><figcaption><b>Private app</b>Planned · 8 open</figcaption></figure>
+      <figure class="shot" style="--h:62vh" data-step="done"><img src="assets/sample/state-b.svg" alt="Sample app after doing it: Done, the numbers moved; three checked steps; 5 tasks open"><figcaption><b>Private app</b>Done · 5 open</figcaption></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE → open the app on your phone and show the new view.</p>
+    <p><b>3:00–4:00.</b> Space swaps the screenshot: before, then after.</p>
+  </aside>
+</section>
+
+<section class="slide" id="numbers" data-section="How it works" data-title="One evening">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How long it took</div>
+      <h2 class="title">One evening. <em>Mostly waiting.</em></h2>
+      <div class="stats">
+        <div class="stat"><strong><span data-count="83">83</span> min</strong><span>start to finish</span></div>
+        <div class="stat"><strong data-count="4">4</strong><span>approaches tried</span></div>
+        <div class="stat"><strong data-count="17">17</strong><span>tests passing</span></div>
+        <div class="stat"><strong>$0</strong><span>extra spend, on an existing plan</span></div>
+      </div>
+    </div>
+    <figure class="phone" style="justify-self:center"><img src="assets/sample/phone.svg" alt="Sample phone screen titled Today with three cards: review the draft, move the 2 pm (flagged, not guessed), and send the update"><figcaption>Same app, phone size</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p><b>4:00–4:40.</b> Only quote numbers you measured; these are placeholders until you have your own.</p>
+  </aside>
+</section>
+
+<section class="slide" id="how-its-made" data-section="How it works" data-title="Four steps, no magic">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it’s made</div>
+      <h2 class="title">Four steps. <em>No magic.</em></h2>
+      <ol class="pipe">
+        <li style="--i:0"><b>01</b>Write the plan</li>
+        <li style="--i:1"><b>02</b>Let Codex run it</li>
+        <li style="--i:2"><b>03</b>Read every diff</li>
+        <li style="--i:3"><b>04</b>Ship the screenshot</li>
+      </ol>
+    </div>
+    <div class="fan">
+      <figure class="shot f1"><img src="assets/sample/app.svg" alt="Sample app overview with counts, an activity chart and a queue"></figure>
+      <figure class="shot f2"><img src="assets/sample/answer.svg" alt="Sample answer listing three changes"></figure>
+      <figure class="shot f3"><img src="assets/sample/state-b.svg" alt="Sample app after the action ran, with three steps checked"></figure>
+      <p class="fan-cap"><b>Sample outputs</b>three of the screens</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>4:40–5:40.</b> Walk the four steps; the fan shows the evidence without a word on it.</p>
+  </aside>
+</section>
+
+<section class="slide" id="takeaways" data-section="Takeaway" data-title="Which one should you reach for?">
+  <div class="eyebrow">The recipe</div>
+  <h2 class="title title--wide">Which one should <em>you</em> reach for?</h2>
+  <div class="recipe">
+    <div class="recipe-row" style="--c:var(--a1)"><b>01</b><strong>Start with the annoyance</strong><span>Something you’d fix tonight.</span></div>
+    <div class="recipe-row" style="--c:var(--a2)"><b>02</b><strong>Write the plan down</strong><span>Goal, limits, done when.</span></div>
+    <div class="recipe-row" style="--c:var(--a4)"><b>03</b><strong>Let Codex run it</strong><span>One prompt at a time.</span></div>
+    <div class="recipe-row" style="--c:var(--a3)"><b>04</b><strong>Read every diff</strong><span>It’s still your code.</span></div>
+    <div class="recipe-row" style="--c:var(--a5)"><b>05</b><strong>Show the real run</strong><span>Screenshots beat slides.</span></div>
+  </div>
+  <i class="mascot mascot--corner mascot--top m-hexagon" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>5:40–6:30.</b> One row per breath. This is the slide people photograph.</p>
+  </aside>
+</section>
+
+<section class="slide slide--close" id="close" data-section="Takeaway" data-chrome="off" data-title="Thank you">
+  <div class="fx" aria-hidden="true">
+    <div class="orb" style="--c:var(--a1);right:8vw;top:-14vh"></div>
+    <div class="orb" style="--c:var(--a3);--size:34vw;right:-8vw;bottom:-16vh;animation-delay:-4s"></div>
+    <div class="sparks" data-n="16"></div>
+  </div>
+  <div class="close-grid">
+    <div class="close-text">
+      <div class="eyebrow">Thank you!</div>
+      <h2 class="title close-title">Prompt it. Run it. <em>Ship it.</em></h2>
+      <p class="sticker" data-step>Go build something tonight ✓</p>
+      <nav class="close-socials" aria-label="Speaker links">
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://x.com/"><b>X</b>@your-handle</a>
+        <a href="https://www.linkedin.com/"><b>LinkedIn</b>your-handle</a>
+      </nav>
+    </div>
+    <a class="close-qr" href="https://example.com/slides" data-slides-url>
+      <span class="qr-ring"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></span>
+      <span class="qr-label">Grab the slides</span>
+      <span class="qr-url">example.com/slides</span>
+      <i class="mascot m-pentagon qm1" aria-hidden="true"></i>
+      <i class="mascot m-hexagon qm2" aria-hidden="true"></i>
+      <i class="mascot m-diamond qm3" aria-hidden="true"></i>
+      <i class="mascot m-octagon qm4" aria-hidden="true"></i>
+      <i class="mascot m-triangle qm5" aria-hidden="true"></i>
+    </a>
+  </div>
+  <i class="pet close-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>6:30–10:00.</b> Land the key line. Space → the sticker. “The slides are on that QR code, with all the links.” Leave this up for questions.</p>
+    <p>Likely questions have extras: “How long did it take?” → One evening, logged. “What didn’t work?” → Honest limits.</p>
+  </aside>
+</section>
+
+<!-- Presenter extras -->
+
+<section class="slide" id="x-timeline" data-hidden data-section="Extras" data-title="Extra: One evening, logged">
+  <div class="eyebrow">Presenter extra · build log</div>
+  <h2 class="title title--wide title--small">One evening, <em>about 83 minutes.</em></h2>
+  <ol class="timeline">
+    <li><time>22:46</time><span>Read the plan. Start.</span></li>
+    <li><time>22:48</time><span>Mock inputs made, clearly fake</span></li>
+    <li><time>22:52</time><span>No-code build started</span></li>
+    <li><time>22:54</time><span>Notes and instructions written</span></li>
+    <li><time>23:00</time><span>First build done</span></li>
+    <li><time>23:04</time><span>Plan → do it works</span></li>
+    <li><time>23:24</time><span>Verified against the real data</span></li>
+    <li><time>23:29</time><span>One feature fails; repair attempted</span></li>
+    <li><time>23:41</time><span>Coded version answers in 6 s</span></li>
+    <li><time>23:46</time><span>17 tests pass</span></li>
+    <li><time>23:49</time><span>One install path blocked</span></li>
+    <li><time>00:09</time><span>Final checks done</span></li>
+  </ol>
+  <aside class="notes"><p>For “how long did it take?”. Copy the times from your build log; don’t round them into a better story.</p></aside>
+</section>
+
+<section class="slide" id="x-limits" data-hidden data-section="Extras" data-title="Extra: Honest limits">
+  <div class="eyebrow">Presenter extra · honest limits</div>
+  <h2 class="title title--wide title--small">What didn’t work. <em>Yet.</em></h2>
+  <div class="split split--even split--auto">
+    <div class="text">
+      <ul class="facts">
+        <li><strong>One feature</strong> failed inside the app and needed a workaround.</li>
+        <li><strong>One install path</strong> was blocked; the local version works.</li>
+        <li><strong>Costs</strong> weren’t measured per run, so no dollar figure.</li>
+      </ul>
+      <div class="chips"><span>Works offline</span><span>Every live beat has a screenshot</span><span>Mock data only</span></div>
+    </div>
+    <figure class="shot" style="--h:46vh"><img src="assets/sample/state-a.svg" alt="Sample app in its planned state"><figcaption><b>Fallback</b>the screenshot path</figcaption></figure>
+  </div>
+  <aside class="notes"><p>For “does it really work?”. Say the limit plainly before anyone has to ask twice.</p></aside>
+</section>
+
+<section class="slide" id="x-cost" data-hidden data-section="Extras" data-title="Extra: What it cost">
+  <div class="eyebrow">Presenter extra · what it cost</div>
+  <h2 class="title title--wide title--small">Mostly time. <em>Not much of it.</em></h2>
+  <div class="counters">
+    <div style="--c:var(--a4)"><strong><span data-count="10">10</span> min</strong><span>first set-up</span></div>
+    <div style="--c:var(--a2)"><strong><span data-count="8">8</span> min</strong><span>first no-code build</span></div>
+    <div style="--c:var(--a3)"><strong><span data-count="60">60</span> min</strong><span>coded version, alongside</span></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--a4)">Existing plan</span>
+    <span style="--c:var(--a2)">No API key</span>
+    <span style="--c:var(--a1)">No billing set-up <small>this time</small></span>
+  </div>
+  <p class="lede">Dollar cost wasn’t measured separately, so there’s no figure to quote.</p>
+  <aside class="notes"><p>For “did it cost money?”. Don’t invent a dollar figure.</p></aside>
+</section>
+
+</main>
+
+<script src="../../core/deck.js"></script>
+<script src="../../components/components.js"></script>
+</body>
+</html>

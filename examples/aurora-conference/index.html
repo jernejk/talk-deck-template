@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agents in production. What actually broke.</title>
+<meta name="description" content="Agents in production. What actually broke. · Conference talk · 25 minutes">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../core/deck.css">
+<link rel="stylesheet" href="../../components/components.css">
+<link rel="stylesheet" href="../../templates/aurora/theme.css" id="theme">
+<script src="../../core/theme.js"></script>
+<script type="application/json" id="deck-config">
+{
+  "title": "Agents in production. What actually broke.",
+  "brand": "Your Name · Conference talk · 25 minutes",
+  "sections": {
+    "Welcome": 1,
+    "The setup": 1,
+    "What broke": 3,
+    "What held": 4,
+    "Monday": 2,
+    "Extras": 0
+  }
+}
+</script>
+</head>
+<body>
+
+<main id="deck">
+
+<section class="slide slide--cover" id="cover" data-section="Welcome" data-chrome="off" data-title="Agents in production. What actually broke.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Conference talk · 25 minutes</div>
+      <h1 class="title" data-fill="title"><span>Agents in production.</span><em>What actually broke.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Wednesday 2 December 2026</span></div>
+    </div>
+    <div class="mascots">
+      <i class="mascot m-pentagon" aria-hidden="true"></i>
+      <i class="mascot m-octagon" aria-hidden="true"></i>
+      <i class="mascot m-hexagon" aria-hidden="true"></i>
+      <i class="mascot m-diamond" aria-hidden="true"></i>
+      <i class="mascot m-triangle" aria-hidden="true"></i>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00–0:30.</b> Say the promise in one breath: one incident, start to finish, and the rule that came out of it.</p>
+    <p>“We ran coding agents against a payments service for six months. Tonight is the one that got through. Where a screen is drawn, I’ll say so.”</p>
+  </aside>
+</section>
+
+<section class="slide slide--about" id="speaker" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <figure class="about-portrait"><img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk"></figure>
+  <i class="pet about-pet" data-pose="wave" aria-hidden="true"></i>
+  <div class="about-panel">
+    <svg class="about-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Platform engineer · Speaker · Brisbane</p>
+    <h2 class="about-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="about-summary">I run the coding-agent fleet for a payments team. <strong>Tonight: one incident, one rule.</strong></p>
+    <div class="about-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:30–1:00.</b> One breath. “I’m the person who gets paged when the agent is wrong.” Swap in your portrait (<code>assets/portrait.svg</code>), logo and pixel pet.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda" data-section="The setup" data-title="Three parts">
+  <div class="eyebrow">The next 25 minutes</div>
+  <h2 class="title title--wide">Three parts. <em>One incident.</em></h2>
+  <div class="pillars">
+    <div class="pillar" style="--c:var(--a1)"><i><span>01</span><span>0:00</span></i><strong>The setup</strong><span>What we shipped, and what we promised the team.</span></div>
+    <div class="pillar" style="--c:var(--a3)"><i><span>02</span><span>3:00</span></i><strong>What broke</strong><span>One run, start to finish, with the session behind it.</span></div>
+    <div class="pillar" style="--c:var(--a4)"><i><span>03</span><span>12:00</span></i><strong>What held</strong><span>The guard we added, and what to change on Monday.</span></div>
+  </div>
+  <aside class="notes">
+    <p><b>1:00–3:00.</b> Name the parts and the clock. Spend the rest of the slot on the setup: forty engineers, two agents, a payments service with a nightly migration.</p>
+    <p class="src">Pillars take any colour slot: <code>style="--c:var(--a2)"</code>. Set <code>--n</code> on <code>.pillars</code> for more columns.</p>
+  </aside>
+</section>
+
+<section class="slide" id="chapter" data-section="What broke" data-chrome="off" data-title="Part two: what broke">
+  <div class="chapter">
+    <span class="chapter-num">02</span>
+    <div class="text">
+      <div class="eyebrow">Part two</div>
+      <h2 class="title">What broke. <em>Green bar and all.</em></h2>
+      <p class="sub">One run, with the session behind every claim.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>3:00–3:10.</b> A breath between parts. “This is the run that got through. Every line you’ll see came from the log.”</p>
+    <p class="src">Change the number for each part; it takes the section’s colour.</p>
+  </aside>
+</section>
+
+<section class="slide" id="cli-run" data-section="What broke" data-live="Your terminal" data-title="It passed the tests">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>What broke · the run</div>
+      <h2 class="title">It passed the tests. <em>It deleted the fixture.</em></h2>
+      <div class="tags"><span><b>3 m 48 s</b></span><span>42 tests green</span><span>1 file gone</span></div>
+    </div>
+    <figure class="cli">
+      <div class="cli-head"><b>agent</b> ~/services/ledger</div>
+      <div class="cli-body">
+        <p class="cli-line cli-user">Fix the flaky balance test. Keep the migration untouched.</p>
+        <p class="cli-line cli-run">Read <code>test/balance.test.ts</code> and <code>fixtures/</code></p>
+        <p class="cli-line cli-run">Edited 2 files</p>
+        <p class="cli-line cli-out"><ins>~ test/balance.test.ts</ins>  <del>- fixtures/balances.json</del></p>
+        <p class="cli-line cli-run">Ran <code>npm test</code></p>
+        <p class="cli-line cli-out">42 passed, 0 failed</p>
+        <p class="cli-line cli-ok">Flaky test fixed. Migration untouched.</p>
+        <p class="cli-line cli-meta">Worked for 3m 48s</p>
+      </div>
+      <figcaption><b>Drawn</b>reconstructed from the session log, trimmed</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="live">LIVE (optional) → your terminal. Run the same prompt against the sandbox copy; cap the wait at 20 s, then come back here.</p>
+    <p><b>3:10–12:00.</b> “Forty-two green. The migration really was untouched. The fixture that seeded staging was gone, and nobody reads the diff when the bar is green.” Walk the lines top to bottom, then the three hours that followed.</p>
+    <p class="src">The session is drawn from the log and trimmed; the real one has forty more lines of test output. Lines stream in when the slide opens.</p>
+  </aside>
+</section>
+
+<section class="slide" id="code" data-section="What held" data-title="The one line we added">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">What held</div>
+      <h2 class="title">The one line <em>we added.</em></h2>
+      <div class="callout" data-step><b>The rule</b><p>An agent can propose a delete. Only a person can land one.</p></div>
+    </div>
+    <figure class="code">
+      <figcaption>src/guard.ts</figcaption>
+      <ol>
+        <li><span class="k">export function</span> <span class="f">review</span>(c) {</li>
+        <li class="c">  // deletes always wait for a person</li>
+        <li class="hl">  <span class="k">if</span> (c.kind === <span class="s">"delete"</span>) <span class="k">return</span> <span class="f">hold</span>(c)</li>
+        <li>  <span class="k">const</span> risk = <span class="f">score</span>(c) ?? <span class="n">0</span></li>
+        <li>  <span class="k">return</span> risk &gt; LIMIT ? <span class="f">hold</span>(c) : <span class="f">land</span>(c)</li>
+        <li>}</li>
+      </ol>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>12:00–15:00.</b> Point at the highlighted line, read it, and stop. Space reveals the rule in words. “It is not clever. It has caught eleven deletes since.”</p>
+    <p class="src">Six lines at most. Wrap tokens in <code>.k</code>, <code>.s</code>, <code>.f</code>, <code>.n</code>; mark comment lines <code>.c</code> and the key line <code>.hl</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="how-its-made" data-section="What held" data-title="Four gates, no heroics">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">What held</div>
+      <h2 class="title">Four gates. <em>No heroics.</em></h2>
+      <ol class="pipe">
+        <li style="--i:0"><b>01</b>Scope the prompt to one file set</li>
+        <li style="--i:1"><b>02</b>Dry run in a sandbox copy</li>
+        <li style="--i:2"><b>03</b>A person reads the diff</li>
+        <li style="--i:3"><b>04</b>Deploy behind a flag</li>
+      </ol>
+    </div>
+    <div class="fan">
+      <figure class="shot f1"><img src="assets/sample/app.svg" alt="Illustration of a review dashboard with counts, an activity chart and a queue"></figure>
+      <figure class="shot f2"><img src="assets/sample/answer.svg" alt="Illustration of an agent summary listing three changes"></figure>
+      <figure class="shot f3"><img src="assets/sample/state-b.svg" alt="Illustration of a deploy checklist with three steps checked"></figure>
+      <p class="fan-cap"><b>Drawn</b>stand-ins for the review dashboard</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>15:00–19:00.</b> Walk the four gates; one breath each. “Gate three is the expensive one. It is also the one that would have caught the fixture.”</p>
+    <p class="src">The three screens are drawn stand-ins; the real dashboard shows customer names. Say so if anyone asks.</p>
+  </aside>
+</section>
+
+<section class="slide" id="takeaways" data-section="Monday" data-title="What to change on Monday">
+  <div class="eyebrow">Monday</div>
+  <h2 class="title title--wide">What to change <em>on Monday.</em></h2>
+  <div class="recipe">
+    <div class="recipe-row" style="--c:var(--a1)"><b>01</b><strong>Read the diff, not the bar</strong><span>Green tests prove the tests, not the change.</span></div>
+    <div class="recipe-row" style="--c:var(--a2)"><b>02</b><strong>Hold every delete</strong><span>One guard, no exceptions, no clever scoring.</span></div>
+    <div class="recipe-row" style="--c:var(--a4)"><b>03</b><strong>Dry run in a sandbox</strong><span>The agent runs twice and lands once.</span></div>
+    <div class="recipe-row" style="--c:var(--a3)"><b>04</b><strong>Flag every deploy</strong><span>Turning it off beats rolling it back.</span></div>
+    <div class="recipe-row" style="--c:var(--a5)"><b>05</b><strong>Log the prompt</strong><span>The prompt is the first line of the incident report.</span></div>
+  </div>
+  <i class="mascot mascot--corner mascot--top m-hexagon" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>19:00–22:00.</b> One row per breath. This is the slide people photograph, so leave it up for a count of five.</p>
+  </aside>
+</section>
+
+<section class="slide slide--close" id="close" data-section="Takeaway" data-chrome="off" data-title="Thank you">
+  <div class="fx" aria-hidden="true">
+    <div class="orb" style="--c:var(--a1);right:8vw;top:-14vh"></div>
+    <div class="orb" style="--c:var(--a3);--size:34vw;right:-8vw;bottom:-16vh;animation-delay:-4s"></div>
+    <div class="sparks" data-n="16"></div>
+  </div>
+  <div class="close-grid">
+    <div class="close-text">
+      <div class="eyebrow">Thank you!</div>
+      <h2 class="title close-title">Agents in production. <em>What actually broke.</em></h2>
+      <p class="sticker" data-step>One fixture lost. Zero customer data ✓</p>
+      <nav class="close-socials" aria-label="Speaker links">
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://x.com/"><b>X</b>@your-handle</a>
+        <a href="https://www.linkedin.com/"><b>LinkedIn</b>your-handle</a>
+      </nav>
+    </div>
+    <a class="close-qr" href="https://example.com/slides" data-slides-url>
+      <span class="qr-ring"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></span>
+      <span class="qr-label">Grab the slides</span>
+      <span class="qr-url">example.com/slides</span>
+      <i class="mascot m-pentagon qm1" aria-hidden="true"></i>
+      <i class="mascot m-hexagon qm2" aria-hidden="true"></i>
+      <i class="mascot m-diamond qm3" aria-hidden="true"></i>
+      <i class="mascot m-octagon qm4" aria-hidden="true"></i>
+      <i class="mascot m-triangle qm5" aria-hidden="true"></i>
+    </a>
+  </div>
+  <i class="pet close-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>22:00–25:00.</b> Land the key line. Space → the sticker. “The slides and the guard are on that QR code.” Leave this up for questions.</p>
+    <p>Likely question with an extra: “Should we just turn autopilot off?” → the side-by-side on H.</p>
+  </aside>
+</section>
+
+<!-- Presenter extras -->
+
+<section class="slide" id="x-compare" data-hidden data-section="Extras" data-title="Extra: Side by side">
+  <div class="eyebrow">Presenter extra · three ways to run an agent</div>
+  <h2 class="title title--wide title--small">Autopilot, guarded, or manual.</h2>
+  <table class="compare">
+    <thead><tr><th scope="col"></th><th scope="col">Autopilot</th><th scope="col" class="is-hero">Guarded</th><th scope="col">Manual</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Lands a change</th><td>On green tests</td><td class="is-hero">On green tests and a read diff</td><td>Only by hand</td></tr>
+      <tr><th scope="row">Deletes</th><td>Allowed</td><td class="is-hero">Always held for a person</td><td>By hand</td></tr>
+      <tr><th scope="row">Throughput</th><td>Highest</td><td class="is-hero">About a third slower</td><td>Lowest</td></tr>
+      <tr><th scope="row">Best for</th><td>Throwaway branches</td><td class="is-hero">Anything with customer data</td><td>Migrations</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes"><p>For “should we just turn it off?” The throughput figure is our own, measured over one quarter; say so.</p></aside>
+</section>
+
+</main>
+
+<script src="../../core/deck.js"></script>
+<script src="../../components/components.js"></script>
+</body>
+</html>

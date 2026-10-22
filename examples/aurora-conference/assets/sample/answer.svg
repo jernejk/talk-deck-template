@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" width="1400" height="1000" font-family="-apple-system,'Helvetica Neue',Arial,sans-serif">
+<rect width="1400" height="1000" fill="#fff"/>
+<rect x="700" y="40" width="660" height="96" rx="28" fill="#eef3fe"/>
+<text x="736" y="98" font-size="26" fill="#1e3a8a">What changed in the project this week?</text>
+<text x="40" y="200" font-size="22" fill="#8e8e8e">Worked for 24 s</text>
+<text x="40" y="252" font-size="28" fill="#111">I checked the project notes and found <tspan font-weight="700">three changes</tspan>:</text>
+<g font-size="26" fill="#111">
+<rect x="40" y="290" width="1320" height="150" rx="18" fill="#fafafa" stroke="#ececec"/>
+<rect x="68" y="318" width="94" height="94" rx="14" fill="#ffedd5"/><text x="96" y="380" font-size="44">🚀</text>
+<text x="190" y="346" font-weight="700">Release moved to Thursday</text><rect x="560" y="322" width="150" height="34" rx="17" fill="#dcfce7"/><text x="580" y="347" font-size="20" fill="#15803d">confirmed</text>
+<text x="190" y="392" fill="#555">The demo build passed review on Tuesday.</text>
+<rect x="40" y="460" width="1320" height="150" rx="18" fill="#fafafa" stroke="#ececec"/>
+<rect x="68" y="488" width="94" height="94" rx="14" fill="#e0e7ff"/><text x="96" y="550" font-size="44">📄</text>
+<text x="190" y="516" font-weight="700">Two docs updated</text><rect x="440" y="492" width="140" height="34" rx="17" fill="#f1f1f1"/><text x="462" y="517" font-size="20" fill="#555">from notes</text>
+<text x="190" y="562" fill="#555">Setup guide and the FAQ, both edited on Monday.</text>
+<rect x="40" y="630" width="1320" height="150" rx="18" fill="#fafafa" stroke="#ececec"/>
+<rect x="68" y="658" width="94" height="94" rx="14" fill="#fef3c7"/><text x="96" y="720" font-size="44">⚠️</text>
+<text x="190" y="686" font-weight="700">One open question</text><rect x="452" y="662" width="170" height="34" rx="17" fill="#fef3c7"/><text x="472" y="687" font-size="20" fill="#b45309">flagged, not guessed</text>
+<text x="190" y="732" fill="#555">Two meetings match "the 2 pm". Which one moves?</text>
+</g>
+<text x="40" y="850" font-size="28" fill="#111"><tspan font-weight="700">Result:</tspan> 2 confirmed changes, 1 question for you.</text>
+<text x="40" y="910" font-size="24" fill="#8e8e8e">Sample answer · replace with a real capture</text>
+</svg>

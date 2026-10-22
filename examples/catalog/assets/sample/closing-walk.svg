@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" role="img" aria-label="Abstract sample photo: a route line across a map">
+<rect width="400" height="500" fill="#1f2a25"/><path d="M0 120H400M0 250H400M0 380H400M90 0V500M230 0V500M330 0V500" stroke="#2f3e37" stroke-width="10"/><path d="M60 440C80 330 150 360 170 270S250 220 280 130 330 70 340 60" fill="none" stroke="#00d084" stroke-width="10" stroke-linecap="round"/><circle cx="60" cy="440" r="14" fill="#fff"/><circle cx="340" cy="60" r="18" fill="#ff6a4d"/><rect x="40" y="46" width="130" height="40" rx="10" fill="#101915"/><rect x="56" y="62" width="70" height="10" rx="5" fill="#a3d9c0"/>
+</svg>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How the ledger works. One event at a time.</title>
+<meta name="description" content="How the ledger works. One event at a time. · Architecture walkthrough · Team brown bag">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../core/deck.css">
+<link rel="stylesheet" href="../../components/components.css">
+<link rel="stylesheet" href="../../templates/blueprint/theme.css" id="theme">
+<script src="../../core/theme.js"></script>
+<script type="application/json" id="deck-config">
+{
+  "title": "How the ledger works. One event at a time.",
+  "brand": "Your Name · Architecture walkthrough · Team brown bag",
+  "sections": {
+    "Welcome": 1,
+    "The shape": 1,
+    "The read path": 2,
+    "The write path": 4,
+    "Takeaway": 1,
+    "Extras": 0
+  }
+}
+</script>
+</head>
+<body>
+
+<main id="deck">
+
+<section class="slide slide--cover" id="cover" data-section="Welcome" data-chrome="off" data-title="How the ledger works. One event at a time.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Architecture walkthrough · Team brown bag</div>
+      <h1 class="title" data-fill="title"><span>How the ledger works.</span><em>One event at a time.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Monday 7 December 2026</span></div>
+    </div>
+    <div class="mascots">
+      <i class="mascot m-pentagon" aria-hidden="true"></i>
+      <i class="mascot m-octagon" aria-hidden="true"></i>
+      <i class="mascot m-hexagon" aria-hidden="true"></i>
+      <i class="mascot m-diamond" aria-hidden="true"></i>
+      <i class="mascot m-triangle" aria-hidden="true"></i>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>0:00–0:20.</b> Say what the pantry app stores and what it doesn’t: it stores events, never stock.</p>
+    <p>“The pantry app has no stock table. It has a log. Fifteen minutes on how that log works, and why we did it that way.”</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda" data-section="The shape" data-title="Three parts">
+  <div class="eyebrow">Today</div>
+  <h2 class="title title--wide">Three parts. <em>Fifteen minutes.</em></h2>
+  <div class="pillars">
+    <div class="pillar" style="--c:var(--a1)"><i><span>01</span><span>0:00</span></i><strong>The shape</strong><span>Why an append-only log, in one line.</span></div>
+    <div class="pillar" style="--c:var(--a2)"><i><span>02</span><span>3:00</span></i><strong>The read path</strong><span>How a stock number comes out of a stream of events.</span></div>
+    <div class="pillar" style="--c:var(--a4)"><i><span>03</span><span>9:00</span></i><strong>The write path</strong><span>Appends, sequence numbers, projections and replays.</span></div>
+  </div>
+  <aside class="notes">
+    <p><b>0:20–1:00.</b> Name the parts and the clock, then move on.</p>
+    <p>“Shape, reads, writes. Questions at the end, or shout if I lose you.”</p>
+  </aside>
+</section>
+
+<section class="slide" id="chapter" data-section="The read path" data-chrome="off" data-title="Part two: the read path">
+  <div class="chapter">
+    <span class="chapter-num">02</span>
+    <div class="text">
+      <div class="eyebrow">Part two</div>
+      <h2 class="title">The read path. <em>Fold, don’t update.</em></h2>
+      <p class="sub">A stock number is a fold over events, never a cell in a table.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>3:00–3:15.</b> A breath between parts. Say what this part proves, then move on.</p>
+    <p>“Nothing in part two mutates. Every number you see is computed from the log.”</p>
+  </aside>
+</section>
+
+<section class="slide" id="rule" data-section="The read path" data-title="Planned events change nothing">
+  <div class="eyebrow">The one rule</div>
+  <h2 class="title title--wide">Planned events change nothing. <em>Consumed events change stock.</em></h2>
+  <div class="ledger" role="table" aria-label="Stock at the start, after planned events and after consumed events">
+    <span class="h" role="columnheader">Item</span><span class="h" role="columnheader">Start</span><span class="h" role="columnheader" data-step="planned">Planned</span><span class="h is-hot" role="columnheader" data-step="done">Consumed</span>
+    <span class="item">Coffee</span><span class="num">250 g</span><span class="num" data-step="planned">250 g</span><span class="num is-hot" data-step="done">232 g</span>
+    <span class="item">Rice</span><span class="num">2.0 kg</span><span class="num" data-step="planned">2.0 kg</span><span class="num is-hot" data-step="done">1.6 kg</span>
+    <span class="item">Eggs</span><span class="num">12</span><span class="num" data-step="planned">12</span><span class="num is-hot" data-step="done">9</span>
+  </div>
+  <aside class="notes">
+    <p><b>3:15–4:30.</b> Space ×2: the Planned column appears and nothing moves, then Consumed appears and the numbers move.</p>
+    <p>“A meal plan is intent. It goes in the log so we can show it, but the fold skips it. Only a consumed event subtracts.”</p>
+    <p class="src">Sample quantities, made up for the slide.</p>
+  </aside>
+</section>
+
+<section class="slide" id="code" data-section="The read path" data-title="The one function that matters">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it works</div>
+      <h2 class="title">The one function <em>that matters.</em></h2>
+      <div class="callout" data-step><b>The rule</b><p>Planned never touches stock. Consumed subtracts, once.</p></div>
+    </div>
+    <figure class="code">
+      <figcaption>src/ledger/fold.ts</figcaption>
+      <ol>
+        <li><span class="k">export function</span> <span class="f">fold</span>(stock, e) {</li>
+        <li class="c">  // planned events are intent, not fact</li>
+        <li class="hl">  <span class="k">if</span> (e.kind === <span class="s">"planned"</span>) <span class="k">return</span> stock</li>
+        <li>  <span class="k">const</span> qty = stock[e.item] ?? <span class="n">0</span></li>
+        <li>  <span class="k">return</span> { ...stock, [e.item]: qty - e.qty }</li>
+        <li>}</li>
+      </ol>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>4:30–5:30.</b> Point at the highlighted line, read it, and stop. Space reveals the rule in words.</p>
+    <p>“Every read of stock is reduce over the log with this function. That’s the whole read model.”</p>
+    <p class="src">Trimmed for the slide; the real function also validates the event and clamps at zero.</p>
+  </aside>
+</section>
+
+<section class="slide" id="how-its-made" data-section="The write path" data-title="Four steps, no updates">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">The write path</div>
+      <h2 class="title">Four steps. <em>No updates.</em></h2>
+      <ol class="pipe">
+        <li style="--i:0"><b>01</b>Append the event</li>
+        <li style="--i:1"><b>02</b>Assign a sequence number</li>
+        <li style="--i:2"><b>03</b>Fan out to projections</li>
+        <li style="--i:3"><b>04</b>Serve the snapshot</li>
+      </ol>
+    </div>
+    <div class="fan">
+      <figure class="shot f1"><img src="assets/sample/app.svg" alt="Drawn overview screen with counts, an activity chart and a queue"></figure>
+      <figure class="shot f2"><img src="assets/sample/answer.svg" alt="Drawn card listing three changes from the log"></figure>
+      <figure class="shot f3"><img src="assets/sample/state-b.svg" alt="Drawn snapshot screen after a consumed event, with three steps checked"></figure>
+      <p class="fan-cap"><b>Drawn</b>three illustrative screens, not captures</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>9:00–10:30.</b> Walk the four steps. The screens are drawn illustrations; say so.</p>
+    <p>“One writer appends. The sequence number is the only lock we have. Projections subscribe and build their own tables, and the API only ever reads a projection.”</p>
+  </aside>
+</section>
+
+<section class="slide" id="long-page" data-section="The write path" data-title="Replay the whole log">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Replays</div>
+      <h2 class="title">Replay the log. <em>Watch stock rebuild.</em></h2>
+      <p class="hint"><b>Why it matters</b>A projection is disposable. Drop it, replay from event one, and it comes back identical.</p>
+    </div>
+    <div class="stage">
+      <figure class="scrollshot"><div class="scrollshot-view"><img src="assets/sample/tall.svg" alt="Drawn long page listing the replay steps in order"></div><figcaption><b>Drawn</b>a replay log, illustrative</figcaption></figure>
+      <figure class="shot inset"><img src="assets/sample/source.svg" alt="Drawn notes page standing in for the raw event list"></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>10:30–11:30.</b> Let it scroll while you talk; don’t narrate every line.</p>
+    <p>“Replay is boring on purpose. Same events, same fold, same numbers. If they differ, the projection is wrong, never the log.”</p>
+    <p class="src">The scrolling page is a drawn sample, not a real replay.</p>
+  </aside>
+</section>
+
+<section class="slide" id="takeaways" data-section="Takeaway" data-title="What to remember on Monday">
+  <div class="eyebrow">The recipe</div>
+  <h2 class="title title--wide">What to remember <em>on Monday.</em></h2>
+  <div class="recipe">
+    <div class="recipe-row" style="--c:var(--a1)"><b>01</b><strong>Append, never update</strong><span>Facts only get added.</span></div>
+    <div class="recipe-row" style="--c:var(--a2)"><b>02</b><strong>Fold for every read</strong><span>Stock is derived, not stored.</span></div>
+    <div class="recipe-row" style="--c:var(--a4)"><b>03</b><strong>Plans are not facts</strong><span>The fold skips planned events.</span></div>
+    <div class="recipe-row" style="--c:var(--a3)"><b>04</b><strong>Projections are disposable</strong><span>Replay rebuilds them.</span></div>
+    <div class="recipe-row" style="--c:var(--a5)"><b>05</b><strong>Compact with care</strong><span>Snapshots cache; the log stays the truth.</span></div>
+  </div>
+  <i class="mascot mascot--corner mascot--top m-hexagon" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>11:30–12:30.</b> One row per breath. This is the slide people photograph.</p>
+    <p>“If you remember one line: the log is the truth, everything else is a cache.”</p>
+  </aside>
+</section>
+
+<section class="slide slide--close" id="close" data-section="Takeaway" data-chrome="off" data-title="Thank you">
+  <div class="fx" aria-hidden="true">
+    <div class="orb" style="--c:var(--a1);right:8vw;top:-14vh"></div>
+    <div class="orb" style="--c:var(--a3);--size:34vw;right:-8vw;bottom:-16vh;animation-delay:-4s"></div>
+    <div class="sparks" data-n="16"></div>
+  </div>
+  <div class="close-grid">
+    <div class="close-text">
+      <div class="eyebrow">Thank you!</div>
+      <h2 class="title close-title">How the ledger works. <em>One event at a time.</em></h2>
+      <p class="sticker" data-step>Rev. A · Questions open ✓</p>
+      <nav class="close-socials" aria-label="Speaker links">
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://x.com/"><b>X</b>@your-handle</a>
+        <a href="https://www.linkedin.com/"><b>LinkedIn</b>your-handle</a>
+      </nav>
+    </div>
+    <a class="close-qr" href="https://example.com/slides" data-slides-url>
+      <span class="qr-ring"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></span>
+      <span class="qr-label">Grab the slides</span>
+      <span class="qr-url">example.com/slides</span>
+      <i class="mascot m-pentagon qm1" aria-hidden="true"></i>
+      <i class="mascot m-hexagon qm2" aria-hidden="true"></i>
+      <i class="mascot m-diamond qm3" aria-hidden="true"></i>
+      <i class="mascot m-octagon qm4" aria-hidden="true"></i>
+      <i class="mascot m-triangle qm5" aria-hidden="true"></i>
+    </a>
+  </div>
+  <i class="pet close-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p><b>12:30–15:00.</b> Land the key line. Space → the stamp. “The slides are on that QR code, with the fold function and the replay notes.” Leave this up for questions.</p>
+    <p>Likely questions have extras: “What happens when a projection is wrong?” → The bad compaction, replayed. “What doesn’t it do?” → Honest limits.</p>
+  </aside>
+</section>
+
+<!-- Presenter extras -->
+
+<section class="slide" id="x-timeline" data-hidden data-section="Extras" data-title="Extra: The bad compaction, replayed">
+  <div class="eyebrow">Presenter extra · incident log</div>
+  <h2 class="title title--wide title--small">One bad compaction, <em>replayed in 23 minutes.</em></h2>
+  <ol class="timeline">
+    <li><time>09:12</time><span>Compaction job ships with an off-by-one</span></li>
+    <li><time>09:20</time><span>Stock drifts on two tenants</span></li>
+    <li><time>09:31</time><span>Alert: projection checksum mismatch</span></li>
+    <li><time>09:34</time><span>Projections marked stale; appends keep going</span></li>
+    <li><time>09:40</time><span>Replay from event one starts</span></li>
+    <li><time>09:48</time><span>Tenant A snapshot rebuilt</span></li>
+    <li><time>09:55</time><span>Tenant B snapshot rebuilt</span></li>
+    <li><time>10:03</time><span>Checksums match the log again</span></li>
+    <li><time>10:10</time><span>Bad compaction reverted</span></li>
+    <li><time>10:15</time><span>Post-mortem opened</span></li>
+    <li><time>10:30</time><span>Boundary test added</span></li>
+    <li><time>10:40</time><span>All clear</span></li>
+  </ol>
+  <aside class="notes"><p>For “what happens when a projection is wrong?”. These times are a made-up example; copy real ones from your incident log and don’t round them into a better story.</p></aside>
+</section>
+
+<section class="slide" id="x-limits" data-hidden data-section="Extras" data-title="Extra: Honest limits">
+  <div class="eyebrow">Presenter extra · honest limits</div>
+  <h2 class="title title--wide title--small">What the ledger doesn’t do. <em>Yet.</em></h2>
+  <div class="split split--even split--auto">
+    <div class="text">
+      <ul class="facts">
+        <li><strong>No multi-item transactions.</strong> One event, one item; a recipe is several events.</li>
+        <li><strong>Compaction is a nightly job,</strong> so a cold replay can take minutes, not seconds.</li>
+        <li><strong>No deletes.</strong> A wrong event is corrected by a compensating event, never removed.</li>
+      </ul>
+      <div class="chips"><span>Append-only</span><span>Replayable</span><span>Single writer</span></div>
+    </div>
+    <figure class="shot" style="--h:46vh"><img src="assets/sample/state-a.svg" alt="Drawn screen showing a planned state before any consumed event"><figcaption><b>Drawn</b>a planned state, illustrative</figcaption></figure>
+  </div>
+  <aside class="notes"><p>For “does it really work?”. Say the limit plainly before anyone has to ask twice.</p></aside>
+</section>
+
+</main>
+
+<script src="../../core/deck.js"></script>
+<script src="../../components/components.js"></script>
+</body>
+</html>

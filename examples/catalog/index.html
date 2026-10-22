@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slide catalog</title>
+<meta name="description" content="Every reusable slide pattern, in any template: add ?theme=&lt;name&gt; to the URL.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../core/deck.css">
+<link rel="stylesheet" href="../../components/components.css">
+<link rel="stylesheet" href="../../templates/community/theme.css" id="theme">
+<script src="../../core/theme.js"></script>
+<script type="application/json" id="deck-config">
+{
+  "title": "Slide catalog",
+  "brand": "Slide catalog · ?theme=\u003cname> switches the template",
+  "sections": {
+    "Welcome": 1,
+    "The hook": 1,
+    "Demo": 2,
+    "Push for more": 3,
+    "How it works": 4,
+    "Takeaway": 1,
+    "Extras": 0
+  }
+}
+</script>
+</head>
+<body>
+
+<main id="deck">
+
+<section class="slide slide--cover" id="cover" data-section="Welcome" data-chrome="off" data-title="Big words. Real demos. Honest fallbacks.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Event name · Project showcase</div>
+      <h1 class="title" data-fill="title"><span>Big words.</span><span>Real demos.</span><em>Honest fallbacks.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 20 October 2026</span></div>
+    </div>
+    <div class="mascots">
+      <i class="mascot m-pentagon" aria-hidden="true"></i>
+      <i class="mascot m-octagon" aria-hidden="true"></i>
+      <i class="mascot m-hexagon" aria-hidden="true"></i>
+      <i class="mascot m-diamond" aria-hidden="true"></i>
+      <i class="mascot m-triangle" aria-hidden="true"></i>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cover</code>: Title, event and speaker, with the mascot cluster. Add it with <code>npm run add -- &lt;deck&gt; cover</code>.</p>
+    <p><b>0:00–0:20.</b> Say the promise in one breath: what the audience will see, and that it’s real.</p>
+    <p>“Everything tonight is a real run. Where something is drawn, I’ll say so.”</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover cover--image" id="cover-image" data-section="Welcome" data-chrome="off" data-title="Make something real. Then show it.">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow" data-fill="event">Event name · A build, start to finish</div>
+      <h1 class="title title--stack" data-fill="title"><span>Make something real.</span><em>Then show it.</em></h1>
+      <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 20 October 2026</span></div>
+    </div>
+    <figure class="cover-frame">
+      <img src="assets/sample/titles-hero.svg" alt="Drawn poster of a sun over layered waves">
+      <figcaption><b>Drawn</b>The thing you made: swap in a real photo of it</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cover-image</code>: Title beside the framed thing you made. Add it with <code>npm run add -- &lt;deck&gt; cover-image</code>.</p>
+    <p><b>0:00–0:20.</b> Point at the artwork. “That’s the finished thing. Here’s how it got made.”</p>
+    <p class="src">The frame fits a 3:4 image (<code>assets/sample/titles-hero.svg</code>). Label the caption <b>Real photo</b> once it is one.</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover cover--photo" id="cover-photo" data-section="Welcome" data-chrome="off" data-ghost="off" data-title="A peek inside the black box">
+  <figure class="cover-photo"><img src="assets/sample/photo.svg" alt="Illustration of a mountain range at dawn"></figure>
+  <div class="text">
+    <div class="eyebrow" data-fill="event">Event name · Deep dive</div>
+    <h1 class="title title--stack" data-fill="title"><span>A peek inside</span><em>the black box.</em></h1>
+    <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 20 October 2026</span></div>
+    <nav class="cover-links" aria-label="Talk links">
+      <a href="https://example.com/"><b>Slides</b>example.com/slides</a>
+      <a href="https://github.com/"><b>GitHub</b>your-handle/repo</a>
+    </nav>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cover-photo</code>: Full-bleed photo, title on a scrim, links. Add it with <code>npm run add -- &lt;deck&gt; cover-photo</code>.</p>
+    <p><b>0:00–0:20.</b> Let the image land, then the promise in one breath. Read the links out once.</p>
+    <p class="src">The scrim takes the theme’s background colour, so the title stays readable in light and dark themes. Use a photo you have the rights to.</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover cover--center" id="cover-center" data-section="Welcome" data-chrome="off" data-title="Ship the small thing.">
+  <div class="text">
+    <div class="eyebrow" data-fill="event">Event name · Lightning talk</div>
+    <h1 class="title title--xl title--center" data-fill="title"><span>Ship the</span> <em>small thing.</em></h1>
+    <i class="cover-rule" aria-hidden="true"></i>
+    <div class="cover-meta"><span><b data-fill="speaker">Your Name</b> (handle)</span><span data-fill="date">Tuesday 20 October 2026</span></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cover-center</code>: One centred statement. Add it with <code>npm run add -- &lt;deck&gt; cover-center</code>.</p>
+    <p><b>0:00–0:15.</b> One line, said plainly. Nothing else on the slide competes with it.</p>
+    <p class="src">Keep the title to five or six words; <code>title--xl</code> is sized for that.</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover-split" id="cover-split" data-section="Welcome" data-chrome="off" data-ghost="off" data-title="Big words. Real demos. Honest fallbacks.">
+  <div class="cover-panel">
+    <div class="eyebrow" data-fill="event">Event name · Developer walkthrough</div>
+    <h1 class="title" data-fill="title"><span>Big words.</span><span>Real demos.</span><em>Honest fallbacks.</em></h1>
+    <p class="sub">One line on what people leave with.</p>
+    <dl class="cover-facts">
+      <div><dt>Presenter</dt><dd data-fill="speaker">Your Name</dd></div>
+      <div><dt>Date</dt><dd data-fill="date">Tuesday 20 October 2026</dd></div>
+      <div><dt>Repo</dt><dd>you/your-repo</dd></div>
+    </dl>
+  </div>
+  <div class="cover-side">
+    <div class="eyebrow">In this talk</div>
+    <ol class="agenda agenda--side" data-auto></ol>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cover-split</code>: A coloured title panel beside an “In this talk” agenda. Add it with <code>npm run add -- &lt;deck&gt; cover-split</code>.</p>
+    <p><b>0:00–0:20.</b> Say the promise in one breath, then point at the list: “Five parts, and you’ll always know which one we’re in.”</p>
+    <p class="src">The panel takes the Welcome colour and the list fills from the deck’s agenda, with nothing marked current on a cover. Swap Repo for Venue when there’s no code to share.</p>
+  </aside>
+</section>
+
+<section class="slide" id="title-styles" data-section="The hook" data-title="Title styles">
+  <div class="eyebrow">Title styles</div>
+  <h2 class="title title--kicker title--number title--stack title--wide"><small>A kicker line sits above</small><b>01</b><span>Stack each line.</span><em>Number the big ones.</em></h2>
+  <p class="sub" data-step>Add <strong>title--xl</strong> for a cover, <strong>title--center</strong> for a statement. They combine.</p>
+  <aside class="notes">
+    <p class="src">Pattern <code>title-styles</code>: Kicker, numeral and stacked lines on one title. Add it with <code>npm run add -- &lt;deck&gt; title-styles</code>.</p>
+    <p><b>0:40–1:00.</b> Say the title as two beats, one per line.</p>
+    <p class="src">Authoring: <code>title--stack</code> puts each <code>span</code> and <code>em</code> on its own line, <code>title--kicker</code> styles a leading <code>&lt;small&gt;</code>, <code>title--number</code> outlines a leading <code>&lt;b&gt;</code> numeral in the slide colour. <code>title--xl</code> and <code>title--center</code> are on the cover patterns.</p>
+  </aside>
+</section>
+
+<section class="slide slide--about" id="speaker" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <figure class="about-portrait"><img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk"></figure>
+  <i class="pet about-pet" data-pose="wave" aria-hidden="true"></i>
+  <div class="about-panel">
+    <svg class="about-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Builder · Speaker · Your city</p>
+    <h2 class="about-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="about-summary">One line about what you do. <strong>One line about tonight.</strong></p>
+    <div class="about-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>speaker</code>: Who you are: portrait, logo, a one-line summary and links. Add it with <code>npm run add -- &lt;deck&gt; speaker</code>.</p>
+    <p><b>0:20–0:40.</b> One breath. Swap in your portrait (<code>assets/portrait.svg</code>), logo and pixel pet.</p>
+  </aside>
+</section>
+
+<section class="slide slide--presenter presenter--card" id="speaker-card" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <div class="presenter-panel">
+    <svg class="presenter-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Builder · Speaker · Your city</p>
+    <h2 class="presenter-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="presenter-summary">The three things you work on, in one line. <strong>Then what tonight is about.</strong></p>
+    <div class="presenter-tags"><span>Your title</span><span>Your city</span><span>Something you host</span></div>
+    <div class="presenter-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+  </div>
+  <div class="presenter-side">
+    <figure class="presenter-portrait">
+      <img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk">
+      <span class="presenter-badge"><small>Programme</small>Award name</span>
+    </figure>
+    <ul class="presenter-coins" aria-label="Topics"><li>AI</li><li>Web</li><li>Data</li><li>OSS</li></ul>
+    <div class="presenter-focus"><b>Current focus</b><strong>Project name</strong><p>One sentence on what it is and why it matters to this room.</p></div>
+  </div>
+  <i class="pet presenter-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>speaker-card</code>: Circle portrait, badge, topic coins and a current-focus card. Add it with <code>npm run add -- &lt;deck&gt; speaker-card</code>.</p>
+    <p><b>0:20–0:40.</b> One breath on who you are, then point at the focus card: that’s the thread for tonight.</p>
+    <p class="src">Swap the portrait (<code>assets/portrait.svg</code>), the badge text and the four coins. Drop the badge if you have no credential to show.</p>
+  </aside>
+</section>
+
+<section class="slide slide--presenter presenter--banner" id="speaker-banner" data-section="Welcome" data-chrome="off" data-ghost="off" data-title="Your Name">
+  <figure class="presenter-banner"><img src="assets/sample/titles-banner.svg" alt="Drawn workspace with a lamp, shelf and window"></figure>
+  <div class="presenter-panel">
+    <svg class="presenter-logo" viewBox="0 0 64 64" role="img" aria-label="Logo"><rect x="3" y="3" width="58" height="58" rx="16" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 13 36.5 27.5 51 32 36.5 36.5 32 51 27.5 36.5 13 32 27.5 27.5Z" style="fill:var(--accent)"/></svg>
+    <p class="eyebrow">Builder · Speaker · Maker</p>
+    <h2 class="presenter-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+    <p class="presenter-summary">What you do, in one line. <strong>This time, what you did differently.</strong></p>
+    <div class="presenter-links" aria-label="Speaker links">
+      <a href="https://github.com/"><span>GitHub</span>your-handle</a>
+      <a href="https://example.com/"><span>Web</span>example.com</a>
+      <a href="https://x.com/"><span>X</span>@your-handle</a>
+      <a href="https://www.linkedin.com/"><span>LinkedIn</span>your-handle</a>
+    </div>
+    <div class="presenter-tags"><span>Your title</span><span>Your city</span><span>First time doing this</span></div>
+  </div>
+  <i class="pet presenter-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>speaker-banner</code>: Wide image fading into your details. Add it with <code>npm run add -- &lt;deck&gt; speaker-banner</code>.</p>
+    <p><b>0:20–0:40.</b> One breath. The picture does the atmosphere; you do the one line about tonight.</p>
+    <p class="src">The banner is a wide image (<code>assets/sample/titles-banner.svg</code>) fading into the theme background from the left. A photo of your desk or your city works well.</p>
+  </aside>
+</section>
+
+<section class="slide slide--presenter presenter--facts" id="speaker-facts" data-section="Welcome" data-chrome="off" data-title="Your Name">
+  <div class="presenter-head">
+    <p class="eyebrow">Builder · Speaker · Your city</p>
+    <h2 class="presenter-name"><b data-fill="speaker">Your Name</b> <span>(handle)</span></h2>
+  </div>
+  <figure class="presenter-portrait--wide"><img src="assets/portrait.svg" alt="Placeholder illustration of the speaker at a desk"></figure>
+  <ul class="presenter-facts" aria-label="Quick facts">
+    <li class="presenter-fact" data-step><b>Day job</b>What you build, for whom.</li>
+    <li class="presenter-fact" data-step><b>Why I’m up here</b>The one thing that happened that made this talk.</li>
+    <li class="presenter-fact" data-step><b>Find me</b>example.com · @your-handle</li>
+  </ul>
+  <i class="pet presenter-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>speaker-facts</code>: Portrait and three fact bubbles revealed on Space. Add it with <code>npm run add -- &lt;deck&gt; speaker-facts</code>.</p>
+    <p><b>0:20–0:45.</b> Space reveals a fact at a time. Say each in one sentence; the third is where to find you.</p>
+    <p class="src">Three bubbles, each with a label and one line. Keep them short enough to read from the back.</p>
+  </aside>
+</section>
+
+<section class="slide" id="speakers" data-section="Welcome" data-chrome="off" data-title="Your hosts tonight">
+  <div class="eyebrow">Your hosts tonight</div>
+  <h2 class="title">Three of us. <em>One demo each.</em></h2>
+  <div class="presenter-team" style="--n:3">
+    <div class="presenter-card" style="--c:var(--a1)">
+      <img src="assets/portrait.svg" alt="Placeholder illustration of the first presenter">
+      <h3 data-fill="speaker">Your Name</h3>
+      <p class="role">Role · Company</p>
+      <p>One line on what you bring tonight.</p>
+      <span class="handle">@your-handle</span>
+    </div>
+    <div class="presenter-card" style="--c:var(--a2)">
+      <img src="assets/sample/titles-portrait-2.svg" alt="Placeholder illustration of the second presenter">
+      <h3>Second Name</h3>
+      <p class="role">Role · Company</p>
+      <p>One line on what they bring tonight.</p>
+      <span class="handle">@second-handle</span>
+    </div>
+    <div class="presenter-card" style="--c:var(--a4)">
+      <img src="assets/sample/titles-portrait-3.svg" alt="Placeholder illustration of the third presenter">
+      <h3>Third Name</h3>
+      <p class="role">Role · Company</p>
+      <p>One line on what they bring tonight.</p>
+      <span class="handle">@third-handle</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>speakers</code>: Two or three co-presenters as cards. Add it with <code>npm run add -- &lt;deck&gt; speakers</code>.</p>
+    <p><b>0:20–0:50.</b> Each presenter says their own line. Ten seconds each.</p>
+    <p class="src">Two presenters: delete a card and set <code>--n:2</code>. Portraits are square crops; the placeholders are <code>assets/portrait.svg</code> and <code>assets/sample/titles-portrait-2.svg</code>, <code>-3.svg</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda" data-section="The hook" data-title="Three parts">
+  <div class="eyebrow">Tonight</div>
+  <h2 class="title title--wide">Three parts. <em>Fifteen minutes.</em></h2>
+  <div class="pillars">
+    <div class="pillar" style="--c:var(--a1)"><i><span>01</span><span>0:00</span></i><strong>The hook</strong><span>Why anyone should care, in one line.</span></div>
+    <div class="pillar" style="--c:var(--a2)"><i><span>02</span><span>2:00</span></i><strong>The demo</strong><span>A real run, with a screenshot behind every live beat.</span></div>
+    <div class="pillar" style="--c:var(--a4)"><i><span>03</span><span>10:00</span></i><strong>The takeaway</strong><span>What to do on Monday.</span></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>agenda</code>: Three numbered parts with their clock times. Add it with <code>npm run add -- &lt;deck&gt; agenda</code>.</p>
+    <p><b>1:10–2:00.</b> Name the parts and the clock, then move on.</p>
+    <p class="src">Pillars take any colour slot: <code>style="--c:var(--a2)"</code>. Set <code>--n</code> on <code>.pillars</code> for more columns.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda-list" data-section="Welcome" data-title="Tonight, in five parts">
+  <div class="eyebrow">Agenda</div>
+  <h2 class="title title--wide">Tonight, in <em>five parts.</em></h2>
+  <ol class="agenda" data-auto>
+    <li><b class="agenda-num">01</b><strong class="agenda-title">Part name</strong><span class="agenda-note">Filled from the deck’s sections.</span></li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>agenda-list</code>: The numbered-parts agenda, filled from the deck’s sections. Add it with <code>npm run add -- &lt;deck&gt; agenda-list</code>.</p>
+    <p><b>0:40–1:20.</b> Read the part names, not the notes. Say how long the whole thing takes, then move on.</p>
+    <p class="src">The list fills itself: an <code>"agenda"</code> array in <code>#deck-config</code> gives each part a <code>title</code>, <code>note</code> and <code>time</code>; without it, the parts are the deck’s <code>data-section</code> names in order. Parts before this slide show as done, so the same list works as a recap.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agenda-schedule" data-section="Welcome" data-title="Today">
+  <div class="eyebrow">The plan</div>
+  <h2 class="title">Today</h2>
+  <div class="schedule" style="--n:4">
+    <div class="slot"><time>9:00</time><strong>Welcome</strong><span>You’re here. That was the hard part.</span></div>
+    <div class="slot is-now" style="--c:var(--a1)"><time>9:15</time><strong>An intro to the tools</strong><span>This bit. About 40 minutes.</span></div>
+    <div class="slot"><time>10:00</time><strong>Build something live</strong><span>A guest, a real build.</span></div>
+    <div class="slot"><time>11:00</time><strong>Have a go</strong><span>Mentors on the floor all day.</span></div>
+    <div class="slot"><time>12:30</time><strong>Lunch</strong><span></span></div>
+    <div class="slot"><time>14:00</time><strong>Show us something</strong><span>Optional. A couple of minutes each.</span></div>
+    <div class="slot"><time>15:00</time><strong>Wrap up</strong><span>Head home.</span></div>
+    <div class="slot"><time>All day</time><strong>Mentors</strong><span>Look for the lanyards.</span></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>agenda-schedule</code>: The day as time blocks, with the current block lit. Add it with <code>npm run add -- &lt;deck&gt; agenda-schedule</code>.</p>
+    <p><b>0:30–1:30.</b> Point at the highlighted block, then the one thing people should not miss.</p>
+    <p class="src"><code>.schedule</code> is a grid of <code>.slot</code>s (<code>time</code>, <code>strong</code>, <code>span</code>); <code>--n</code> sets the columns. Move <code>.is-now</code> to whichever block is current, and a slot can take its own <code>--c</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="chapter" data-section="Demo" data-chrome="off" data-title="Part two: the demo">
+  <div class="chapter">
+    <span class="chapter-num">02</span>
+    <div class="text">
+      <div class="eyebrow">Part two</div>
+      <h2 class="title">The demo. <em>Real runs only.</em></h2>
+      <p class="sub">A screenshot behind every live beat.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>chapter</code>: A part divider with a huge outlined number. Add it with <code>npm run add -- &lt;deck&gt; chapter</code>.</p>
+    <p><b>2:00–2:10.</b> A breath between parts. Say what this part proves, then move on.</p>
+    <p class="src">Change the number for each part; it takes the section’s colour.</p>
+  </aside>
+</section>
+
+<section class="slide" id="chapter-agenda" data-section="Demo" data-title="Up next: the demo">
+  <div class="agenda-part">
+    <div class="text">
+      <div class="eyebrow">Up next</div>
+      <h2 class="title">The demo. <em>Real runs only.</em></h2>
+      <p class="sub">One line on what this part proves.</p>
+      <p class="agenda-where"><b>Where the code is</b><code>github.com/you/repo/tree/main/demo</code></p>
+    </div>
+    <div class="agenda-aside">
+      <svg class="agenda-art" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
+        <path d="M60 52 104 30 60 8 16 30Z"/>
+        <path d="M16 30v34l44 22V52M104 30v34L60 86"/>
+        <path d="M38 41v22M82 41v22" opacity=".5"/>
+        <path d="M60 52v-18l-22-11M60 34l22-11" stroke-dasharray="3 4" opacity=".6"/>
+      </svg>
+      <div class="eyebrow">Where we are</div>
+      <ol class="agenda agenda--side" data-auto></ol>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>chapter-agenda</code>: Up next: a part divider with the code path and the agenda sidebar. Add it with <code>npm run add -- &lt;deck&gt; chapter-agenda</code>.</p>
+    <p><b>2:00–2:15.</b> A breath between parts. Say what this part proves and where the code lives, then move on.</p>
+    <p class="src">The sidebar is the deck’s agenda with this slide’s part lit; set <code>data-agenda-current="Demo"</code> to light a different one. Swap the drawn box for your own illustration, and point the code hint at the folder you’re about to open.</p>
+  </aside>
+</section>
+
+<section class="slide" id="statement" data-section="The hook" data-title="One idea per slide">
+  <div class="eyebrow">The hook</div>
+  <h2 class="title">One idea per slide. <em>Say it big.</em></h2>
+  <p class="sub" data-step>If it needs a third line, <strong>it’s two slides.</strong></p>
+  <i class="pet pet--corner" data-pose="thinking" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>statement</code>: One big idea, with a line held back for Space. Add it with <code>npm run add -- &lt;deck&gt; statement</code>.</p>
+    <p><b>0:40–1:10.</b> The key line. Pause after it. Space reveals the sub line.</p>
+    <p class="src">Authoring: eyebrow, then a title with one <code>&lt;em&gt;</code> for the payoff. <code>data-step</code> holds anything back until Space.</p>
+  </aside>
+</section>
+
+<section class="slide" id="pets" data-section="The hook" data-title="Your pet has four moods">
+  <div class="eyebrow">The hook · meet the pet</div>
+  <h2 class="title title--wide">Your pet has <em>four moods.</em></h2>
+  <ol class="pets">
+    <li>
+      <p class="pet-say">“Hi! I’ll be here all talk.”</p>
+      <i class="pet" data-pose="wave" aria-hidden="true"></i>
+      <b>wave</b>
+      <span>Cover and close: hello and goodbye.</span>
+    </li>
+    <li data-step>
+      <p class="pet-say">“Watch this. It’s live.”</p>
+      <i class="pet" data-pose="coding" aria-hidden="true"></i>
+      <b>coding</b>
+      <span>Demos and anything running for real.</span>
+    </li>
+    <li data-step>
+      <p class="pet-say">“Good question. Hmm…”</p>
+      <i class="pet" data-pose="thinking" aria-hidden="true"></i>
+      <b>thinking</b>
+      <span>Questions, open problems and pauses.</span>
+    </li>
+    <li data-step>
+      <p class="pet-say">“That wasn’t meant to happen.”</p>
+      <i class="pet" data-pose="facepalm" aria-hidden="true"></i>
+      <b>facepalm</b>
+      <span>When the demo breaks. Laugh, then recover.</span>
+    </li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>pets</code>: The pet’s four poses, each with the line it might say. Add it with <code>npm run add -- &lt;deck&gt; pets</code>.</p>
+    <p><b>1:10–1:40.</b> Introduce the pet once, so the audience knows what its moods mean later. Space brings in each mood.</p>
+    <p class="src">Lineup: <code>ol.pets &gt; li</code> holding <code>p.pet-say</code>, <code>i.pet[data-pose]</code>, <code>b</code> for the pose and <code>span</code> for when to use it. <code>.pet-say</code> works beside any pet; <code>--tail</code> moves its tail. The template brings the pet images; the default is a drawn pixel robot.</p>
+  </aside>
+</section>
+
+<section class="slide slide--bleed" id="photo" data-section="The hook" data-chrome="off" data-ghost="off" data-title="Let one image do the talking">
+  <figure class="bleed"><img src="assets/sample/photo.svg" alt="Illustration of a mountain range at dawn"></figure>
+  <div class="bleed-text">
+    <div class="eyebrow">Big picture</div>
+    <h2 class="title">Let one image <em>do the talking.</em></h2>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>photo</code>: A full-bleed image with the title on a scrim. Add it with <code>npm run add -- &lt;deck&gt; photo</code>.</p>
+    <p><b>1:10–1:30.</b> Let the picture land for two seconds, then say one line.</p>
+    <p class="src">Use a photo you have the rights to. The scrim takes the theme’s background colour, so the title stays readable in light and dark themes.</p>
+  </aside>
+</section>
+
+<section class="slide slide--cover slide--opener" id="opener" data-section="Demo" data-title="Here’s a real input">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>The demo</div>
+      <h2 class="title"><span>“Here’s a real input.</span><span>Watch what</span><em>comes out.”</em></h2>
+    </div>
+    <div class="cover-art">
+      <figure class="tilt" style="--rh:66vh"><img src="assets/sample/receipt.svg" alt="A clearly marked sample input slip listing coffee beans, notebooks, sticky notes, an HDMI adapter, a spare clicker, water and snacks"></figure>
+      <p class="sticker" data-step>Spoiler: it worked ✓<small>second try</small></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>opener</code>: Messy input on a tilted card, with a sticker reveal. Add it with <code>npm run add -- &lt;deck&gt; opener</code>.</p>
+    <p><b>2:00–2:20.</b> Show the messy input before the clean output. Space pops the sticker; it’s the laugh line.</p>
+    <p class="src">Use clearly marked mock data on slides. No card numbers, addresses or account IDs.</p>
+  </aside>
+</section>
+
+<section class="slide" id="question" data-section="Demo" data-live="Your app" data-title="What did it actually say?">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>Demo · real answer</div>
+      <h2 class="ask">What changed this week?</h2>
+      <div class="tags"><span><b>24 s</b></span><span>First try</span><span>Names hidden</span></div>
+      <div class="callout" data-step><b>Bonus</b><p>“Two meetings match. Which one moves?”</p></div>
+    </div>
+    <figure class="shot" style="--h:70vh"><img src="assets/sample/answer.svg" alt="Sample answer listing three changes: the release moved to Thursday, two docs updated, and one open question flagged rather than guessed"><figcaption><b>Sample</b>swap in a real run</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>question</code>: The exact question, and the real answer as a screenshot. Add it with <code>npm run add -- &lt;deck&gt; question</code>.</p>
+    <p class="live">LIVE (optional) → your app. Ask the exact question on the slide. Cap the wait at 20 s, then come back here.</p>
+    <p><b>2:20–3:20.</b> Read the answer’s best line aloud. Space reveals the callout.</p>
+    <p class="src"><code>data-live</code> puts “● Live: …” in the footer and the overview, so you know where a switch is safe.</p>
+  </aside>
+</section>
+
+<section class="slide" id="prompt" data-section="Demo" data-title="Let the prompt type">
+  <div class="eyebrow"><span class="n">02</span>Demo</div>
+  <h2 class="title title--wide">Show the source. <em>Let the prompt type.</em></h2>
+  <div class="flow">
+    <div class="mock" role="img" aria-label="Drawn illustration of a notes app with eight pages">
+      <div class="mock-title">📒 My notes</div>
+      <div class="mock-sub">A page per thing</div>
+      <div class="tiles">
+        <div class="tile" style="--i:0;--t:#d3e5ef"><em>💻</em><strong>Work laptop</strong><span>Device</span></div>
+        <div class="tile" style="--i:1;--t:#e8deee"><em>📱</em><strong>Phone</strong><span>Device</span></div>
+        <div class="tile" style="--i:2;--t:#fdecc8"><em>🎧</em><strong>Headphones</strong><span>Audio</span></div>
+        <div class="tile is-hit" style="--i:3;--t:#dbeddb"><em>🧾</em><strong>Warranties</strong><span>Docs</span></div>
+        <div class="tile" style="--i:4;--t:#fadec9"><em>🎮</em><strong>Console</strong><span>Games</span></div>
+        <div class="tile" style="--i:5;--t:#d3e5ef"><em>🚲</em><strong>Bike</strong><span>Outdoors</span></div>
+        <div class="tile" style="--i:6;--t:#e8deee"><em>📷</em><strong>Camera</strong><span>Device</span></div>
+        <div class="tile" style="--i:7;--t:#fdecc8"><em>🗓️</em><strong>Plans</strong><span>Life</span></div>
+      </div>
+    </div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="composer">
+      <div class="composer-mode"><span class="on">Chat</span><span>Work</span></div>
+      <div class="composer-box">
+        <div class="composer-chips"><span class="composer-chip"><i>N</i>Notes</span></div>
+        <div class="composer-text" data-type="Which of my things are still under warranty?" data-ph="Ask anything">Which of my things are still under warranty?</div>
+        <div class="composer-bar"><span class="plus">+</span><span>Medium ⌄</span><span class="send">↑</span></div>
+      </div>
+      <p class="composer-label"><b>Drawn</b>the prompt I really used</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>prompt</code>: A drawn source card flowing into a prompt that types itself. Add it with <code>npm run add -- &lt;deck&gt; prompt</code>.</p>
+    <p><b>3:20–4:00.</b> “That’s the whole set-up: my notes, and one question.”</p>
+    <p class="src">The notes card and the composer are drawn, and the caption says so. <code>data-type</code> types the prompt when the slide opens; <code>.tile.is-hit</code> lights up the page it will read.</p>
+  </aside>
+</section>
+
+<section class="slide" id="cli-run" data-section="Demo" data-live="Your terminal" data-title="One prompt, one run">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow"><span class="n">02</span>Demo · the run</div>
+      <h2 class="title">One prompt. <em>One run.</em></h2>
+      <div class="tags"><span><b>6 m 12 s</b></span><span>17 tests</span><span>4 files</span></div>
+    </div>
+    <figure class="cli">
+      <div class="cli-head"><b>agent</b> ~/projects/pantry</div>
+      <div class="cli-body">
+        <p class="cli-line cli-user">Add a phone view to the pantry app, with tests. Don’t touch the data model.</p>
+        <p class="cli-line cli-run">Read <code>src/pantry.ts</code> and <code>src/views/</code></p>
+        <p class="cli-line cli-run">Edited 4 files</p>
+        <p class="cli-line cli-out"><ins>+ src/views/phone.tsx</ins>  <ins>+ test/phone.test.ts</ins></p>
+        <p class="cli-line cli-run">Ran <code>npm test</code></p>
+        <p class="cli-line cli-out">17 passed, 0 failed</p>
+        <p class="cli-line cli-ok">Phone view added. Data model unchanged.</p>
+        <p class="cli-line cli-meta">Worked for 6m 12s</p>
+      </div>
+      <figcaption><b>Drawn</b>from the real session, trimmed</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>cli-run</code>: A drawn terminal session whose lines stream in. Add it with <code>npm run add -- &lt;deck&gt; cli-run</code>.</p>
+    <p class="live">LIVE (optional) → your terminal. Paste the prompt from the slide; cap the wait at 20 s, then come back here.</p>
+    <p><b>4:00–5:00.</b> “One prompt, one run. It read the code, changed four files and ran the tests.”</p>
+    <p class="src">The session is drawn from a real run and trimmed. Lines stream in when the slide opens; put the agent’s name in the head.</p>
+  </aside>
+</section>
+
+<section class="slide" id="demo-map" data-section="Demo" data-live="Your terminal" data-title="Live demo map">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Live demo · the map</div>
+      <h2 class="title">Five checkpoints. <em>Then I stop.</em></h2>
+      <ol class="facts">
+        <li>Show the failing test</li>
+        <li>Paste the prompt</li>
+        <li>Watch it read the code</li>
+        <li>Check the diff</li>
+        <li>Run the tests again</li>
+      </ol>
+    </div>
+    <figure class="cli">
+      <div class="cli-head"><b>agent</b> ~/projects/pantry</div>
+      <div class="cli-body">
+        <p class="cli-line cli-user">1 · <code>npm test</code></p>
+        <p class="cli-line cli-out">1 failed: low-stock badge missing</p>
+        <p class="cli-line cli-user">2 · Add a low-stock badge under 2 units.</p>
+        <p class="cli-line cli-run">3 · Read <code>src/views/</code></p>
+        <p class="cli-line cli-run">4 · <code>git diff --stat</code></p>
+        <p class="cli-line cli-out">3 files changed</p>
+        <p class="cli-line cli-ok">5 · <code>npm test</code> passes</p>
+      </div>
+      <figcaption><b>Drawn</b>the plan, not a recording</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>demo-map</code>: Numbered live-demo checkpoints beside a drawn terminal. Add it with <code>npm run add -- &lt;deck&gt; demo-map</code>.</p>
+    <p class="live">LIVE → your terminal. Follow the five numbers in order; if a step stalls for 20 s, skip to the screenshot slide and say so.</p>
+    <p><b>8:00–10:00.</b> “Five checkpoints. If any one fails, I stop and show you the backup.”</p>
+    <p class="src">A numbered <code>.facts</code> list beside a drawn <code>.cli</code>. The numbers in the terminal match the list, so the audience can find their place.</p>
+  </aside>
+</section>
+
+<section class="slide" id="try-it" data-section="Demo" data-title="Click it yourself">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · in the slide</div>
+      <h2 class="title">Click it <em>yourself.</em></h2>
+      <p class="hint">A real page runs in the frame. Click it on stage, or let the room call the clicks.</p>
+    </div>
+    <figure class="embed">
+      <div class="embed-bar"><span class="embed-url">bucket.html</span></div>
+      <div class="embed-view"><iframe class="embed-frame" data-src="assets/sample/bucket.html" title="Token-bucket rate limiter, live"></iframe></div>
+      <figcaption><b>Sample demo</b>runs in the slide</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>try-it</code>: A live HTML demo in a browser frame that you can use during the talk. Add it with <code>npm run add -- &lt;deck&gt; try-it</code>.</p>
+    <p><b>10:00–10:40.</b> “Five tokens, one back every second. Send a few… now burst. Two get through; the rest get a 429.”</p>
+    <p class="src">The frame loads <code>data-src</code> when the slide opens and goes back to <code>about:blank</code> when you leave, so its timers and sound stop. To use your own, put one self-contained HTML file in <code>assets/</code> and point <code>data-src</code> and the URL pill at it. Expand fills the slide; Reload starts it fresh. Clicks inside the frame keep the keyboard, so click the slide edge before pressing Space.</p>
+  </aside>
+</section>
+
+<section class="slide" id="live-demo" data-section="Demo" data-live="Sample app" data-title="Screenshot first, live if it answers">
+  <div class="eyebrow">Demo · live on L</div>
+  <h2 class="title title--stack title--wide"><span>Screenshot first.</span> <em>Live if it answers.</em></h2>
+  <div class="split split--auto">
+    <ul class="facts">
+      <li><strong>L</strong> or Go live loads the real app over the slide.</li>
+      <li>The ring counts down 20&nbsp;s. At zero it says so, and stays open.</li>
+      <li><strong>L</strong> again, or Back, returns to the screenshot.</li>
+    </ul>
+    <figure class="embed" data-cap="20" style="--h:42vh">
+      <div class="embed-bar"><span class="embed-url">bucket.html</span></div>
+      <div class="embed-view">
+        <img class="embed-shot" src="assets/sample/bucket.png" alt="The sample rate limiter after a burst: five requests accepted, two rejected with 429">
+        <iframe class="embed-frame" data-src="assets/sample/bucket.html" title="Sample app, live"></iframe>
+      </div>
+      <figcaption><b>Sample</b>screenshot now, the real page on L</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>live-demo</code>: A screenshot that goes live on L, with a 20-second cap. Add it with <code>npm run add -- &lt;deck&gt; live-demo</code>.</p>
+    <p class="live">LIVE (optional) → Sample app. Press L; cap it at 20 s, then L again for the screenshot.</p>
+    <p><b>10:40–11:40.</b> “This is what it looked like this morning. If the Wi-Fi’s kind, here it is live.”</p>
+    <p class="src">The screenshot shows until you press L or Go live; then the frame loads <code>data-src</code> and fills the slide. Point <code>data-src</code> and the URL pill at your dev server, such as <code>http://localhost:5173</code>, and replace bucket.png with a 16:9 capture of the same screen. <code>data-cap</code> sets the countdown in seconds. While the frame has focus, keys go to the app: click Back instead of pressing L. Leaving the slide also goes back.</p>
+  </aside>
+</section>
+
+<section class="slide" id="before-after" data-section="Demo" data-live="Your app" data-title="Click once, watch it change">
+  <div class="split split--hero">
+    <div class="text">
+      <div class="eyebrow">Before → after</div>
+      <h2 class="title">Click once. <em>Watch it change.</em></h2>
+      <p class="sub"><strong>Plan</strong> → nothing moves.</p>
+      <p class="sub" data-step="done"><strong>Do it</strong> → 8 becomes 5.</p>
+    </div>
+    <div class="swap">
+      <figure class="shot" style="--h:62vh"><img src="assets/sample/state-a.svg" alt="Sample app after planning: Planned, nothing has changed yet; three unchecked steps; 8 tasks open"><figcaption><b>Private app</b>Planned · 8 open</figcaption></figure>
+      <figure class="shot" style="--h:62vh" data-step="done"><img src="assets/sample/state-b.svg" alt="Sample app after doing it: Done, the numbers moved; three checked steps; 5 tasks open"><figcaption><b>Private app</b>Done · 5 open</figcaption></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>before-after</code>: Two screenshots swapped by one step. Add it with <code>npm run add -- &lt;deck&gt; before-after</code>.</p>
+    <p class="live">LIVE → click Plan, read the unchanged number, then click Do it.</p>
+    <p><b>4:00–5:00.</b> Space swaps the screenshot and reveals the second line together; they share one step.</p>
+    <p class="src">Elements with the same <code>data-step="name"</code> reveal together. Unnamed steps reveal one at a time.</p>
+  </aside>
+</section>
+
+<section class="slide" id="zoom" data-section="Demo" data-title="Zoom to the number that matters">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · zoom</div>
+      <h2 class="title">Zoom to the number <em>that matters.</em></h2>
+      <ol class="zoom-steps">
+        <li data-step data-zoom="46% 67% 1.7"><span><strong>The busy day.</strong> The orange bar is the one to read out.</span></li>
+        <li data-step data-zoom="50% 31% 3.8"><span><strong>The number.</strong> 17 done this week, close enough to read from the back.</span></li>
+      </ol>
+    </div>
+    <figure class="zoom"><div class="zoom-frame"><img src="assets/sample/app.svg" alt="Sample app overview: number tiles across the top, an activity bar chart and a task queue below"></div><figcaption><b>Sample image</b>swap in your own capture</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>zoom</code>: One screenshot, zoomed to two regions on Space. Add it with <code>npm run add -- &lt;deck&gt; zoom</code>.</p>
+    <p><b>2:00–2:40.</b> Space zooms to the chart, Space again to the number; Left steps back out. Say what to look at before the zoom lands.</p>
+    <p class="src">Each <code>data-zoom="x% y% scale"</code> moves that point of the image towards the centre of the frame at that scale. It clamps at the edges, so a point near a corner stays in the corner instead of showing empty space. Keep the image the same shape as the frame (16:10 unless you set <code>--ar</code>).</p>
+  </aside>
+</section>
+
+<section class="slide" id="video" data-section="Demo" data-title="Show the clip, skip the clicks">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · recording</div>
+      <h2 class="title">Show the clip. <em>Skip the clicks.</em></h2>
+      <p class="sub">Muted, looping, and <strong>playing when the slide opens.</strong></p>
+    </div>
+    <figure class="video"><video src="assets/sample/demo.mp4" poster="assets/sample/demo-poster.png" muted loop playsinline preload="auto" aria-label="Screen recording of the sample app zooming into its activity chart"></video><figcaption><b>Screen recording</b>sped up 2×</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>video</code>: A muted screen recording that plays when the slide opens. Add it with <code>npm run add -- &lt;deck&gt; video</code>.</p>
+    <p><b>5:00–5:40.</b> Talk over the loop; it starts again each time you come back to this slide.</p>
+    <p class="src">Keep clips under ten seconds and a few MB. With reduced motion the poster frame shows instead.</p>
+  </aside>
+</section>
+
+<section class="slide" id="player" data-section="Demo" data-title="Play the clip with sound">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · clip with sound</div>
+      <h2 class="title">Play it <em>with sound</em>.</h2>
+      <p class="sub">Press play when you’re ready. <strong>Only the part you trimmed.</strong></p>
+    </div>
+    <figure class="player" data-start="0:01" data-end="0:04"><video src="assets/sample/demo.mp4" poster="assets/sample/demo-poster.png" controls playsinline preload="auto" aria-label="Screen recording of the sample app zooming into its activity chart"></video><figcaption><b>Screen recording</b>trimmed to 0:01–0:04 of a 5-second clip</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>player</code>: A clip with sound and controls, trimmed to the part you need. Add it with <code>npm run add -- &lt;deck&gt; player</code>.</p>
+    <p><b>5:40–6:20.</b> Say what to listen for, then press play so the sound starts on your cue.</p>
+    <p class="src">Put <code>data-start</code> and <code>data-end</code> (seconds or m:ss) on the figure to play only that part; the seek bar and clock count inside the trimmed segment. <code>data-autoplay</code> starts it when the slide opens, and if the browser refuses, the play button stays. Leaving pauses it and coming back resets it. The sample clip has no audio track.</p>
+  </aside>
+</section>
+
+<section class="slide" id="youtube" data-section="Demo" data-title="Show the talk, load it on play">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">Demo · YouTube</div>
+      <h2 class="title">Show the talk. <em>Load it on play.</em></h2>
+      <p class="sub">A local poster until you press play, so <strong>nothing loads early</strong>.</p>
+    </div>
+    <figure class="player" data-youtube="aqz-KE-bpKQ" data-start="0">
+      <div class="player-stage">
+        <img class="player-poster" src="assets/sample/video-poster.svg" alt="Drawn poster of a rabbit silhouette in a meadow at sunrise">
+        <p class="player-meta"><b>Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film</b><span>Blender · about 10 min</span><span class="player-note" hidden></span></p>
+        <button type="button" class="player-big" aria-label="Play Big Buck Bunny"></button>
+      </div>
+      <figcaption><b>Sample</b>Big Buck Bunny, CC BY 3.0 © Blender Foundation · drawn poster · <a class="player-link" href="https://www.youtube.com/watch?v=aqz-KE-bpKQ" target="_blank" rel="noopener noreferrer">Open on YouTube</a></figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>youtube</code>: A YouTube video behind a local poster, loaded only when you press play. Add it with <code>npm run add -- &lt;deck&gt; youtube</code>.</p>
+    <p><b>6:20–7:10.</b> Press play and let it run for the beat you came for. Leave the slide and it unloads.</p>
+    <p class="src">Set <code>data-youtube</code> to the video id and <code>data-start</code> to the second to begin at. Before you press play the slide makes no request to YouTube. On http(s) the poster becomes a privacy-enhanced embed; opened from disk or offline it opens the watch page in a new tab instead, because YouTube refuses embeds that send no referrer. “Open on YouTube” is always there as a fallback. Credit: Big Buck Bunny, © Blender Foundation, CC BY 3.0 (peach.blender.org).</p>
+  </aside>
+</section>
+
+<section class="slide" id="versus" data-section="Push for more" data-title="A weak prompt and a useful one">
+  <div class="eyebrow">Same ask, two prompts</div>
+  <h2 class="title title--wide">Say less, get less. <em>Say what done looks like.</em></h2>
+  <div class="versus">
+    <div class="versus-panel">
+      <span class="versus-chip">Weak prompt</span>
+      <p class="versus-body">Make the pantry app better.</p>
+      <p class="versus-verdict"><b>Result</b>A new colour scheme nobody asked for.</p>
+    </div>
+    <div class="versus-panel" data-step="useful">
+      <span class="versus-chip">Useful prompt</span>
+      <p class="versus-body">Add a <mark>low-stock badge</mark> to items under 2 units. Keep the data model. Add tests. <mark>Stop and ask</mark> if a change needs a new table.</p>
+      <p class="versus-verdict"><b>Result</b>One badge, four tests, no surprises.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>versus</code>: A weak and a useful prompt side by side, with a verdict line. Add it with <code>npm run add -- &lt;deck&gt; versus</code>.</p>
+    <p><b>7:00–7:50.</b> Read the weak one aloud and let it land. Space: the useful one, and point at the three highlighted phrases.</p>
+    <p class="src">Two <code>.versus-panel</code> cards: the first is tinted as the warning, the second as the good one. Put the real prompts in; <code>mark</code> picks out the phrases that matter. Drop the verdict line if the result isn’t known.</p>
+  </aside>
+</section>
+
+<section class="slide" id="pipeline" data-section="How it works" data-title="An order moves through four stages">
+  <div class="eyebrow">Order flow</div>
+  <h2 class="title title--wide">An order moves through <em>four stages</em></h2>
+  <ol class="stages">
+    <li data-step="s1"><i class="pin" aria-hidden="true"></i><strong>Receive</strong><span>Take the message off the queue and find who sent it.</span></li>
+    <li data-step="s2"><i class="pin" aria-hidden="true"></i><strong>Guess</strong><span>Work out which items the message is asking for.</span></li>
+    <li data-step="s3"><i class="pin" aria-hidden="true"></i><strong>Confirm</strong><span>Reply with the order read back, in plain words.</span></li>
+    <li data-step="s4"><i class="pin" aria-hidden="true"></i><strong>Pick</strong><span>Put it on the packing list for the morning.</span></li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>pipeline</code>: Stage cards with a marker that moves to the current stage. Add it with <code>npm run add -- &lt;deck&gt; pipeline</code>.</p>
+    <p><b>6:00–7:00.</b> Press Space once per stage and say one sentence for it; the marker moves to the stage you’re on.</p>
+    <p class="src">Stages are numbered by CSS. With <code>data-step</code> the last revealed card is the current one, via <code>:has()</code>. Without steps, add <code>is-current</code> to the card to light.</p>
+  </aside>
+</section>
+
+<section class="slide" id="agents" data-section="How it works" data-title="Four agents, one pull request">
+  <div class="eyebrow">How it works · the agents</div>
+  <h2 class="title title--wide">Four agents. <em>One pull request.</em></h2>
+  <ol class="agents">
+    <li class="agent" style="--accent:var(--a1)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Planner</strong><span class="agent-model">big model</span></div>
+      </div>
+      <p class="agent-task">Turns the issue into a plan.</p>
+      <ol class="agent-log">
+        <li data-state="thinking">Reading the issue</li>
+        <li data-state="done" data-step="s1">Plan: 3 tasks, 12 tests</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a2)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Builder</strong><span class="agent-model">fast model</span></div>
+      </div>
+      <p class="agent-task">Writes the change.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for the plan</li>
+        <li data-state="coding" data-step="s1">Writing the date parser</li>
+        <li data-state="thinking" data-step="s2">Reading the failure</li>
+        <li data-state="done" data-step="s3">Fix pushed: time zones</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a3)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Tester</strong><span class="agent-model">small model</span></div>
+      </div>
+      <p class="agent-task">Writes and runs the tests.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for the plan</li>
+        <li data-state="coding" data-step="s1">Writing 12 tests</li>
+        <li data-state="blocked" data-step="s2">1 of 12 fails: time zones</li>
+        <li data-state="done" data-step="s3">12 of 12 pass</li>
+      </ol>
+    </li>
+    <li class="agent" style="--accent:var(--a5)">
+      <div class="agent-head">
+        <span class="agent-avatar" aria-hidden="true"><i class="pet"></i></span>
+        <div><strong class="agent-name">Reviewer</strong><span class="agent-model">other lab</span></div>
+      </div>
+      <p class="agent-task">Reads the diff cold.</p>
+      <ol class="agent-log">
+        <li data-state="queued">Waiting for green tests</li>
+        <li data-state="thinking" data-step="s3">Reading the diff</li>
+        <li data-state="done" data-step="s4">Approved, one nit</li>
+      </ol>
+    </li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>agents</code>: Agents working one task, their states and pets changing on Space. Add it with <code>npm run add -- &lt;deck&gt; agents</code>.</p>
+    <p><b>7:00–8:00.</b> One task, four agents. Space moves the story on: the plan, building and testing side by side, a failing test and its fix, then the review.</p>
+    <p class="src">Drawn: no agents ran. <code>ol.agents &gt; li.agent</code>, coloured with <code>--accent</code>, holds <code>.agent-head</code> (<code>.agent-avatar &gt; i.pet</code>, <code>.agent-name</code>, <code>.agent-model</code>), <code>p.agent-task</code> and <code>ol.agent-log &gt; li[data-state]</code>: queued, thinking, coding, blocked or done. Lines that share a <code>data-step</code> name reveal together. The script sets each card’s state chip and pet pose from its last visible line; <code>data-pose</code> on a line overrides the pose.</p>
+  </aside>
+</section>
+
+<section class="slide" id="get-the-code" data-section="Push for more" data-title="Get the repo">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Get started</div>
+      <h2 class="title">Get the <em>repo</em></h2>
+      <p class="hint"><b>Or type this</b><code class="qr-path">github.com/your-handle/your-repo</code></p>
+      <ol class="pipe pipe--text">
+        <li><b>01</b><span><strong>Clone it.</strong> One command.</span></li>
+        <li><b>02</b><span><strong>Run the setup.</strong> Five minutes.</span></li>
+        <li><b>03</b><span><strong>Open the first task.</strong> It’s in the README.</span></li>
+      </ol>
+    </div>
+    <div class="media" style="display:grid;justify-items:center">
+      <div class="qr">
+        <a class="qr-link" href="https://example.com/repo"><span class="qr-card"><img src="assets/sample/closing-qr-repo.png" alt="QR code linking to the repo"></span></a>
+        <span class="qr-label">Scan to open the repo</span>
+        <span class="qr-url">example.com/repo</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>get-the-code</code>: A mid-talk QR to the repo, with the path and steps. Add it with <code>npm run add -- &lt;deck&gt; get-the-code</code>.</p>
+    <p><b>6:00–6:30.</b> Leave it up for ten seconds. Say the path out loud for anyone who can’t scan.</p>
+    <p class="src"><code>.qr</code> wraps <code>a.qr-link</code> (the link goes around the card, and QA decodes the image and compares it with the <code>href</code>), then the label and the URL text. Make the image with <code>swift tools/qr.swift &lt;url&gt; &lt;out.png&gt;</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="exercise" data-section="Push for more" data-title="Your turn: five minutes">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Your turn · hands on</div>
+      <h2 class="title">Your turn. <em>Five minutes.</em></h2>
+      <ol class="facts">
+        <li><strong>Pick one annoyance.</strong> Something you would fix tonight.</li>
+        <li><strong>Describe it in a sentence.</strong> Plain English is enough.</li>
+        <li><strong>Run it once.</strong> Then change one thing and run it again.</li>
+      </ol>
+      <p class="hint"><b>Stuck?</b>Start smaller. One input, one output, nothing else.</p>
+    </div>
+    <div class="timer" data-time="5:00"></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>exercise</code>: A workshop task with a countdown timer. Add it with <code>npm run add -- &lt;deck&gt; exercise</code>.</p>
+    <p class="live">Start the timer before you stop talking, then walk the room. Do not stand at the front.</p>
+    <p><b>8:00–13:00.</b> Say the three steps once, press Start, and leave the slide up. At zero the timer turns red and pulses; ask for one result from the room.</p>
+    <p class="src">Change <code>data-time</code> for another length. Buttons: Start/Pause, Reset, +1 min. The countdown keeps running if you change slides. Add <code>data-autostart</code> to start it when the slide opens.</p>
+  </aside>
+</section>
+
+<section class="slide" id="rule" data-section="Demo" data-title="Planning changes nothing">
+  <div class="eyebrow">The one rule</div>
+  <h2 class="title title--wide">Planning changes nothing. <em>Doing changes the numbers.</em></h2>
+  <div class="ledger" role="table" aria-label="Values at the start, after planning and after doing">
+    <span class="h" role="columnheader">This week</span><span class="h" role="columnheader">Start</span><span class="h" role="columnheader" data-step="planned">Planned</span><span class="h is-hot" role="columnheader" data-step="done">Done</span>
+    <span class="item">Tasks open</span><span class="num">8</span><span class="num" data-step="planned">8</span><span class="num is-hot" data-step="done">5</span>
+    <span class="item">Coffee</span><span class="num">250 g</span><span class="num" data-step="planned">250 g</span><span class="num is-hot" data-step="done">232 g</span>
+    <span class="item">Patience</span><span class="num">100%</span><span class="num" data-step="planned">100%</span><span class="num is-hot" data-step="done">64%</span>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>rule</code>: A table whose columns reveal one step at a time. Add it with <code>npm run add -- &lt;deck&gt; rule</code>.</p>
+    <p><b>5:00–5:40.</b> Space ×2: the Planned column appears (nothing changes), then Done (now it changes).</p>
+    <p class="src">Ledger columns reveal as named steps. Set <code>--cols</code> for a different column count.</p>
+  </aside>
+</section>
+
+<section class="slide" id="at-a-glance" data-section="How it works" data-title="The week at a glance">
+  <div class="eyebrow">At a glance</div>
+  <h2 class="title title--wide">Four numbers. <em>One honest note.</em></h2>
+  <div class="kpis" style="--n:4">
+    <div class="kpi" data-step="k1"><strong>38<small>orders</small></strong><span>Placed this week</span><em>Up from 31 last week</em></div>
+    <div class="kpi" data-step="k2" style="--c:var(--a2)"><strong>4.2<small>min</small></strong><span>Average pick time</span><em>Measured on 20 orders</em></div>
+    <div class="kpi" data-step="k3" style="--c:var(--a4)"><strong>96<small>%</small></strong><span>Picked first time</span><em>Two substitutions</em></div>
+    <div class="kpi" data-step="k4" style="--c:var(--a3)"><strong>0<small>refunds</small></strong><span>Asked for</span><em>Small sample, so treat it as a hint</em></div>
+  </div>
+  <p class="hint" data-step="note">Same four cards, built one Space at a time. Say the caveat out loud.</p>
+  <aside class="notes">
+    <p class="src">Pattern <code>at-a-glance</code>: KPI cards that build up one at a time, with a note. Add it with <code>npm run add -- &lt;deck&gt; at-a-glance</code>.</p>
+    <p><b>3:00–3:40.</b> One card per Space. Say the number, then the label, then the caveat in the note. Only quote numbers you measured.</p>
+    <p class="src">Each <code>.kpi</code> is a boxed card: <code>strong</code> for the big number with a <code>small</code> unit, then a label <code>span</code> and an optional <code>em</code> note. <code>--n</code> sets the column count and <code>--c</code> recolours one card. Put <code>data-step</code> on a card to build the row up.</p>
+  </aside>
+</section>
+
+<section class="slide" id="numbers" data-section="How it works" data-title="One evening">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How long it took</div>
+      <h2 class="title">One evening. <em>Mostly waiting.</em></h2>
+      <div class="stats">
+        <div class="stat"><strong><span data-count="83">83</span> min</strong><span>start to finish</span></div>
+        <div class="stat"><strong data-count="4">4</strong><span>approaches tried</span></div>
+        <div class="stat"><strong data-count="17">17</strong><span>tests passing</span></div>
+        <div class="stat"><strong>$0</strong><span>extra spend, on an existing plan</span></div>
+      </div>
+    </div>
+    <figure class="phone" style="justify-self:center"><img src="assets/sample/phone.svg" alt="Sample phone screen titled Today with three cards: review the draft, move the 2 pm (flagged, not guessed), and send the update"><figcaption>Same app, phone size</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>numbers</code>: Count-up stats next to a phone capture. Add it with <code>npm run add -- &lt;deck&gt; numbers</code>.</p>
+    <p><b>5:40–6:20.</b> Numbers count up when the slide opens. Only quote numbers you measured.</p>
+    <p class="src"><code>data-count="83"</code> counts from zero; keep units outside the counting span.</p>
+  </aside>
+</section>
+
+<section class="slide" id="poll" data-section="The hook" data-title="Who's in the room">
+  <div class="eyebrow">Who’s here</div>
+  <h2 class="title title--wide">I asked how much you’d used. <em>Here’s the room.</em></h2>
+  <div class="stats" style="--n:3;--w:86vw;margin-top:7vh">
+    <div class="stat" style="--accent:var(--a5)"><strong><span data-count="17">17</span>%</strong><span>7 people · new to this</span></div>
+    <div class="stat" style="--accent:var(--a2)"><strong><span data-count="59">59</span>%</strong><span>24 people · a little bit</span></div>
+    <div class="stat" style="--accent:var(--a3)"><strong><span data-count="24">24</span>%</strong><span>10 people · a lot</span></div>
+  </div>
+  <p class="hint" data-step><b>Three quarters of this room is new or nearly new.</b>That’s the normal case, so nobody here is behind.</p>
+  <aside class="notes">
+    <p class="src">Pattern <code>poll</code>: Poll results as big percentages, with who answered. Add it with <code>npm run add -- &lt;deck&gt; poll</code>.</p>
+    <p><b>1:30–2:10.</b> Read the biggest bar first, then the smallest. Space → the reassurance line.</p>
+    <p class="src">Built from <code>.stats</code> with <code>--n:3</code> and a colour slot per stat (<code>style="--accent:var(--a2)"</code>). Put the count in the label so the percentages stay honest; use only answers you collected.</p>
+  </aside>
+</section>
+
+<section class="slide" id="quote" data-section="How it works" data-title="Real words beat paraphrase">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Quote the real thing</div>
+      <h2 class="title">Real words <em>beat paraphrase.</em></h2>
+      <blockquote class="quote"><p>“…move the 2 pm, unless it’s the client one. <b>Is it the client one?</b>”</p><cite>Voice note, transcribed as-is</cite></blockquote>
+    </div>
+    <div class="bubbles">
+      <p class="bubble">Which 2 pm?</p>
+      <p class="bubble bubble--me">The one with the designers.</p>
+      <p class="bubble">Two meetings match. <strong>Flagged, not guessed.</strong><small>assistant</small></p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>quote</code>: A real quote, with the chat that followed. Add it with <code>npm run add -- &lt;deck&gt; quote</code>.</p>
+    <p><b>6:20–6:50.</b> Read the quote in the speaker’s voice. The bubbles are the follow-up.</p>
+  </aside>
+</section>
+
+<section class="slide" id="transcript" data-section="How it works" data-title="One voice note, three mistakes">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Messy input</div>
+      <h2 class="title">One voice note. <em>Three mistakes.</em></h2>
+      <p class="sub">The highlights get the laughs. <strong>Read them aloud.</strong></p>
+    </div>
+    <figure class="memo">
+      <div class="label"><span class="play">▶</span>Voice note · transcript</div>
+      <div class="wave" data-n="46" aria-hidden="true"></div>
+      <p>so tomorrow I need to <mark>book the fairy<i>= ferry</i></mark> … and remind the team about <mark>the deck<i>which deck?</i></mark> … the groceries are in, <mark>market is done<i>= mark it as done</i></mark></p>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>transcript</code>: A voice-note transcript with its mistakes annotated. Add it with <code>npm run add -- &lt;deck&gt; transcript</code>.</p>
+    <p><b>6:50–7:20.</b> “Fairy” was the ferry. “Market is done” was “mark it as done”.</p>
+    <p class="src">The waveform is decorative (<code>.wave data-n</code> draws the bars). Paste your real transcript, trimmed; ellipses mark the cuts.</p>
+  </aside>
+</section>
+
+<section class="slide" id="findings" data-section="Push for more" data-title="What the review found">
+  <div class="eyebrow">Review · four findings</div>
+  <h2 class="title title--wide">The review found <em>one real problem</em></h2>
+  <ul class="findings">
+    <li class="is-high" data-step="f1"><strong><span class="sev">High</span>Out-of-stock items can still be ordered</strong><span>The check runs after the order is saved, so the stock count can go negative.</span></li>
+    <li class="is-med" data-step="f2"><strong><span class="sev">Med</span>Two orders can claim the last item</strong><span>No lock around the stock update; rare, but possible.</span></li>
+    <li class="is-low" data-step="f3"><strong><span class="sev">Low</span>Badge colour is hard to read on white</strong><span>Contrast is under the recommended ratio.</span></li>
+    <li class="is-ok" data-step="f4"><strong><span class="sev">OK</span>Tests cover the new path</strong><span>Four new tests, all deterministic.</span></li>
+  </ul>
+  <aside class="notes">
+    <p class="src">Pattern <code>findings</code>: Review findings with coloured severity dots, building up. Add it with <code>npm run add -- &lt;deck&gt; findings</code>.</p>
+    <p><b>10:00–11:00.</b> One finding per Space, worst first. Say what you checked before believing each one.</p>
+    <p class="src">Each <code>li</code> takes a severity class (<code>is-high</code>, <code>is-med</code>, <code>is-low</code>, <code>is-ok</code>) that colours the dot and rule. The <code>.sev</code> word keeps it readable without colour.</p>
+  </aside>
+</section>
+
+<section class="slide" id="log-trace" data-section="How it works" data-title="One order, traced">
+  <div class="eyebrow">Event log · order 1042</div>
+  <h2 class="title title--wide">The order was paid. <em>The stock never moved.</em></h2>
+  <table class="log">
+    <thead><tr><th scope="col">Time (UTC)</th><th scope="col">What happened</th></tr></thead>
+    <tbody>
+      <tr data-step><td>09:14:02.10</td><td>Order <code>1042</code> placed for 3 items</td></tr>
+      <tr data-step><td>09:14:02.35</td><td>Payment accepted</td></tr>
+      <tr data-step class="is-bad"><td>09:14:02.41</td><td>Stock update dropped: queue full</td></tr>
+      <tr data-step><td>09:14:02.90</td><td>Confirmation sent anyway</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p class="src">Pattern <code>log-trace</code>: An event log whose bad row is highlighted. Add it with <code>npm run add -- &lt;deck&gt; log-trace</code>.</p>
+    <p><b>11:00–12:00.</b> Walk the rows in order. When the red row arrives, stop talking for a beat.</p>
+    <p class="src">A plain table of timestamps and events. Add <code>is-bad</code> to the row where it went wrong; rows can be <code>data-step</code>s so the story builds. Trim real logs and hide IDs.</p>
+  </aside>
+</section>
+
+<section class="slide" id="matrix" data-section="Push for more" data-title="Which option does what">
+  <div class="eyebrow">Feature matrix</div>
+  <h2 class="title title--wide">Only one covers <em>the whole list</em></h2>
+  <table class="compare matrix">
+    <thead><tr><th scope="col">Can it…</th><th scope="col">Spreadsheet</th><th scope="col" class="is-hero">Pantry app</th><th scope="col">Shared notes</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Track stock</th><td class="yes"><span class="sr">Yes</span></td><td class="is-hero yes"><span class="sr">Yes</span></td><td class="no"><span class="sr">No</span></td></tr>
+      <tr><th scope="row">Warn when low</th><td class="part"><span class="sr">Partial: </span><small>manual rule</small></td><td class="is-hero yes"><span class="sr">Yes</span></td><td class="no"><span class="sr">No</span></td></tr>
+      <tr><th scope="row">Work offline</th><td class="yes"><span class="sr">Yes</span></td><td class="is-hero part"><span class="sr">Partial: </span><small>read only</small></td><td class="yes"><span class="sr">Yes</span></td></tr>
+      <tr><th scope="row">Share with family</th><td class="part"><span class="sr">Partial: </span><small>one editor</small></td><td class="is-hero yes"><span class="sr">Yes</span></td><td class="yes"><span class="sr">Yes</span></td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p class="src">Pattern <code>matrix</code>: A feature matrix with yes, no and partial cells. Add it with <code>npm run add -- &lt;deck&gt; matrix</code>.</p>
+    <p><b>12:00–13:00.</b> Read the highlighted column first, then admit the one partial in it.</p>
+    <p class="src">A <code>table.compare.matrix</code>. Cells take <code>yes</code>, <code>no</code> or <code>part</code>; the glyph is drawn by CSS and the <code>.sr</code> text carries the meaning for screen readers. Put short context in a <code>small</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="milestones" data-section="The hook" data-title="From chatbot to colleague">
+  <div class="eyebrow">The arc</div>
+  <h2 class="title title--wide">From chatbot <em>to colleague</em></h2>
+  <ol class="milestones" style="--n:5">
+    <li style="--c:var(--a3)"><time>Nov 2022</time><strong>Chat</strong><span>It could talk.</span></li>
+    <li style="--c:var(--a3)" data-step><time>Mar 2023</time><strong>Tools</strong><span>It could call things.</span></li>
+    <li style="--c:var(--a2)" data-step><time>Nov 2024</time><strong>Standards</strong><span>One way to plug tools in.</span></li>
+    <li style="--c:var(--a1)" data-step><time>Feb 2025</time><strong>Agents</strong><span>It reads your project and edits files.</span></li>
+    <li style="--c:var(--a5)" class="is-now" data-step><time>Now</time><strong>In parallel</strong><span>Several at once, checking each other.</span></li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>milestones</code>: A horizontal timeline whose dots reveal one by one. Add it with <code>npm run add -- &lt;deck&gt; milestones</code>.</p>
+    <p><b>3:00–4:00.</b> One step per Space; say what a human stopped doing by hand at each dot.</p>
+    <p class="src"><code>ol.milestones</code> takes <code>--n</code> for the column count and <code>--c</code> per item. <code>.is-now</code> lights the current dot. <code>data-step</code> on an item reveals it with Space. Dates are placeholders; use dates you can source.</p>
+  </aside>
+</section>
+
+<section class="slide" id="how-its-made" data-section="How it works" data-title="Four steps, no magic">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it’s made</div>
+      <h2 class="title">Four steps. <em>No magic.</em></h2>
+      <ol class="pipe">
+        <li style="--i:0"><b>01</b>Write it down once</li>
+        <li style="--i:1"><b>02</b>Plug it in</li>
+        <li style="--i:2"><b>03</b>Ask in plain English</li>
+        <li style="--i:3"><b>04</b>Check the answer</li>
+      </ol>
+    </div>
+    <div class="fan">
+      <figure class="shot f1"><img src="assets/sample/app.svg" alt="Sample app overview with counts, an activity chart and a queue"></figure>
+      <figure class="shot f2"><img src="assets/sample/answer.svg" alt="Sample answer listing three changes"></figure>
+      <figure class="shot f3"><img src="assets/sample/state-b.svg" alt="Sample app after the action ran, with three steps checked"></figure>
+      <p class="fan-cap"><b>Sample outputs</b>three of the screens</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>how-its-made</code>: Numbered steps beside a fan of screenshots. Add it with <code>npm run add -- &lt;deck&gt; how-its-made</code>.</p>
+    <p><b>7:20–8:20.</b> Walk the four steps; the fan shows the evidence without a word on it.</p>
+  </aside>
+</section>
+
+<section class="slide" id="code" data-section="How it works" data-title="The one line that matters">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it works</div>
+      <h2 class="title">The one line <em>that matters.</em></h2>
+      <div class="callout" data-step><b>The rule</b><p>Planning never changes stock. Eating does, once.</p></div>
+    </div>
+    <figure class="code">
+      <figcaption>src/pantry.ts</figcaption>
+      <ol>
+        <li><span class="k">export function</span> <span class="f">apply</span>(stock, e) {</li>
+        <li class="c">  // planned events never touch stock</li>
+        <li class="hl">  <span class="k">if</span> (e.kind === <span class="s">"planned"</span>) <span class="k">return</span> stock</li>
+        <li>  <span class="k">const</span> qty = stock[e.item] ?? <span class="n">0</span></li>
+        <li>  <span class="k">return</span> { ...stock, [e.item]: qty - e.qty }</li>
+        <li>}</li>
+      </ol>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>code</code>: A code card with the line that matters highlighted. Add it with <code>npm run add -- &lt;deck&gt; code</code>.</p>
+    <p><b>8:20–9:00.</b> Point at the highlighted line, read it, and stop. Nobody reads code on a slide past the first line.</p>
+    <p class="src">Six lines at most. Wrap tokens in <code>.k</code>, <code>.s</code>, <code>.f</code>, <code>.n</code>; mark comment lines <code>.c</code> and the key line <code>.hl</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="diff" data-section="How it works" data-title="The agent changed four lines">
+  <div class="split split--wide">
+    <div class="text">
+      <div class="eyebrow">How it works · the change</div>
+      <h2 class="title">The agent changed <em>four&nbsp;lines.</em></h2>
+      <p class="sub">One guard in <code>reserve()</code>, plus a test. The rest is context you can expand.</p>
+    </div>
+    <figure class="diff">
+      <details class="diff-file" open>
+        <summary><b>src/stock.ts</b><span class="diff-stat"><ins>+3</ins><del>−1</del></span></summary>
+        <div class="diff-hunk">@@ -12,4 +12,6 @@ export function reserve</div>
+        <ol>
+          <li data-o="12" data-n="12"><code><span class="k">export function</span> <span class="f">reserve</span>(stock: Stock, item: <span class="k">string</span>, qty: <span class="k">number</span>) {</code></li>
+          <li data-o="13" data-n="13"><code>  <span class="k">const</span> have = stock[item] ?? <span class="n">0</span></code></li>
+          <li class="del" data-o="14"><code>  <span class="k">return</span> { ...stock, [item]: have - qty }</code></li>
+          <li class="add" data-n="14" data-step="guard"><code>  <span class="k">const</span> left = have - qty</code></li>
+          <li class="add" data-n="15" data-step="guard"><code>  <span class="k">if</span> (left &lt; <span class="n">0</span>) <span class="k">throw new</span> <span class="f">RangeError</span>(<span class="s">`only ${have} ${item} left`</span>)</code></li>
+          <li class="add" data-n="16" data-step="use"><code>  <span class="k">return</span> { ...stock, [item]: left }</code></li>
+          <li data-o="15" data-n="17"><code>}</code></li>
+          <li class="diff-fold">
+            <details>
+              <summary>8 unchanged lines</summary>
+              <ol>
+                <li data-o="16" data-n="18"><code><span class="k">export function</span> <span class="f">release</span>(stock: Stock, item: <span class="k">string</span>, qty: <span class="k">number</span>) {</code></li>
+                <li data-o="17" data-n="19"><code>  <span class="k">const</span> have = stock[item] ?? <span class="n">0</span></code></li>
+                <li data-o="18" data-n="20"><code>  <span class="k">return</span> { ...stock, [item]: have + qty }</code></li>
+                <li data-o="19" data-n="21"><code>}</code></li>
+                <li data-o="20" data-n="22"><code><span class="c">// items the low-stock badge should flag</span></code></li>
+                <li data-o="21" data-n="23"><code><span class="k">export function</span> <span class="f">lowStock</span>(stock: Stock, limit = <span class="n">2</span>) {</code></li>
+                <li data-o="22" data-n="24"><code>  <span class="k">return</span> Object.keys(stock).filter(k =&gt; stock[k] &lt; limit)</code></li>
+                <li data-o="23" data-n="25"><code>}</code></li>
+              </ol>
+            </details>
+          </li>
+        </ol>
+      </details>
+      <details class="diff-file">
+        <summary><b>test/stock.test.ts</b><span class="diff-stat"><ins>+6</ins></span></summary>
+        <div class="diff-hunk">@@ -0,0 +1,6 @@</div>
+        <ol>
+          <li class="add" data-n="1"><code><span class="k">import</span> { reserve } <span class="k">from</span> <span class="s">"../src/stock"</span></code></li>
+          <li class="add" data-n="2"><code><span class="f">describe</span>(<span class="s">"reserve"</span>, () =&gt; {</code></li>
+          <li class="add" data-n="3"><code>  <span class="f">it</span>(<span class="s">"never takes stock below zero"</span>, () =&gt; {</code></li>
+          <li class="add" data-n="4"><code>    <span class="f">expect</span>(() =&gt; reserve({ rice: <span class="n">2</span> }, <span class="s">"rice"</span>, <span class="n">3</span>)).<span class="f">toThrow</span>(RangeError)</code></li>
+          <li class="add" data-n="5"><code>  })</code></li>
+          <li class="add" data-n="6"><code>})</code></li>
+        </ol>
+      </details>
+      <figcaption><b>Drawn</b>from the real PR, trimmed</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>diff</code>: What changed: added and removed lines, with the context folded. Add it with <code>npm run add -- &lt;deck&gt; diff</code>.</p>
+    <p><b>2:20–3:00.</b> “That’s the whole change.” Press Space to add the guard, then the line that uses it. Click “8 unchanged lines” only if someone asks what’s around it.</p>
+    <p class="src">Drawn from a real PR and trimmed. Each line is <code>li.add</code>, <code>li.del</code> or plain context, with <code>data-o</code> and <code>data-n</code> for the old and new line numbers; give added lines <code>data-step</code> to reveal them on Space. A <code>li.diff-fold</code> holds a nested <code>details</code> of unchanged lines, and a second <code>details.diff-file</code> without <code>open</code> starts collapsed.</p>
+  </aside>
+</section>
+
+<section class="slide" id="fold" data-section="How it works" data-title="Keep the log, fold it">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">How it works · the run, folded</div>
+      <h2 class="title">Keep the log. <em>Fold&nbsp;it.</em></h2>
+      <p class="sub">The full output stays one click away. Open only the part you’re talking about.</p>
+    </div>
+    <div class="folds">
+      <details class="fold" open>
+        <summary><b>The plan</b><span>4 steps</span></summary>
+        <div class="fold-body is-prose">
+          <ol>
+            <li>Read <code>src/stock.ts</code> and its tests</li>
+            <li>Reject negative quantities in <code>reserve()</code></li>
+            <li>Add a test for the empty-shelf case</li>
+            <li>Run <code>npm test</code> and report</li>
+          </ol>
+        </div>
+      </details>
+      <details class="fold">
+        <summary><b>Test output</b><span>212 lines · 3.1 s</span></summary>
+        <div class="fold-body" data-step>
+          <p>$ npm test</p>
+          <p class="is-dim">… 204 passing lines folded</p>
+          <p class="is-bad">✗ reserve › never takes stock below zero</p>
+          <p class="is-bad">    expected 0, received -2</p>
+          <p class="is-bad">✗ reserve › refuses a negative quantity</p>
+          <p>Fixed in <b>src/stock.ts</b>, ran again</p>
+          <p class="is-ok">✓ 17 passed, 0 failed (3.1 s)</p>
+        </div>
+      </details>
+      <details class="fold">
+        <summary><b>Diff summary</b><span>2 files · +9 −1</span></summary>
+        <div class="fold-body">
+          <p><b>src/stock.ts</b>  <ins>+3</ins> <del>−1</del></p>
+          <p><b>test/stock.test.ts</b>  <ins>+6</ins> (new)</p>
+        </div>
+      </details>
+      <p class="fold-cap"><b>Drawn</b>from one agent run, trimmed</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>fold</code>: Long output folded away, opened on Space. Add it with <code>npm run add -- &lt;deck&gt; fold</code>.</p>
+    <p><b>2:00–2:20.</b> “The agent logs everything. I keep all of it and show you almost none of it.” Press Space: the test output opens on the failing lines and ends on the green summary.</p>
+    <p class="src">Drawn from one agent run, trimmed. Each <code>details.fold</code> is a title, a meta label and a scrolling body. A <code>data-step</code> inside a fold opens it on Space and closes it when you go back; folds without one open on click. Add <code>is-prose</code> to the body for plain text, and <code>is-ok</code>, <code>is-bad</code> and <code>is-dim</code> to log lines.</p>
+  </aside>
+</section>
+
+<section class="slide" id="long-page" data-section="How it works" data-title="Let long pages scroll themselves">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Long answers</div>
+      <h2 class="title">Let long pages <em>scroll themselves.</em></h2>
+      <p class="hint"><b>Tip</b>Crop the browser chrome and keep the content. Tall captures scroll slowly and loop.</p>
+    </div>
+    <div class="stage">
+      <figure class="scrollshot"><div class="scrollshot-view"><img src="assets/sample/tall.svg" alt="A long sample page with eight steps, from gather the inputs to ship the slides"></div><figcaption><b>Sample</b>the whole answer</figcaption></figure>
+      <figure class="shot inset"><img src="assets/sample/source.svg" alt="The notes page the answer was built from"></figure>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>long-page</code>: A tall capture that scrolls itself, with its source inset. Add it with <code>npm run add -- &lt;deck&gt; long-page</code>.</p>
+    <p><b>8:20–9:00.</b> Let it scroll while you talk; don’t narrate every line.</p>
+  </aside>
+</section>
+
+<section class="slide" id="photo-strip" data-section="Demo" data-title="While the agents worked, I went for a walk">
+  <div class="eyebrow">While it ran</div>
+  <h2 class="title title--wide">While the agents worked, <em>I went for a walk.</em></h2>
+  <div class="strip" style="--n:4">
+    <figure><img src="assets/sample/closing-screen.svg" alt="Abstract sample: a screen with a progress bar"><figcaption><b>19:50</b>Task started</figcaption></figure>
+    <figure><img src="assets/sample/closing-walk.svg" alt="Abstract sample: a walking route on a map"><figcaption><b>20:03</b>First walk, 2.9 km</figcaption></figure>
+    <figure><img src="assets/sample/closing-lunch.svg" alt="Abstract sample: a plate of food"><figcaption><b>20:53</b>Dinner, checks still running</figcaption></figure>
+    <figure><img src="assets/sample/closing-skyline.svg" alt="Abstract sample: a city skyline at dusk"><span class="strip-badge" aria-hidden="true">Done</span><figcaption><b>22:05</b>Still out walking</figcaption></figure>
+  </div>
+  <div class="strip-metrics" data-step>
+    <div><b>4.9 km</b><span>walked</span></div>
+    <div><b>22</b><span>checks run unattended</span></div>
+    <div><b>0</b><span>times I touched the keyboard</span></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>photo-strip</code>: Four photos with captions and a metric row. Add it with <code>npm run add -- &lt;deck&gt; photo-strip</code>.</p>
+    <p><b>7:00–7:40.</b> Let the pictures carry it, then Space for the numbers.</p>
+    <p class="src"><code>.strip</code> takes 3–5 <code>figure</code>s (<code>--n</code> sets the columns, <code>--h</code> the image height) with an optional <code>.strip-badge</code>. <code>.strip-metrics</code> is the optional metric row. The pictures here are drawn samples; swap in your own photos and say whose they are.</p>
+  </aside>
+</section>
+
+<section class="slide" id="iterations" data-section="How it works" data-title="About nine fronts later">
+  <div class="eyebrow">Iterations</div>
+  <h2 class="title title--wide">About nine rounds later, <em>it held.</em></h2>
+  <div class="strip" style="--n:3;--h:30vh">
+    <figure><img src="assets/sample/state-a.svg" alt="Sample first attempt"><span class="strip-badge" aria-hidden="true">v1</span><figcaption><b>Round 1</b>Works on the happy path</figcaption></figure>
+    <figure data-step><img src="assets/sample/state-b.svg" alt="Sample middle attempt"><span class="strip-badge" aria-hidden="true">v5</span><figcaption><b>Round 5</b>Edge cases found by the tests</figcaption></figure>
+    <figure data-step><img src="assets/sample/answer.svg" alt="Sample final answer"><span class="strip-badge" aria-hidden="true">v9</span><figcaption><b>Round 9</b>Flags what it can’t answer</figcaption></figure>
+  </div>
+  <div class="strip-metrics" data-step>
+    <div><b>9</b><span>rounds</span></div>
+    <div><b>31</b><span>prompts</span></div>
+    <div><b>3</b><span>dead ends dropped</span></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>iterations</code>: Rounds of an attempt as images with counts. Add it with <code>npm run add -- &lt;deck&gt; iterations</code>.</p>
+    <p><b>8:30–9:10.</b> Show the first attempt, Space to the middle and the end. The counts are the point: say them out loud.</p>
+    <p class="src">The same <code>.strip</code> and <code>.strip-metrics</code> as the photo strip, with badges as iteration labels. Every count must come from your log.</p>
+  </aside>
+</section>
+
+<section class="slide" id="options" data-section="Push for more" data-title="Then you can push for more">
+  <div class="eyebrow">Want more?</div>
+  <h2 class="title title--wide">Then you can <em>push for more.</em></h2>
+  <div class="cols" style="--n:2;gap:3vw">
+    <div class="card" style="--c:var(--a2)"><h3><b>1</b>A no-code app</h3><figure class="shot" style="--h:42vh;--accent:var(--a2)"><img src="assets/sample/app.svg" alt="Sample no-code app overview"><figcaption>About ten minutes</figcaption></figure></div>
+    <div class="card" style="--c:var(--a3)"><h3><b>2</b>Code it properly</h3><figure class="shot" style="--h:42vh;--accent:var(--a3)"><img src="assets/sample/state-b.svg" alt="Sample coded app after the action ran"><figcaption>About an hour, with tests</figcaption></figure></div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>options</code>: Two side-by-side cards for the next step up. Add it with <code>npm run add -- &lt;deck&gt; options</code>.</p>
+    <p><b>9:00–10:00.</b> “If you want more control, there’s a next step.” Details live in the extras (H).</p>
+  </aside>
+</section>
+
+<section class="slide" id="takeaways" data-section="Takeaway" data-title="Which one should you reach for?">
+  <div class="eyebrow">The recipe</div>
+  <h2 class="title title--wide">Which one should <em>you</em> reach for?</h2>
+  <div class="recipe">
+    <div class="recipe-row" style="--c:var(--a1)"><b>01</b><strong>Start with the annoyance</strong><span>Something you’d fix tonight.</span></div>
+    <div class="recipe-row" style="--c:var(--a2)"><b>02</b><strong>Write it down</strong><span>Notes or a sheet.</span></div>
+    <div class="recipe-row" style="--c:var(--a4)"><b>03</b><strong>Plug it in and ask</strong><span>Plain English.</span></div>
+    <div class="recipe-row" style="--c:var(--a3)"><b>04</b><strong>Want buttons?</strong><span>A no-code app.</span></div>
+    <div class="recipe-row" style="--c:var(--a5)"><b>05</b><strong>Want control?</strong><span>Code it.</span></div>
+  </div>
+  <i class="mascot mascot--corner mascot--top m-hexagon" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>takeaways</code>: The recipe: five coloured rows people photograph. Add it with <code>npm run add -- &lt;deck&gt; takeaways</code>.</p>
+    <p><b>10:00–11:00.</b> One row per breath. This is the slide people photograph.</p>
+  </aside>
+</section>
+
+<section class="slide" id="questions" data-section="Takeaway" data-chrome="off" data-title="Questions?">
+  <div class="split split--even">
+    <div class="text">
+      <div class="eyebrow">Thank you</div>
+      <h2 class="title">Questions<em>?</em></h2>
+      <p class="sub">Which job in your system is small enough to hand over, and what would the check be?</p>
+      <nav class="close-socials" aria-label="Links">
+        <a href="https://example.com/slides"><b>Slides</b>example.com/slides</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+      </nav>
+    </div>
+    <div class="media" style="display:grid;justify-items:center">
+      <div class="qr">
+        <a class="qr-link" href="https://example.com/slides"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></a>
+        <span class="qr-label">Slides and links</span>
+        <span class="qr-url">example.com/slides</span>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>questions</code>: A prompt question, a QR to the slides and links. Add it with <code>npm run add -- &lt;deck&gt; questions</code>.</p>
+    <p><b>14:00–15:00.</b> Ask the prompt question first; it gets better questions than “any questions?”. Leave this up.</p>
+    <p class="src">An alternative to the full close slide when there’s no room for a sticker or mascots. <code>data-chrome="off"</code> hides the footer. Its id isn’t <code>close</code>, so keep one slide with that id if you use C to jump.</p>
+  </aside>
+</section>
+
+<section class="slide" id="follow-up" data-section="Takeaway" data-title="Follow along after tonight">
+  <div class="eyebrow">Keep going</div>
+  <h2 class="title title--wide">Follow the experiments <em>after tonight</em></h2>
+  <div class="split split--auto" style="grid-template-columns:minmax(0,1.7fr) minmax(0,.6fr)">
+    <div class="pillars" style="--n:2;margin-top:0">
+      <div class="pillar" style="--c:var(--a1)"><i><span>Side quest</span><span>Running</span></i><strong>1.10 t lifted</strong><span>A fundraiser, one rep at a time. <a href="https://example.com/now">example.com/now</a></span></div>
+      <div class="pillar" style="--c:var(--a2)"><i><span>Benchmark</span><span>Open</span></i><strong>22 checks</strong><span>A repeatable test bench. <a href="https://example.com/repo">example.com/repo</a></span></div>
+    </div>
+    <div class="qr qr--sm">
+      <a class="qr-link" href="https://example.com/repo"><span class="qr-card"><img src="assets/sample/closing-qr-repo.png" alt="QR code linking to the project repo"></span></a>
+      <span class="qr-label">Follow along</span>
+      <span class="qr-url">example.com/repo</span>
+    </div>
+  </div>
+  <nav class="close-socials" aria-label="Handle"><a href="https://github.com/"><b>GitHub</b>@your-handle</a><a href="https://example.com/now"><b>Now page</b>example.com/now</a></nav>
+  <aside class="notes">
+    <p class="src">Pattern <code>follow-up</code>: Project cards with a stat, a QR and a handle line. Add it with <code>npm run add -- &lt;deck&gt; follow-up</code>.</p>
+    <p><b>14:30–15:00.</b> Name one project and one number, then point at the QR. Don’t read the cards.</p>
+    <p class="src">Project cards are <code>.pillars</code> with the stat in <code>strong</code> and the link in the last <code>span</code>. The QR and handle row reuse <code>.qr</code> and <code>.close-socials</code>. Stats are placeholders; use numbers you can show.</p>
+  </aside>
+</section>
+
+<section class="slide slide--close" id="close" data-section="Takeaway" data-chrome="off" data-title="Thank you">
+  <div class="fx" aria-hidden="true">
+    <div class="orb" style="--c:var(--a1);right:8vw;top:-14vh"></div>
+    <div class="orb" style="--c:var(--a3);--size:34vw;right:-8vw;bottom:-16vh;animation-delay:-4s"></div>
+    <div class="sparks" data-n="16"></div>
+  </div>
+  <div class="close-grid">
+    <div class="close-text">
+      <div class="eyebrow">Thank you!</div>
+      <h2 class="title close-title">Big words. Real demos. <em>Honest fallbacks.</em></h2>
+      <p class="sticker" data-step>Thanks for staying for the demo ✓</p>
+      <nav class="close-socials" aria-label="Speaker links">
+        <a href="https://example.com/"><b>Web</b>example.com</a>
+        <a href="https://github.com/"><b>GitHub</b>your-handle</a>
+        <a href="https://x.com/"><b>X</b>@your-handle</a>
+        <a href="https://www.linkedin.com/"><b>LinkedIn</b>your-handle</a>
+      </nav>
+    </div>
+    <a class="close-qr" href="https://example.com/slides" data-slides-url>
+      <span class="qr-ring"><span class="qr-card"><img src="assets/qr-slides.png" alt="QR code linking to these slides"></span></span>
+      <span class="qr-label">Grab the slides</span>
+      <span class="qr-url">example.com/slides</span>
+      <i class="mascot m-pentagon qm1" aria-hidden="true"></i>
+      <i class="mascot m-hexagon qm2" aria-hidden="true"></i>
+      <i class="mascot m-diamond qm3" aria-hidden="true"></i>
+      <i class="mascot m-octagon qm4" aria-hidden="true"></i>
+      <i class="mascot m-triangle qm5" aria-hidden="true"></i>
+    </a>
+  </div>
+  <i class="pet close-pet" data-pose="wave" aria-hidden="true"></i>
+  <aside class="notes">
+    <p class="src">Pattern <code>close</code>: The key line, links and a QR code to the slides. Add it with <code>npm run add -- &lt;deck&gt; close</code>.</p>
+    <p><b>11:00–15:00.</b> Land the key line. Space → the sticker. “The slides are on that QR code, with all the links.” Leave this up for questions.</p>
+    <p>Likely questions have extras: “How long did it take?” → One evening, logged. “What didn’t work?” → Honest limits.</p>
+  </aside>
+</section>
+
+<!-- Presenter extras -->
+
+<section class="slide" id="x-timeline" data-hidden data-section="Extras" data-title="Extra: One evening, logged">
+  <div class="eyebrow">Presenter extra · build log</div>
+  <h2 class="title title--wide title--small">One evening, <em>about 83 minutes.</em></h2>
+  <ol class="timeline">
+    <li><time>22:46</time><span>Read the plan. Start.</span></li>
+    <li><time>22:48</time><span>Mock inputs made, clearly fake</span></li>
+    <li><time>22:52</time><span>No-code build started</span></li>
+    <li><time>22:54</time><span>Notes and instructions written</span></li>
+    <li><time>23:00</time><span>First build done</span></li>
+    <li><time>23:04</time><span>Plan → do it works</span></li>
+    <li><time>23:24</time><span>Verified against the real data</span></li>
+    <li><time>23:29</time><span>One feature fails; repair attempted</span></li>
+    <li><time>23:41</time><span>Coded version answers in 6 s</span></li>
+    <li><time>23:46</time><span>17 tests pass</span></li>
+    <li><time>23:49</time><span>One install path blocked</span></li>
+    <li><time>00:09</time><span>Final checks done</span></li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>x-timeline</code>: Extra: the build log as a timeline. Add it with <code>npm run add -- &lt;deck&gt; x-timeline</code>.</p><p>For “how long did it take?”. Copy the times from your build log; don’t round them into a better story.</p></aside>
+</section>
+
+<section class="slide" id="x-compare" data-hidden data-section="Extras" data-title="Extra: Side by side">
+  <div class="eyebrow">Presenter extra · comparison</div>
+  <h2 class="title title--wide title--small">Side by side.</h2>
+  <table class="compare">
+    <thead><tr><th scope="col"></th><th scope="col">Just ask</th><th scope="col" class="is-hero">No-code app</th><th scope="col">Code it</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Set-up</th><td>Minutes</td><td class="is-hero">About ten minutes</td><td>About an hour</td></tr>
+      <tr><th scope="row">Control</th><td>Low</td><td class="is-hero">Buttons and rules</td><td>Everything</td></tr>
+      <tr><th scope="row">Runs where</th><td>In the chat</td><td class="is-hero">A private page</td><td>Your machine or server</td></tr>
+      <tr><th scope="row">Best for</th><td>Questions</td><td class="is-hero">Daily use</td><td>Anything that must not break</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p class="src">Pattern <code>x-compare</code>: Extra: a comparison table. Add it with <code>npm run add -- &lt;deck&gt; x-compare</code>.</p><p>Condensed comparison. Keep the full version in your own notes, not here; notes ship with the slides.</p></aside>
+</section>
+
+<section class="slide" id="x-ladder" data-hidden data-section="Extras" data-title="Extra: From just ask to real code">
+  <div class="eyebrow">Presenter extra · four ways</div>
+  <h2 class="title title--wide">From “just ask” to <em>real code.</em></h2>
+  <ol class="ladder">
+    <li style="--c:var(--a4)"><b>01 · NO CODE</b><strong>Just ask</strong><span>A chat that reads your notes.</span><span class="tag">Minutes</span></li>
+    <li style="--c:var(--a2)"><b>02 · NO CODE</b><strong>Buttons</strong><span>A private app built from a chat.</span><span class="tag">About ten minutes</span></li>
+    <li style="--c:var(--a3)"><b>03 · CODE</b><strong>Your app</strong><span>A coding agent builds it, with tests.</span><span class="tag">About an hour</span></li>
+    <li style="--c:var(--a1)"><b>04 · CODE</b><strong>Your plan</strong><span>Your app signs in with your own AI plan.</span><span class="tag">A spike</span></li>
+  </ol>
+  <aside class="notes">
+    <p class="src">Pattern <code>x-ladder</code>: Extra: four approaches as a ladder. Add it with <code>npm run add -- &lt;deck&gt; x-ladder</code>.</p><p>The map of every approach, for someone who wants the whole picture.</p></aside>
+</section>
+
+<section class="slide" id="x-limits" data-hidden data-section="Extras" data-title="Extra: Honest limits">
+  <div class="eyebrow">Presenter extra · honest limits</div>
+  <h2 class="title title--wide title--small">What didn’t work. <em>Yet.</em></h2>
+  <div class="split split--even split--auto">
+    <div class="text">
+      <ul class="facts">
+        <li><strong>One feature</strong> failed inside the app and needed a workaround.</li>
+        <li><strong>One install path</strong> was blocked; the local version works.</li>
+        <li><strong>Costs</strong> weren’t measured per run, so no dollar figure.</li>
+      </ul>
+      <div class="chips"><span>Works offline</span><span>Every live beat has a screenshot</span><span>Mock data only</span></div>
+    </div>
+    <figure class="shot" style="--h:46vh"><img src="assets/sample/state-a.svg" alt="Sample app in its planned state"><figcaption><b>Fallback</b>the screenshot path</figcaption></figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>x-limits</code>: Extra: honest limits, with the fallback screenshot. Add it with <code>npm run add -- &lt;deck&gt; x-limits</code>.</p><p>For “does it really work?”. Say the limit plainly before anyone has to ask twice.</p></aside>
+</section>
+
+<section class="slide" id="x-cost" data-hidden data-section="Extras" data-title="Extra: What it cost">
+  <div class="eyebrow">Presenter extra · what it cost</div>
+  <h2 class="title title--wide title--small">Mostly time. <em>Not much of it.</em></h2>
+  <div class="counters">
+    <div style="--c:var(--a4)"><strong><span data-count="10">10</span> min</strong><span>first set-up</span></div>
+    <div style="--c:var(--a2)"><strong><span data-count="8">8</span> min</strong><span>first no-code build</span></div>
+    <div style="--c:var(--a3)"><strong><span data-count="60">60</span> min</strong><span>coded version, alongside</span></div>
+  </div>
+  <div class="legend">
+    <span style="--c:var(--a4)">Existing plan</span>
+    <span style="--c:var(--a2)">No API key</span>
+    <span style="--c:var(--a1)">No billing set-up <small>this time</small></span>
+  </div>
+  <p class="lede">Dollar cost wasn’t measured separately, so there’s no figure to quote.</p>
+  <aside class="notes">
+    <p class="src">Pattern <code>x-cost</code>: Extra: what it cost, as counters. Add it with <code>npm run add -- &lt;deck&gt; x-cost</code>.</p><p>For “did it cost money?”. Don’t invent a dollar figure.</p></aside>
+</section>
+
+</main>
+
+<script src="../../core/deck.js"></script>
+<script src="../../components/components.js"></script>
+</body>
+</html>
