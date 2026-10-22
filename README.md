@@ -1,12 +1,18 @@
-# Talk deck template
+# <img src="slides/assets/favicon.svg" alt="" width="36" align="top"> Talk deck template
 
-Reusable talk decks in one style family: big type, one idea per slide, real screenshots with honest captions, live demos with a fallback on every slide, and presenter extras ready for questions. Decks are plain HTML and CSS with a small engine. There's no build step to present and no CDN, and every deck runs offline from `file://`.
+![Polished talks in hours. Not weeks. Plain HTML decks your coding agent can build, restyle and fix, right up until you walk on stage.](docs/hero.jpg)
 
-The style comes from the "My stuff. My games. My lunch." deck (DevDay Exchange Brisbane, 20 October 2026). The other patterns come from a year of HTML talks, with names and branding taken out.
+I used to spend 2–6 weeks getting a deck ready. Not writing it, mostly.
 
-![Slides from the library in six templates and three colourways](docs/showcase/hero.jpg)
+I'd redo slides every time a demo or the tech changed. I'd fine-tune animations and tiny design details, and reword titles until they flowed with the story in my head. Then there were the agenda slides, which I kept in sync by hand.
 
-The [showcase](docs/showcase/README.md) has pictures of every pattern, six example talks, six colourways and the presenter tools.
+In the end I was copy-pasting whole old decks and remixing them, because starting clean took too long. I already knew what I wanted to say. Getting it onto slides was the slow part.
+
+Now I work AI-first. I tell a coding agent what I know and what I want to say, and it builds the slides, notes and demo fallbacks while I steer the story. I often get only a few hours' heads-up before a talk, and I still walk in with something I'm happy to put my name on.
+
+This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 63 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
+
+People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
 ## Quickstart
 
@@ -17,6 +23,26 @@ You need Node.js 20 or later.
 3. `npm run new -- ~/talks/my-talk --title "Big words.|Real demos.|*Honest fallbacks.*"`, then open `~/talks/my-talk/site/index.html` in a browser.
 
 QA needs Playwright's browser once: `npx playwright install chromium`.
+
+## How I actually use it
+
+![A pixel-art rider on an e-scooter at dusk while a checklist ticks off a tighter title, a refreshed demo fallback, QA and a deploy](docs/scooter.jpg)
+
+**Figure: Still tweaking on the way to the venue. A slide made with this template; the rider and city were generated with gpt-image-2.**
+
+The scooter slide isn't a metaphor. When a talk lands with a few hours' notice, the deck is often still getting better on my way to the venue.
+
+My MacBook's in my backpack, kept awake with `caffeinate`, on my phone's hotspot. The agent keeps going: a tighter title on slide 7, a refreshed demo fallback, another QA run, a fresh deploy. By the time I walk in, the deck behind the QR code is the latest one.
+
+That's what AI-first means to me. Not writing less, but polishing right up to the last minute without it costing me the whole day. I'm not recommending you present like this. I'm saying the template holds up when I do.
+
+## What's in it
+
+Reusable talk decks in one style family: big type, one idea per slide, real screenshots with honest captions, live demos with a fallback on every slide, and presenter extras ready for questions.
+
+![Slides from the library in six templates and three colourways](docs/showcase/hero.jpg)
+
+The [showcase](docs/showcase/README.md) has pictures of every pattern, six example talks, six colourways and the presenter tools.
 
 It's a blueprint, not a framework: fork it, keep what you like and change the rest. [docs/guide.md](docs/guide.md) walks through a talk from plan to publish, working with a coding agent, and how far you can take it.
 
@@ -163,11 +189,12 @@ AGENTS.md      authoring guide; CLAUDE.md links here
 
 ## Licence and credits
 
-[MIT](LICENSE) © Jernej Kavka. The code, docs, sample images, mascots and the drawn robot pet were made for this repo and share that licence.
+[MIT](LICENSE) © Jernej Kavka. The code, docs, logo, sample images, mascots and the drawn robot pet were made for this repo and share that licence.
 
 - **Fonts:** none bundled. Templates use system font stacks.
 - **Big Buck Bunny** (the `youtube` pattern's sample) © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). It plays from YouTube; the poster is drawn.
 - **`docs/generated-example.jpg`** was generated with gpt-image-2; the prompt is in `docs/images.md`.
+- **`docs/scooter.jpg`:** the rider and city were generated with gpt-image-2. The hero image is a render of `docs/hero/index.html`, which shows the example decks live.
 - **Playwright** ([Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE)) runs QA and the showcase as a dev dependency.
 - **Codex pets:** this repo doesn't bundle other people's pets from Codex or community galleries such as [Petdex](https://petdex.crafter.run), because their artwork isn't licensed for redistribution. Make your own in the Codex app and add its spritesheet to your template (`docs/styles.md`, "The pet").
 
