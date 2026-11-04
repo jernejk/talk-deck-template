@@ -180,6 +180,10 @@
     "summary": "A feature matrix with yes, no and partial cells"
   },
   {
+    "name": "question-map",
+    "summary": "A two-by-two map of questions by effort and value, with the quick wins lit"
+  },
+  {
     "name": "milestones",
     "summary": "A horizontal timeline whose dots reveal one by one"
   },
