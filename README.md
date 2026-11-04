@@ -94,7 +94,7 @@ npm run new -- ~/talks/my-talk --template community-codex \
   --url https://my-talk.surge.sh
 ```
 
-Outside this repo, `new` makes a self-contained folder: `site/` is the deck you publish, with the engine, components and templates copied into `site/lib/`. It also writes `PRESENTER.md`, `AGENTS.md` and its own QA tooling. Inside `examples/`, the deck links the shared library instead. In `--title`, `|` starts a new cover line and `*…*` marks the accent. Without `--slides`, the deck gets the template's default slide list.
+Outside this repo, `new` makes a self-contained folder: `site/` is the deck you publish, with the engine, components and templates copied into `site/lib/`. It also writes `PRESENTER.md`, `AGENTS.md` and its own tooling: `npm run qa`, `lint`, `inline` and `route`, which need no deck path there. Inside `examples/`, the deck links the shared library instead. In `--title`, `|` starts a new cover line and `*…*` marks the accent. Without `--slides`, the deck gets the template's default slide list.
 
 | Task | Command |
 |---|---|

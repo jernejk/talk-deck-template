@@ -1,11 +1,13 @@
 // Build one self-contained HTML file from a deck: stylesheets (with @import), scripts, fonts, images, video and embedded pages inlined.
-// usage: npm run inline -- examples/my-talk [out.html]   (default: <deck>/standalone.html)
+// usage: npm run inline -- examples/my-talk [out.html]   (default: <deck>/standalone.html; in a standalone deck the path is optional)
 // The deck's own index.html keeps linking the shared library. Rebuild this file after every edit.
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
-import { deckIndex, fail } from "./lib.mjs";
+import { REPO, deckIndex, exists, fail } from "./lib.mjs";
 
-const [deckArg, outArg] = process.argv.slice(2);
+// A standalone deck has no examples/, so the deck is the folder this tool lives in.
+const standalone = !await exists(join(REPO, "examples"));
+const [deckArg = standalone ? REPO : undefined, outArg] = process.argv.slice(2);
 if (!deckArg) fail("Usage: npm run inline -- <deck> [out.html]");
 const index = await deckIndex(deckArg);
 const out = resolve(outArg || join(dirname(index), "standalone.html"));
