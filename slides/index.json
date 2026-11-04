@@ -1,254 +1,317 @@
 [
   {
     "name": "cover",
+    "layout": "split",
     "summary": "Title, event and speaker, with the mascot cluster"
   },
   {
     "name": "cover-image",
+    "layout": "media",
     "summary": "Title beside the framed thing you made"
   },
   {
     "name": "cover-photo",
+    "layout": "full-bleed",
     "summary": "Full-bleed photo, title on a scrim, links"
   },
   {
     "name": "cover-center",
+    "layout": "statement",
     "summary": "One centred statement"
   },
   {
     "name": "cover-split",
+    "layout": "split",
     "summary": "A coloured title panel beside an “In this talk” agenda"
   },
   {
     "name": "title-styles",
+    "layout": "statement",
     "summary": "Kicker, numeral and stacked lines on one title"
   },
   {
     "name": "speaker",
+    "layout": "media",
     "summary": "Who you are: portrait, logo, a one-line summary and links"
   },
   {
     "name": "speaker-card",
+    "layout": "media",
     "summary": "Circle portrait, badge, topic coins and a current-focus card"
   },
   {
     "name": "speaker-banner",
+    "layout": "full-bleed",
     "summary": "Wide image fading into your details"
   },
   {
     "name": "speaker-facts",
+    "layout": "media",
     "summary": "Portrait and three fact bubbles revealed on Space"
   },
   {
     "name": "speakers",
+    "layout": "columns",
     "summary": "Two or three co-presenters as cards"
   },
   {
     "name": "agenda",
+    "layout": "columns",
     "summary": "Three numbered parts with their clock times"
   },
   {
     "name": "agenda-list",
+    "layout": "list",
     "summary": "The numbered-parts agenda, filled from the deck’s sections"
   },
   {
     "name": "agenda-schedule",
+    "layout": "columns",
     "summary": "The day as time blocks, with the current block lit"
   },
   {
     "name": "chapter",
+    "layout": "statement",
     "summary": "A part divider with a huge outlined number"
   },
   {
     "name": "chapter-agenda",
+    "layout": "split",
     "summary": "Up next: a part divider with the code path and the agenda sidebar"
   },
   {
     "name": "statement",
+    "layout": "statement",
     "summary": "One big idea, with a line held back for Space"
   },
   {
     "name": "pets",
+    "layout": "columns",
     "summary": "The pet’s four poses, each with the line it might say"
   },
   {
     "name": "photo",
+    "layout": "full-bleed",
     "summary": "A full-bleed image with the title on a scrim"
   },
   {
     "name": "opener",
+    "layout": "media",
     "summary": "Messy input on a tilted card, with a sticker reveal"
   },
   {
     "name": "question",
+    "layout": "media",
     "summary": "The exact question, and the real answer as a screenshot"
   },
   {
     "name": "prompt",
+    "layout": "flow",
     "summary": "A drawn source card flowing into a prompt that types itself"
   },
   {
     "name": "cli-run",
+    "layout": "split",
     "summary": "A drawn terminal session whose lines stream in"
   },
   {
     "name": "demo-map",
+    "layout": "split",
     "summary": "Numbered live-demo checkpoints beside a drawn terminal"
   },
   {
     "name": "try-it",
+    "layout": "media",
     "summary": "A live HTML demo in a browser frame that you can use during the talk"
   },
   {
     "name": "live-demo",
+    "layout": "media",
     "summary": "A screenshot that goes live on L, with a 20-second cap"
   },
   {
     "name": "before-after",
+    "layout": "media",
     "summary": "Two screenshots swapped by one step"
   },
   {
     "name": "zoom",
+    "layout": "media",
     "summary": "One screenshot, zoomed to two regions on Space"
   },
   {
     "name": "video",
+    "layout": "media",
     "summary": "A muted screen recording that plays when the slide opens"
   },
   {
     "name": "player",
+    "layout": "media",
     "summary": "A clip with sound and controls, trimmed to the part you need"
   },
   {
     "name": "youtube",
+    "layout": "media",
     "summary": "A YouTube video behind a local poster, loaded only when you press play"
   },
   {
     "name": "versus",
+    "layout": "columns",
     "summary": "A weak and a useful prompt side by side, with a verdict line"
   },
   {
     "name": "pipeline",
+    "layout": "flow",
     "summary": "Stage cards with a marker that moves to the current stage"
   },
   {
     "name": "agents",
+    "layout": "columns",
     "summary": "Agents working one task, their states and pets changing on Space"
   },
   {
     "name": "get-the-code",
+    "layout": "split",
     "summary": "A mid-talk QR to the repo, with the path and steps"
   },
   {
     "name": "exercise",
+    "layout": "split",
     "summary": "A workshop task with a countdown timer"
   },
   {
     "name": "rule",
+    "layout": "table",
     "summary": "A table whose columns reveal one step at a time"
   },
   {
     "name": "at-a-glance",
+    "layout": "columns",
     "summary": "KPI cards that build up one at a time, with a note"
   },
   {
     "name": "numbers",
+    "layout": "media",
     "summary": "Count-up stats next to a phone capture"
   },
   {
     "name": "poll",
+    "layout": "columns",
     "summary": "Poll results as big percentages, with who answered"
   },
   {
     "name": "quote",
+    "layout": "split",
     "summary": "A real quote, with the chat that followed"
   },
   {
     "name": "transcript",
+    "layout": "split",
     "summary": "A voice-note transcript with its mistakes annotated"
   },
   {
     "name": "findings",
+    "layout": "list",
     "summary": "Review findings with coloured severity dots, building up"
   },
   {
     "name": "log-trace",
+    "layout": "table",
     "summary": "An event log whose bad row is highlighted"
   },
   {
     "name": "matrix",
+    "layout": "table",
     "summary": "A feature matrix with yes, no and partial cells"
   },
   {
     "name": "milestones",
+    "layout": "timeline",
     "summary": "A horizontal timeline whose dots reveal one by one"
   },
   {
     "name": "how-its-made",
+    "layout": "media",
     "summary": "Numbered steps beside a fan of screenshots"
   },
   {
     "name": "code",
+    "layout": "split",
     "summary": "A code card with the line that matters highlighted"
   },
   {
     "name": "diff",
+    "layout": "split",
     "summary": "What changed: added and removed lines, with the context folded"
   },
   {
     "name": "fold",
+    "layout": "split",
     "summary": "Long output folded away, opened on Space"
   },
   {
     "name": "long-page",
+    "layout": "media",
     "summary": "A tall capture that scrolls itself, with its source inset"
   },
   {
     "name": "photo-strip",
+    "layout": "gallery",
     "summary": "Four photos with captions and a metric row"
   },
   {
     "name": "iterations",
+    "layout": "gallery",
     "summary": "Rounds of an attempt as images with counts"
   },
   {
     "name": "options",
+    "layout": "gallery",
     "summary": "Two side-by-side cards for the next step up"
   },
   {
     "name": "takeaways",
+    "layout": "list",
     "summary": "The recipe: five coloured rows people photograph"
   },
   {
     "name": "questions",
+    "layout": "split",
     "summary": "A prompt question, a QR to the slides and links"
   },
   {
     "name": "follow-up",
+    "layout": "columns",
     "summary": "Project cards with a stat, a QR and a handle line"
   },
   {
     "name": "close",
+    "layout": "split",
     "summary": "The key line, links and a QR code to the slides"
   },
   {
     "name": "x-timeline",
+    "layout": "timeline",
     "summary": "Extra: the build log as a timeline"
   },
   {
     "name": "x-compare",
+    "layout": "table",
     "summary": "Extra: a comparison table"
   },
   {
     "name": "x-ladder",
+    "layout": "columns",
     "summary": "Extra: four approaches as a ladder"
   },
   {
     "name": "x-limits",
+    "layout": "media",
     "summary": "Extra: honest limits, with the fallback screenshot"
   },
   {
     "name": "x-cost",
+    "layout": "columns",
     "summary": "Extra: what it cost, as counters"
   }
 ]
