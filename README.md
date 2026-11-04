@@ -10,7 +10,7 @@ In the end I was copy-pasting whole old decks and remixing them, because startin
 
 Now I work AI-first. I tell a coding agent what I know and what I want to say, and it builds the slides, notes and demo fallbacks while I steer the story. I often get only a few hours' heads-up before a talk, and I still walk in with something I'm happy to put my name on.
 
-This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 63 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
+This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 64 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
 
 People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
@@ -115,7 +115,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | [Demo](docs/showcase/README.md#demos) | `prompt`, `cli-run`, `demo-map`, `before-after`, `zoom`, `video`, `versus`, `get-the-code` |
 | [Live and interactive](docs/showcase/README.md#live-and-interactive) | `try-it`, `live-demo`, `player`, `youtube`, `exercise` |
 | [How it works](docs/showcase/README.md#how-it-works) | `pipeline`, `agents`, `how-its-made`, `code`, `diff`, `fold`, `long-page`, `transcript`, `rule` |
-| [Evidence](docs/showcase/README.md#evidence) | `numbers`, `at-a-glance`, `poll`, `quote`, `findings`, `log-trace`, `matrix`, `milestones`, `photo-strip`, `iterations` |
+| [Evidence](docs/showcase/README.md#evidence) | `numbers`, `at-a-glance`, `poll`, `quote`, `findings`, `log-trace`, `matrix`, `sourced-table`, `milestones`, `photo-strip`, `iterations` |
 | [Wrap-up](docs/showcase/README.md#summaries-and-wrap-ups) | `options`, `takeaways`, `questions`, `follow-up`, `close` |
 | [Extras](docs/showcase/README.md#presenter-extras) | `x-timeline`, `x-compare`, `x-ladder`, `x-limits`, `x-cost` |
 

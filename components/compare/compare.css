@@ -3,3 +3,4 @@
 .compare thead th{border-top:0;background:var(--panel-2);font-weight:600;font-size:1.05em}
 .compare tbody th{width:13%;color:var(--muted);font-weight:600}
 .compare .is-hero{background:color-mix(in srgb,var(--ok) 8%,transparent)}
+.compare .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
