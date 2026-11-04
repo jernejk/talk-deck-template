@@ -32,6 +32,7 @@
     "qa": "node tools/qa.mjs",
     "new": "node tools/new.mjs",
     "add": "node tools/add.mjs",
+    "outline": "node tools/outline.mjs",
     "export": "node tools/export.mjs",
     "showcase": "node tools/showcase.mjs"
   },

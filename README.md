@@ -100,6 +100,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 |---|---|
 | List slide patterns | `npm run add -- --list` |
 | Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
+| Build the slides from an outline | `npm run outline -- ~/talks/my-talk outline.json --force` (or `--dry-run`; see `docs/slides.md`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
 | Check a deck | `cd ~/talks/my-talk && npm install && npm run qa` |
 | Publish | `npx surge ~/talks/my-talk/site my-talk.surge.sh` |
@@ -153,10 +154,10 @@ Every `ol.agenda[data-auto]` fills from that list, with past parts done and the 
 ## Extend it
 
 - **A component:** add `components/<name>/` with CSS, plus JavaScript if it needs behaviour. See `docs/components.md`.
-- **A slide pattern:** add `slides/<name>.html` and list it in `slides/index.json`. See `docs/slides.md`.
+- **A slide pattern:** add `slides/<name>.html` and list it in `slides/index.json` with its layout. See `docs/slides.md`.
 - **A template:** add `templates/<name>/`. See `docs/styles.md`.
 
-Then run `npm run build`. It regenerates `components/components.css` and `components/components.js`, the catalog and the gallery, and checks that every component appears in a slide and that every component and slide is documented. QA fails while any of that is stale. `npm run showcase` re-renders the pictures in `docs/showcase/`; run it when a pattern or template changes how it looks.
+Then run `npm run build`. It regenerates `components/components.css` and `components/components.js`, the catalog and the gallery, and checks that every component appears in a slide, that every component and slide is documented, and that every slide has a known layout. QA fails while any of that is stale. `npm run showcase` re-renders the pictures in `docs/showcase/`; run it when a pattern or template changes how it looks.
 
 ## Writing slides
 
@@ -188,7 +189,7 @@ components/    one folder per component; components.css and components.js are ge
 slides/        slide patterns, index.json and sample assets
 templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
-tools/         build, new, add, export, qa, showcase, qr.swift (macOS QR generator that decodes what it writes)
+tools/         build, new, add, outline, export, qa, showcase, qr.swift (macOS QR generator that decodes what it writes)
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
 AGENTS.md      authoring guide; CLAUDE.md links here
 ```

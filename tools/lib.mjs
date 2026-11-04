@@ -4,6 +4,19 @@ import { fileURLToPath } from "node:url";
 
 export const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_SECTIONS = { Welcome: 1, "The hook": 1, Demo: 2, "How it works": 4, "Push for more": 3, Takeaway: 1, Extras: 0 };
+// The shape of each slide pattern: `layout` in slides/index.json and data-layout on its section. docs/slides.md lists them too.
+export const LAYOUTS = {
+  statement: "One big line or numeral, little else",
+  "full-bleed": "An image fills the slide, with the text on top of it",
+  media: "Text beside one large picture: a screenshot, video, live frame or portrait",
+  split: "Text beside a drawn panel of text: code, a terminal, a chat, an agenda or a QR",
+  columns: "The title above equal cards side by side, in one or two rows",
+  gallery: "The title above a row of captioned images",
+  list: "The title above full-width rows, read top to bottom",
+  table: "The title above a table of rows and columns",
+  timeline: "Dated or timed entries in order",
+  flow: "Stages joined by arrows or lines, left to right"
+};
 
 export const exists = path => access(path).then(() => true, () => false);
 export const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -48,6 +61,27 @@ export function uniqueId(id, taken) {
 
 export function withId(slideHtml, id) {
   return slideHtml.replace(/^(<section\b[^>]*?\sid\s*=\s*)(["']).*?\2/i, (_, a, q) => `${a}${q}${id}${q}`);
+}
+
+// Title text: "|" starts a new cover line and *word* is the accent.
+export const plainTitle = text => text.replace(/\|/g, " ").replace(/\*/g, "").replace(/\s+/g, " ").trim();
+export const coverTitleHtml = text => text.split("|").map(part => {
+  const t = part.trim();
+  const whole = t.match(/^\*([^*]+)\*$/);
+  if (whole) return `<em>${esc(whole[1])}</em>`;
+  return `<span>${esc(t).replace(/\*([^*]+)\*/g, "<em>$1</em>")}</span>`;
+}).join("");
+
+export const toClock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+// Rewrites the first clock in each main slide's notes so the clocks run on from 0:00.
+// A slide keeps the length of its own clock unless seconds[i] gives one.
+export function retime(slides, seconds = []) {
+  let at = 0;
+  return slides.map((html, i) => /^<section\b[^>]*\sdata-hidden\b/.test(html) ? html : html.replace(/(<aside class="notes">[\s\S]*?<b>)(\d+):(\d{2})–(\d+):(\d{2})(\.<\/b>)/, (_, a, m1, s1, m2, s2, b) => {
+    const from = at;
+    at += seconds[i] ?? Math.max(0, m2 * 60 + +s2 - (m1 * 60 + +s1));
+    return a + toClock(from) + "–" + toClock(at) + b;
+  }));
 }
 
 export function assetRefs(html) {
