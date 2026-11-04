@@ -100,6 +100,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 |---|---|
 | List slide patterns | `npm run add -- --list` |
 | Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
+| Build the slides from an outline | `npm run outline -- ~/talks/my-talk outline.json --force` (or `--dry-run`; see `docs/slides.md`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
 | One offline HTML file to email or put on a USB stick | `npm run inline -- examples/codex-lightning` (writes `standalone.html` next to `index.html`) |
 | Refresh the PRESENTER.md route table after editing slides | `npm run route -- examples/my-talk` (`--check` only reports) |
@@ -211,7 +212,7 @@ components/    one folder per component; components.css and components.js are ge
 slides/        slide patterns, index.json and sample assets
 templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
-tools/         build, new, add, export, qa, lint, showcase, qr.swift (macOS QR generator that decodes what it writes)
+tools/         build, new, add, outline, export, qa, lint, showcase, qr.swift (macOS QR generator that decodes what it writes)
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
 AGENTS.md      authoring guide; CLAUDE.md links here
 ```

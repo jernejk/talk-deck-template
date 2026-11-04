@@ -16,7 +16,7 @@ This repo is one way to build talks, not a framework you have to follow. Everyth
 ## A talk, start to finish
 
 1. **Plan the parts.** List them in `#deck-config` as `agenda`, each with a start time, and set `duration`. Agenda slides and footer dots fill in from this list.
-2. **Make the deck.** Run `npm run new` with `--slides` listing the patterns you need, in order. The README's table groups the patterns by part of the talk, and `docs/showcase/` shows each one.
+2. **Make the deck.** Run `npm run new` with `--slides` listing the patterns you need, in order. Or write the plan as an outline and run `npm run outline`, which also sets each slide's title and clock (`docs/slides.md`). The README's table groups the patterns by part of the talk, and `docs/showcase/` shows each one.
 3. **Write the slides.** Each slide has one idea: an eyebrow, then a title with one highlighted payoff. The placeholder copy says what goes where.
 4. **Add images.** Use real screenshots where you can, cropped and captioned. `docs/images.md` lists free sources, how to generate an image, and how to caption each kind.
 5. **Write the notes.** Start each with the slide's clock (`<b>2:00–2:40.</b>`), then the line you'll say. Notes are published with the slides, so nothing private goes in them.
