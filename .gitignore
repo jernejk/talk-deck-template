@@ -4,3 +4,4 @@ qa/
 .env
 .env.*
 *.log
+standalone.html

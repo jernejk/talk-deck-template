@@ -16,7 +16,7 @@ This repo is one way to build talks, not a framework you have to follow. Everyth
 ## A talk, start to finish
 
 1. **Plan the parts.** List them in `#deck-config` as `agenda`, each with a start time, and set `duration`. Agenda slides and footer dots fill in from this list.
-2. **Make the deck.** Run `npm run new` with `--slides` listing the patterns you need, in order. The README's table groups the patterns by part of the talk, and `docs/showcase/` shows each one.
+2. **Make the deck.** Run `npm run new` with `--slides` listing the patterns you need, in order. Or write the plan as an outline and run `npm run outline`, which also sets each slide's title and clock (`docs/slides.md`). The README's table groups the patterns by part of the talk, and `docs/showcase/` shows each one.
 3. **Write the slides.** Each slide has one idea: an eyebrow, then a title with one highlighted payoff. The placeholder copy says what goes where.
 4. **Add images.** Use real screenshots where you can, cropped and captioned. `docs/images.md` lists free sources, how to generate an image, and how to caption each kind.
 5. **Write the notes.** Start each with the slide's clock (`<b>2:00–2:40.</b>`), then the line you'll say. Notes are published with the slides, so nothing private goes in them.
@@ -50,6 +50,23 @@ An agent following `AGENTS.md` will:
 - label drawn and generated images;
 - add a 20-second cap to every live demo;
 - keep the notes' clocks in order.
+
+## Agent skills
+
+`skills/` holds one agent skill for each job. Each is a folder with a short `SKILL.md`: when to use it, the steps with the exact commands, and what "done" means. It points to the docs instead of copying them, so an agent reads `docs/agent-index.md` and one or two sections, not every doc.
+
+| Skill | Use it to |
+|---|---|
+| `deck-plan` | Plan a talk and build the first draft from an outline. `fanout.md` splits a long deck across agents |
+| `deck-slides` | Add, change and reorder slides, and pick patterns |
+| `deck-media` | Add screenshots, generated images and live demos, with honest captions |
+| `deck-notes` | Write notes and clocks, add extras and update `PRESENTER.md` |
+| `deck-check` | Run QA and the lint, read the screenshots and pass the "done" list |
+| `deck-style` | Make a colourway or a template, and check contrast |
+| `deck-publish` | Export, inline, refresh the QR, and publish after you say yes |
+| `deck-library` | Change components, patterns and templates in this repo |
+
+`.claude/skills` (Claude Code) and `.agents/skills` (Codex and other agents that read `SKILL.md` folders) are links to `skills/`, so the agents find the skills when they open this repo. On Windows, git checks out a link as a small text file unless symlinks are on (`git config core.symlinks true`, which needs Developer Mode). If they are off, copy `skills/` to the folder your agent reads. The skills are plain Markdown: delete `skills/`, `.claude/` and `.agents/` if you do not want them.
 
 ## Make it yours
 
