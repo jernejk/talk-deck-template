@@ -1,0 +1,36 @@
+.motion{--rise:1;margin:4vh 0 0;width:100%;max-width:var(--w,86vw)}
+.motion svg{display:block;width:100%;height:auto;max-height:var(--h,54vh);overflow:visible}
+.motion text{fill:var(--ink);font:600 26px/1 var(--sans);letter-spacing:-.01em;text-anchor:middle;dominant-baseline:central}
+.motion .mx-node{fill:var(--panel);stroke:var(--rule);stroke-width:2}
+.motion .mx-hub{fill:color-mix(in srgb,var(--c,var(--accent)) 14%,var(--panel));stroke:var(--c,var(--accent));stroke-width:3}
+.motion .mx-line{fill:none;stroke:var(--rule);stroke-width:3;stroke-linecap:round}
+.motion figcaption{margin-top:1.4vh;font:500 clamp(.74rem,.95vw,1rem)/1.35 var(--sans);color:var(--muted);text-align:center}
+.motion figcaption b{color:var(--accent);font-weight:600;margin-right:.6em}
+
+/* Strokes draw in when the slide opens, or when their step is revealed. Needs pathLength="1". */
+.mx-draw{fill:none;stroke:var(--c,var(--accent));stroke-width:4;stroke-linecap:round;stroke-dasharray:1 2}
+.slide.is-active .mx-draw{animation:mx-draw var(--t,1.2s) var(--ease) var(--d,.3s) both}
+.slide [data-step]:not(.is-shown) .mx-draw,.slide .mx-draw[data-step]:not(.is-shown){animation:none}
+@keyframes mx-draw{from{stroke-dashoffset:1.05}to{stroke-dashoffset:0}}
+
+/* A soft, repeating pulse on a node or dot. */
+.mx-pulse{transform-box:fill-box;transform-origin:center}
+.slide.is-active .mx-pulse{animation:mx-pulse var(--t,2.4s) ease-in-out var(--d,0s) infinite}
+@keyframes mx-pulse{50%{transform:scale(var(--s,1.12));opacity:.55}}
+
+/* Children of g.mx-orbit circle the group's origin; place it with transform="translate(x y)". */
+.mx-orbit > *{fill:var(--c,var(--accent));transform:rotate(calc(var(--i,0) / var(--n,1) * 1turn)) translateX(var(--r,80px))}
+.slide.is-active .mx-orbit > *{animation:mx-orbit var(--t,12s) linear calc(var(--t,12s) * var(--i,0) / var(--n,1) * -1) infinite}
+@keyframes mx-orbit{from{transform:rotate(0turn) translateX(var(--r,80px))}to{transform:rotate(1turn) translateX(var(--r,80px))}}
+
+/* g.mx-travel > path + dots: motion.js moves the dots along the path. */
+.mx-travel > path{fill:none;stroke:var(--rule);stroke-width:3;stroke-linecap:round}
+.mx-travel > :not(path){fill:var(--c,var(--accent))}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active .mx-draw,.slide.is-active .mx-pulse,.slide.is-active .mx-orbit > *{animation:none!important}
+}
+@media screen and (max-aspect-ratio:1/1){
+  .motion{max-width:none}
+  .motion svg{max-height:none}
+}

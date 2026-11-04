@@ -56,6 +56,7 @@ The cover, speaker and close slides carry `data-fill` markers (`title`, `event`,
 | `youtube` | A YouTube video behind a local poster, loaded only when you press play | player |
 | `versus` | A weak and a useful prompt side by side, with a verdict line | versus |
 | `pipeline` | Stage cards with a marker that moves to the current stage | stages |
+| `motion` | A small drawn diagram that moves: dots travel and orbit, a node pulses, lines draw in on Space | motion |
 | `agents` | Agents working one task, their states and pets changing on Space | agents, pet |
 | `get-the-code` | A mid-talk QR to the repo, with the path and steps | pipe, qr |
 | `exercise` | A workshop task with three steps, a hint and a countdown timer | facts, timer |
