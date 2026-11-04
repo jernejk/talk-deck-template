@@ -17,8 +17,9 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 - Likely questions get a presenter extra (`data-hidden`) and a row in PRESENTER.md.
 - Colour slides with palette slots (`var(--a1)` … `var(--a6)`) so every template can recolour them. Fixed colours belong only inside drawn mock-ups.
 - Slide text uses curly quotes and apostrophes.
+- Vary the layout between neighbouring slides. Each pattern’s `data-layout` names its shape; two slides in a row with the same shape read as one.
 <!-- repo-only -->
-- Don't edit generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`); run `npm run build`. `docs/showcase/` is generated too, by `npm run showcase`.
+- Don't edit generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`, `docs/agent-index.md`); run `npm run build`. `docs/showcase/` is generated too, by `npm run showcase`.
 <!-- /repo-only -->
 
 ## Slide anatomy
@@ -37,6 +38,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 | `data-section` | Footer label and colour slot (see the config block) |
 | `data-title` | Overview, document title and screen readers |
 | `data-live` | "● Live: …" in the footer and overview |
+| `data-layout` | The slide’s shape (`statement`, `media`, `split`, `columns` …, listed in `docs/slides.md`). A label for people and tools; it doesn’t change rendering |
 | `data-hidden` | Presenter extra: skipped until H, or picked from O |
 | `data-chrome="off"` | No footer (cover, speaker, close) |
 | `data-ghost="off"` | No faint background shape |
@@ -49,7 +51,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 
 The `#deck-config` block in the head sets `title`, footer `brand` and `sections`, which map section names to slots 1–6 (0 is muted). Unlisted sections cycle through slots 1–5, the ones with a ghost shape. Optional keys: `agenda`, the parts (`section`, `title`, `note`, `time`) behind agenda lists and footer dots, which otherwise come from the sections in slide order; `"agendaDots": false` to hide the dots; `duration` (`"15:00"`) for the rehearsal timer; and `"petWalk": true` to walk the template's pet along the progress bar. The close slide's id must be `close`; C jumps to it.
 
-Component classes and options are in `docs/components.md`, slide patterns in `docs/slides.md`, and template tokens in `docs/styles.md`. The catalog (`examples/catalog/index.html`) shows every pattern, and its notes say how each works. For pictures, open `docs/showcase/`: every pattern in a mix of templates, six example talks and six colourways, labelled pattern · template.
+To pick patterns, read `docs/agent-index.md` first: one line for each pattern and component, grouped by layout. Component classes and options are in `docs/components.md`, slide patterns in `docs/slides.md`, and template tokens in `docs/styles.md`. The catalog (`examples/catalog/index.html`) shows every pattern, and its notes say how each works. For pictures, open `docs/showcase/`: every pattern in a mix of templates, six example talks and six colourways, labelled pattern · template.
 
 ## Changing a deck
 
@@ -60,7 +62,7 @@ Component classes and options are in `docs/components.md`, slide patterns in `do
 ## Changing the library
 
 - **Component:** a folder in `components/`, root class named after it, theme tokens with fallbacks for anything new, `--rise:1` to enter with the slide, reduced-motion and portrait rules, behaviour through `Deck.use`. Use it in a slide pattern and add a row to `docs/components.md`.
-- **Slide pattern:** `slides/<name>.html` plus an entry in `slides/index.json` and a row in `docs/slides.md`.
+- **Slide pattern:** `slides/<name>.html` with a `data-layout`, plus an entry in `slides/index.json` with the same `layout` and a row in `docs/slides.md`.
 - **Template:** `templates/<name>/theme.css` and `template.json`; follow `docs/styles.md`.
 - Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template. If a pattern or template looks different, run `npm run showcase` too.
 <!-- /repo-only -->
