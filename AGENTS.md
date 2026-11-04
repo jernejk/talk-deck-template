@@ -70,7 +70,8 @@ Component classes and options are in `docs/components.md`, slide patterns in `do
 ## Before calling a deck done
 
 1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one. While you work, `--slides <ids> --fast` checks only the slides you changed; run it in full before you finish.
-2. Look at the `qa/` screenshots of every slide you touched, in each template you ship. `sheet-<size>.png` beside them shows the whole deck at once.
-3. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
-4. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
-5. Update PRESENTER.md: route table, timings, what's real, extras.
+2. Read the `warnings` in the QA output. The content lint lists there what breaks the rules above: clocks out of order, live beats without a cap or a screenshot, extra `<em>`, straight quotes, private data in notes, undisclosed drawings, fixed colours and repeated layouts. Fix each one, or know why it stays.
+3. Look at the `qa/` screenshots of every slide you touched, in each template you ship. `sheet-<size>.png` beside them shows the whole deck at once.
+4. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
+5. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
+6. Update PRESENTER.md: route table, timings, what's real, extras.

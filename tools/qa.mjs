@@ -98,6 +98,13 @@ await new Promise(r => server.listen(0, "127.0.0.1", r));
 const base = `http://127.0.0.1:${server.address().port}/`;
 
 const browser = await chromium.launch();
+// The content lint adds warnings, never problems. Standalone decks made before lint.mjs was copied into them skip it.
+const lintFile = join(ROOT, "tools/lint.mjs");
+const lint = await exists(lintFile) ? (await import(pathToFileURL(lintFile).href)).lint : null;
+async function lintDeck(deck) {
+  const found = await lint(await readFile(deck.index, "utf8"), { browser, catalog: basename(dirname(deck.index)) === "catalog" });
+  return { problems: [], warnings: found.map(({ slide, check, message }) => ({ where: slide ? `${deck.name} #${slide}` : deck.name, check, message })) };
+}
 
 function watch(page, where, problems) {
   const errors = [];
@@ -232,6 +239,7 @@ for (const deck of await decks()) {
     for (const size of sizes) tasks.push(() => render(deck, theme, size));
   }
   tasks.push(() => offline(deck), () => keyboard(deck));
+  if (lint) tasks.push(() => lintDeck(deck));
 }
 const results = [];
 let next = 0;

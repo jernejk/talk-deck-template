@@ -102,6 +102,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
 | Check a deck | `cd ~/talks/my-talk && npm install && npm run qa` |
+| Lint a deck's content | `npm run lint -- ~/talks/my-talk` (no screenshots, about a second) |
 | Publish | `npx surge ~/talks/my-talk/site my-talk.surge.sh` |
 
 ### Patterns for each part of a talk
@@ -183,6 +184,23 @@ QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and s
 
 Each deck × template × size runs as a separate job, four at a time by default (fewer on a machine with fewer cores); `--jobs 1` runs them one after another. Every run also writes `qa/<deck>/<template>/sheet-<size>.png`, all the screenshots of that run on one image. `--slides` takes slide ids or numbers (`cover,3-5`) and checks only those slides; the `file://` and keyboard checks still cover the whole deck. `--fast` checks only the first size and skips the screenshots and contact sheet, except slides with a QR code. The JSON output lists failures under `problems` and non-fatal notes under `warnings`.
 
+### Content lint
+
+`npm run lint -- <deck>` reads a deck's HTML and checks the authoring rules in `AGENTS.md`, without screenshots. QA runs it on every deck it checks and adds the findings to `warnings`, each with its check id. For now the findings are warnings only: they never fail QA or change the exit code.
+
+| Check | Warns when |
+|---|---|
+| `clock-order` | A main slide has no clock in its notes, a clock ends before it starts, or it starts before the previous slide's clock ends. It reads the first `m:ss–m:ss` in a `<b>` in the notes, like the rehearsal timer, and skips presenter extras |
+| `live-cap` | A `data-live` slide has no `img`, `picture`, video poster, `.cli` or `.mock` on it, or its notes don't say 20 s, 20s, 20-second or 20 seconds |
+| `one-em` | A `.title` has more than one `<em>` |
+| `curly-quotes` | Visible slide text has a straight `'` or `"`. Attributes, notes, `code`, `pre`, `kbd`, `samp`, `.cli`, `.code`, `.diff` and `.log` are skipped, because they often quote code |
+| `private-data` | Notes, or links in them, have an email, `localhost` or a private IP address, a URL with a `token=`, `key=` or similar parameter, an API key, a UUID or a hex ID of 24 characters or more. Reserved example domains such as `example.com` are fine |
+| `drawn-disclosure` | A slide has a `.mock`, `.composer`, `.memo` or `.cli`, but no caption or note on it says “drawn” or “illustration”. Or a caption says **Generated**, but the notes have no prompt |
+| `fixed-colour` | An inline `style` on a slide has a hex, `rgb()`, `hsl()` or similar colour outside a drawn mock-up. Named colours are not checked |
+| `layout-variety` | Two main slides in a row have the same `data-layout`. Slides without one are skipped |
+
+The catalog lists patterns, not a talk, so it skips `clock-order` and `layout-variety`.
+
 ## Layout
 
 ```
@@ -191,7 +209,7 @@ components/    one folder per component; components.css and components.js are ge
 slides/        slide patterns, index.json and sample assets
 templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
-tools/         build, new, add, export, qa, showcase, qr.swift (macOS QR generator that decodes what it writes)
+tools/         build, new, add, export, qa, lint, showcase, qr.swift (macOS QR generator that decodes what it writes)
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
 AGENTS.md      authoring guide; CLAUDE.md links here
 ```
