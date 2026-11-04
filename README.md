@@ -101,6 +101,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | List slide patterns | `npm run add -- --list` |
 | Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
+| Refresh the PRESENTER.md route table after editing slides | `npm run route -- examples/my-talk` (`--check` only reports) |
 | Check a deck | `cd ~/talks/my-talk && npm install && npm run qa` |
 | Publish | `npx surge ~/talks/my-talk/site my-talk.surge.sh` |
 
