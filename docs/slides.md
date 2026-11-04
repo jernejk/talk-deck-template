@@ -68,6 +68,7 @@ The cover, speaker and close slides carry `data-fill` markers (`title`, `event`,
 | `findings` | Review findings with coloured severity dots, building up | findings |
 | `log-trace` | An event log whose bad row is highlighted | log |
 | `matrix` | A feature matrix with yes, no and partial cells | compare, matrix |
+| `sourced-table` | A table of figures with the source of every number | compare, srcline |
 | `milestones` | A horizontal timeline whose dots reveal one by one | milestones |
 | `how-its-made` | Numbered steps beside a fan of screenshots | fan, pipe, shot |
 | `code` | A code card with the line that matters highlighted | callout, code |

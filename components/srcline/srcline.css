@@ -1,0 +1,6 @@
+.srcline{--rise:1;position:absolute;left:7vw;right:7vw;bottom:10.5vh;margin:0;font:400 clamp(.62rem,.8vw,.86rem)/1.35 var(--sans);color:var(--muted)}
+.srcline b{font-weight:600;color:var(--ink)}
+
+@media screen and (max-aspect-ratio:1/1){
+  .srcline{position:static;margin-top:3vh}
+}

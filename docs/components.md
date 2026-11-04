@@ -43,7 +43,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `cli` | Drawn terminal session whose lines stream in | `figure.cli > .cli-head + .cli-body > .cli-line` (`cli-user`, `cli-run`, `cli-out`, `cli-ok`, `cli-meta`; `code`, `ins`, `del`) | yes |
 | `close` | Closing slide with links and a QR code | `.slide--close`, `.close-grid`, `.close-title`, `.close-socials`, `a.close-qr > .qr-ring > .qr-card`, `.qr-label`, `.qr-url`, `.qm1`–`.qm5`, `.close-pet`; the slide id must be `close` | |
 | `code` | Code card with a highlighted line | `figure.code > figcaption + ol > li` (`.hl`, `.c`; tokens `.k` `.s` `.f` `.n`) | |
-| `compare` | Comparison table | `table.compare`, `.is-hero` column | |
+| `compare` | Comparison table | `table.compare`, `.is-hero` column, `.num` on number cells and their headers | |
 | `composer` | Drawn prompt box that types itself | `.composer > .composer-box > .composer-chips + .composer-text[data-type] + .composer-bar`; `.composer-mode`, `.composer-label` | |
 | `count` | Numbers that count up when the slide opens | `[data-count="83"]` | yes |
 | `cover` | Cover and section-opener layouts | `.slide--cover`, `.slide--opener`, `.cover-meta`, `data-fill` markers for `npm run new` | |
@@ -78,6 +78,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `schedule` | Grid of event-day time blocks | `.schedule > .slot > time + strong + span` (`--n`, `--c`, `.is-now`) | |
 | `scrollshot` | Tall capture that scrolls itself | `figure.scrollshot > .scrollshot-view > img` (`--vh`), inside `.stage` | |
 | `shot` | Screenshot with caption; click to zoom | `figure.shot > img + figcaption > b` (`--h`), `.swap`, `.inset` | yes |
+| `srcline` | One line above the footer that names where the slide’s numbers came from | `p.srcline` with an optional `b` label | |
 | `stages` | Stage cards with the current one lit | `ol.stages > li` (`strong`, `span`, `i.pin[aria-hidden]`); `li.is-current`, or with `data-step` the last revealed is current | |
 | `stats` | Big numbers | `.stats > .stat` (`--n`, `--w`), `.counters` | |
 | `sticker` | Tilted label | `.sticker` (`small`), often `data-step` | |
