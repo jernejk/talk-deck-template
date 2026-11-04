@@ -1,6 +1,6 @@
 # Slide patterns
 
-A slide pattern is one file in `slides/`: a single `<section class="slide">` with placeholder copy that says what goes there, timed speaker notes, and sample assets from `slides/assets/`. `slides/index.json` lists the patterns in catalog order, each with a one-line summary.
+A slide pattern is one file in `slides/`: a single `<section class="slide">` with placeholder copy that says what goes there, timed speaker notes, and sample assets from `slides/assets/`. `slides/index.json` lists the patterns in catalog order, each with its layout and a one-line summary.
 
 - `npm run add -- --list` prints them.
 - `npm run add -- <deck> <name>` copies one into a deck, by default in front of the close slide (`--before <id>` or `--after <id>` to choose). It keeps ids unique and copies the assets the slide uses. The deck can live in `examples/` or anywhere else.
@@ -10,79 +10,98 @@ A slide pattern is one file in `slides/`: a single `<section class="slide">` wit
 ## Writing a pattern
 
 1. Create `slides/<name>.html` with one `<section class="slide">`, whose `id` is the file name. Extras use `data-hidden` and an `x-` prefix.
-2. Set `data-title`, and a `data-section` from the usual set (Welcome, The hook, Demo, How it works, Push for more, Takeaway, Extras). Other names work too and take the next free colour slot.
+2. Set `data-title`, a `data-layout` from [the layouts](#layouts), and a `data-section` from the usual set (Welcome, The hook, Demo, How it works, Push for more, Takeaway, Extras). Other names work too and take the next free colour slot.
 3. Write placeholder copy that teaches: what goes in the eyebrow, the title and its `<em>` payoff.
 4. Open the notes with the clock (`<b>2:00–2:20.</b>`) and the line to say. Use `p.live` for live cues, and `p.src` to explain how the slide works or where its content came from.
 5. Reference sample files as `assets/…` and keep them in `slides/assets/`; `new` and `add` copy what a slide needs.
 6. Mark decorative elements `aria-hidden="true"`.
-7. Add the pattern to `slides/index.json`, then run `npm run build` and `npm run qa`.
+7. Add the pattern to `slides/index.json` with the same `layout`, then run `npm run build` and `npm run qa`.
 
 The cover, speaker and close slides carry `data-fill` markers (`title`, `event`, `speaker`, `date`) and the close slide's QR link, which `npm run new` fills in.
 
+## Layouts
+
+Every pattern names its shape, so you can see at a glance which slides look alike. Vary the layout between neighbouring slides: a `media` slide after a `media` slide reads as one long slide. The layout is a label for people and tools. It doesn't change how the slide renders, and it isn't a class: a `media` slide often uses `.split` too.
+
+`npm run build` rejects a pattern whose layout is missing, isn't in this list, or differs between `slides/index.json` and the file. The list lives in `LAYOUTS` in `tools/lib.mjs`. Add a new layout there and here only when no existing one fits.
+
+| Layout | Shape |
+|---|---|
+| `statement` | One big line or numeral, little else |
+| `full-bleed` | An image fills the slide, with the text on top of it |
+| `media` | Text beside one large picture: a screenshot, video, live frame or portrait |
+| `split` | Text beside a drawn panel of text: code, a terminal, a chat, an agenda or a QR |
+| `columns` | The title above equal cards side by side, in one or two rows |
+| `gallery` | The title above a row of captioned images |
+| `list` | The title above full-width rows, read top to bottom |
+| `table` | The title above a table of rows and columns |
+| `timeline` | Dated or timed entries in order |
+| `flow` | Stages joined by arrows or lines, left to right |
+
 ## Patterns
 
-| Pattern | What it's for | Components |
-|---|---|---|
-| `cover` | Title, event and speaker, with the mascot cluster | cover, mascots |
-| `cover-image` | Title beside the framed thing you made | cover, covers, titles |
-| `cover-photo` | Full-bleed photo, title on a scrim, links | cover, covers, titles |
-| `cover-center` | One centred statement | cover, covers, titles |
-| `cover-split` | A coloured title panel beside an “In this talk” agenda | agenda, cover |
-| `title-styles` | Kicker, numeral and stacked lines on one title | titles |
-| `speaker` | Who you are: portrait, logo, a one-line summary and links | about, pet |
-| `speaker-card` | Circle portrait, badge, topic coins and a current-focus card | pet, presenter |
-| `speaker-banner` | Wide image fading into your details | pet, presenter |
-| `speaker-facts` | Portrait and three fact bubbles revealed on Space | pet, presenter |
-| `speakers` | Two or three co-presenters as cards | presenter |
-| `agenda` | Three numbered parts with their clock times | pillars |
-| `agenda-list` | The numbered-parts agenda, filled from the deck’s sections | agenda |
-| `agenda-schedule` | The day as time blocks, with the current block lit | schedule |
-| `chapter` | A part divider with a huge outlined number | chapter |
-| `chapter-agenda` | Up next: a part divider with the code path and the agenda sidebar | agenda |
-| `statement` | One big idea, with a line held back for Space | pet |
-| `pets` | The pet’s four poses, each with when to use it and a line it might say | pet |
-| `photo` | A full-bleed image with the title on a scrim | bleed |
-| `opener` | Messy input on a tilted card, with a sticker reveal | cover, sticker, tilt |
-| `question` | The exact question, and the real answer as a screenshot | callout, shot, tags |
-| `prompt` | A drawn source card flowing into a prompt that types itself | composer, mock, type |
-| `cli-run` | A drawn terminal session whose lines stream in | cli, tags |
-| `demo-map` | Numbered live-demo checkpoints beside a drawn terminal | cli, facts |
-| `try-it` | A live HTML demo in a browser frame that you can use during the talk | embed |
-| `live-demo` | A screenshot that goes live on L, with a 20-second cap | embed, facts, titles |
-| `before-after` | Two screenshots swapped by one step | shot |
-| `zoom` | One screenshot zoomed to two regions on Space | zoom |
-| `video` | A muted screen recording that plays when the slide opens | video |
-| `player` | A clip with sound and controls, trimmed to the part you need | player |
-| `youtube` | A YouTube video behind a local poster, loaded only when you press play | player |
-| `versus` | A weak and a useful prompt side by side, with a verdict line | versus |
-| `pipeline` | Stage cards with a marker that moves to the current stage | stages |
-| `agents` | Agents working one task, their states and pets changing on Space | agents, pet |
-| `get-the-code` | A mid-talk QR to the repo, with the path and steps | pipe, qr |
-| `exercise` | A workshop task with three steps, a hint and a countdown timer | facts, timer |
-| `rule` | A table whose columns reveal one step at a time | ledger |
-| `at-a-glance` | KPI cards that build up one at a time, with a note | kpis |
-| `numbers` | Count-up stats next to a phone capture | count, phone, stats |
-| `poll` | Poll results as big percentages, with who answered | count, stats |
-| `quote` | A real quote, with the chat that followed | bubbles, quote |
-| `transcript` | A voice-note transcript with its mistakes annotated | memo |
-| `findings` | Review findings with coloured severity dots, building up | findings |
-| `log-trace` | An event log whose bad row is highlighted | log |
-| `matrix` | A feature matrix with yes, no and partial cells | compare, matrix |
-| `milestones` | A horizontal timeline whose dots reveal one by one | milestones |
-| `how-its-made` | Numbered steps beside a fan of screenshots | fan, pipe, shot |
-| `code` | A code card with the line that matters highlighted | callout, code |
-| `diff` | A small code diff with added lines on Space and folded context | diff |
-| `fold` | Long output folded away: the plan, the test log and the diff summary | fold |
-| `long-page` | A tall capture that scrolls itself, with its source inset | scrollshot, shot |
-| `photo-strip` | Four photos with captions and a metric row | strip |
-| `iterations` | Rounds of an attempt as images with counts | strip |
-| `options` | Two side-by-side cards for the next step up | shot |
-| `takeaways` | The recipe: five coloured rows people photograph | mascots, recipe |
-| `questions` | A prompt question, a QR to the slides and links | qr |
-| `follow-up` | Project cards with a stat, a QR and a handle line | pillars, qr |
-| `close` | The key line, links and a QR code to the slides | close, fx, mascots, pet, sticker |
-| `x-timeline` | Extra: the build log as a timeline | timeline |
-| `x-compare` | Extra: a comparison table | compare |
-| `x-ladder` | Extra: four approaches as a ladder | ladder |
-| `x-limits` | Extra: honest limits, with the fallback screenshot | facts, shot |
-| `x-cost` | Extra: what it cost, as counters | count |
+| Pattern | Layout | What it's for | Components |
+|---|---|---|---|
+| `cover` | split | Title, event and speaker, with the mascot cluster | cover, mascots |
+| `cover-image` | media | Title beside the framed thing you made | cover, covers, titles |
+| `cover-photo` | full-bleed | Full-bleed photo, title on a scrim, links | cover, covers, titles |
+| `cover-center` | statement | One centred statement | cover, covers, titles |
+| `cover-split` | split | A coloured title panel beside an “In this talk” agenda | agenda, cover |
+| `title-styles` | statement | Kicker, numeral and stacked lines on one title | titles |
+| `speaker` | media | Who you are: portrait, logo, a one-line summary and links | about, pet |
+| `speaker-card` | media | Circle portrait, badge, topic coins and a current-focus card | pet, presenter |
+| `speaker-banner` | full-bleed | Wide image fading into your details | pet, presenter |
+| `speaker-facts` | media | Portrait and three fact bubbles revealed on Space | pet, presenter |
+| `speakers` | columns | Two or three co-presenters as cards | presenter |
+| `agenda` | columns | Three numbered parts with their clock times | pillars |
+| `agenda-list` | list | The numbered-parts agenda, filled from the deck’s sections | agenda |
+| `agenda-schedule` | columns | The day as time blocks, with the current block lit | schedule |
+| `chapter` | statement | A part divider with a huge outlined number | chapter |
+| `chapter-agenda` | split | Up next: a part divider with the code path and the agenda sidebar | agenda |
+| `statement` | statement | One big idea, with a line held back for Space | pet |
+| `pets` | columns | The pet’s four poses, each with when to use it and a line it might say | pet |
+| `photo` | full-bleed | A full-bleed image with the title on a scrim | bleed |
+| `opener` | media | Messy input on a tilted card, with a sticker reveal | cover, sticker, tilt |
+| `question` | media | The exact question, and the real answer as a screenshot | callout, shot, tags |
+| `prompt` | flow | A drawn source card flowing into a prompt that types itself | composer, mock, type |
+| `cli-run` | split | A drawn terminal session whose lines stream in | cli, tags |
+| `demo-map` | split | Numbered live-demo checkpoints beside a drawn terminal | cli, facts |
+| `try-it` | media | A live HTML demo in a browser frame that you can use during the talk | embed |
+| `live-demo` | media | A screenshot that goes live on L, with a 20-second cap | embed, facts, titles |
+| `before-after` | media | Two screenshots swapped by one step | shot |
+| `zoom` | media | One screenshot zoomed to two regions on Space | zoom |
+| `video` | media | A muted screen recording that plays when the slide opens | video |
+| `player` | media | A clip with sound and controls, trimmed to the part you need | player |
+| `youtube` | media | A YouTube video behind a local poster, loaded only when you press play | player |
+| `versus` | columns | A weak and a useful prompt side by side, with a verdict line | versus |
+| `pipeline` | flow | Stage cards with a marker that moves to the current stage | stages |
+| `agents` | columns | Agents working one task, their states and pets changing on Space | agents, pet |
+| `get-the-code` | split | A mid-talk QR to the repo, with the path and steps | pipe, qr |
+| `exercise` | split | A workshop task with three steps, a hint and a countdown timer | facts, timer |
+| `rule` | table | A table whose columns reveal one step at a time | ledger |
+| `at-a-glance` | columns | KPI cards that build up one at a time, with a note | kpis |
+| `numbers` | media | Count-up stats next to a phone capture | count, phone, stats |
+| `poll` | columns | Poll results as big percentages, with who answered | count, stats |
+| `quote` | split | A real quote, with the chat that followed | bubbles, quote |
+| `transcript` | split | A voice-note transcript with its mistakes annotated | memo |
+| `findings` | list | Review findings with coloured severity dots, building up | findings |
+| `log-trace` | table | An event log whose bad row is highlighted | log |
+| `matrix` | table | A feature matrix with yes, no and partial cells | compare, matrix |
+| `milestones` | timeline | A horizontal timeline whose dots reveal one by one | milestones |
+| `how-its-made` | media | Numbered steps beside a fan of screenshots | fan, pipe, shot |
+| `code` | split | A code card with the line that matters highlighted | callout, code |
+| `diff` | split | A small code diff with added lines on Space and folded context | diff |
+| `fold` | split | Long output folded away: the plan, the test log and the diff summary | fold |
+| `long-page` | media | A tall capture that scrolls itself, with its source inset | scrollshot, shot |
+| `photo-strip` | gallery | Four photos with captions and a metric row | strip |
+| `iterations` | gallery | Rounds of an attempt as images with counts | strip |
+| `options` | gallery | Two side-by-side cards for the next step up | shot |
+| `takeaways` | list | The recipe: five coloured rows people photograph | mascots, recipe |
+| `questions` | split | A prompt question, a QR to the slides and links | qr |
+| `follow-up` | columns | Project cards with a stat, a QR and a handle line | pillars, qr |
+| `close` | split | The key line, links and a QR code to the slides | close, fx, mascots, pet, sticker |
+| `x-timeline` | timeline | Extra: the build log as a timeline | timeline |
+| `x-compare` | table | Extra: a comparison table | compare |
+| `x-ladder` | columns | Extra: four approaches as a ladder | ladder |
+| `x-limits` | media | Extra: honest limits, with the fallback screenshot | facts, shot |
+| `x-cost` | columns | Extra: what it cost, as counters | count |
