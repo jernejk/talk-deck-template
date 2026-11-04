@@ -13,7 +13,7 @@ npx playwright install chromium
 
 1. Read `AGENTS.md`. It holds the authoring rules for people and coding agents.
 2. Add a component, pattern or template the way `README.md` ("Extend it") describes, and document it in `docs/`.
-3. Run `npm run build`. Don't edit the generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`) by hand.
+3. Run `npm run build`. Don't edit the generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`, `docs/agent-index.md`) by hand.
 4. Run `npm run qa`. It must report no problems. Look at the `qa/` screenshots of what you changed, in every template.
 5. If a pattern or template looks different, run `npm run showcase` and commit the new pictures.
 
