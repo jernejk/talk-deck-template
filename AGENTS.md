@@ -17,6 +17,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 - Likely questions get a presenter extra (`data-hidden`) and a row in PRESENTER.md.
 - Colour slides with palette slots (`var(--a1)` … `var(--a6)`) so every template can recolour them. Fixed colours belong only inside drawn mock-ups.
 - Slide text uses curly quotes and apostrophes.
+- Vary the layout between neighbouring slides. Each pattern’s `data-layout` names its shape; two slides in a row with the same shape read as one.
 <!-- repo-only -->
 - Don't edit generated files (`components/components.css`, `components/components.js`, `examples/catalog/`, `examples/index.html`); run `npm run build`. `docs/showcase/` is generated too, by `npm run showcase`.
 <!-- /repo-only -->
@@ -37,6 +38,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 | `data-section` | Footer label and colour slot (see the config block) |
 | `data-title` | Overview, document title and screen readers |
 | `data-live` | "● Live: …" in the footer and overview |
+| `data-layout` | The slide’s shape (`statement`, `media`, `split`, `columns` …, listed in `docs/slides.md`). A label for people and tools; it doesn’t change rendering |
 | `data-hidden` | Presenter extra: skipped until H, or picked from O |
 | `data-chrome="off"` | No footer (cover, speaker, close) |
 | `data-ghost="off"` | No faint background shape |
@@ -60,15 +62,16 @@ Component classes and options are in `docs/components.md`, slide patterns in `do
 ## Changing the library
 
 - **Component:** a folder in `components/`, root class named after it, theme tokens with fallbacks for anything new, `--rise:1` to enter with the slide, reduced-motion and portrait rules, behaviour through `Deck.use`. Use it in a slide pattern and add a row to `docs/components.md`.
-- **Slide pattern:** `slides/<name>.html` plus an entry in `slides/index.json` and a row in `docs/slides.md`.
+- **Slide pattern:** `slides/<name>.html` with a `data-layout`, plus an entry in `slides/index.json` with the same `layout` and a row in `docs/slides.md`.
 - **Template:** `templates/<name>/theme.css` and `template.json`; follow `docs/styles.md`.
 - Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template. If a pattern or template looks different, run `npm run showcase` too.
 <!-- /repo-only -->
 
 ## Before calling a deck done
 
-1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one.
-2. Look at the `qa/` screenshots of every slide you touched, in each template you ship.
-3. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
-4. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
-5. Update PRESENTER.md: route table, timings, what's real, extras.
+1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one. While you work, `--slides <ids> --fast` checks only the slides you changed; run it in full before you finish.
+2. Read the `warnings` in the QA output. The content lint lists there what breaks the rules above: clocks out of order, live beats without a cap or a screenshot, extra `<em>`, straight quotes, private data in notes, undisclosed drawings, fixed colours and repeated layouts. Fix each one, or know why it stays.
+3. Look at the `qa/` screenshots of every slide you touched, in each template you ship. `sheet-<size>.png` beside them shows the whole deck at once.
+4. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
+5. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
+6. Update PRESENTER.md: route table, timings, what's real, extras.
