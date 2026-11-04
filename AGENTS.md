@@ -52,6 +52,10 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 The `#deck-config` block in the head sets `title`, footer `brand` and `sections`, which map section names to slots 1–6 (0 is muted). Unlisted sections cycle through slots 1–5, the ones with a ghost shape. Optional keys: `agenda`, the parts (`section`, `title`, `note`, `time`) behind agenda lists and footer dots, which otherwise come from the sections in slide order; `"agendaDots": false` to hide the dots; `duration` (`"15:00"`) for the rehearsal timer; and `"petWalk": true` to walk the template's pet along the progress bar. The close slide's id must be `close`; C jumps to it.
 
 To pick patterns, read `docs/agent-index.md` first: one line for each pattern and component, grouped by layout. Component classes and options are in `docs/components.md`, slide patterns in `docs/slides.md`, and template tokens in `docs/styles.md`. The catalog (`examples/catalog/index.html`) shows every pattern, and its notes say how each works. For pictures, open `docs/showcase/`: every pattern in a mix of templates, six example talks and six colourways, labelled pattern · template.
+<!-- repo-only -->
+
+Agent skills in `skills/` give the steps and commands for each job, from planning a deck to publishing it. See "Agent skills" in `docs/guide.md`.
+<!-- /repo-only -->
 
 ## Changing a deck
 
