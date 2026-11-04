@@ -5,7 +5,7 @@ import { REPO, assetRefs, copyAssets, deckHtml, esc, exists, patterns, readDeck,
 
 const { values: opt } = parseArgs({ options: { check: { type: "boolean", default: false } } });
 
-const USED_BY = { count: /data-count=/, type: /data-type=/, ghost: /./, rehearse: /./, cover: /slide--cover/, about: /slide--about/, close: /slide--close/, mascots: /class="mascot\b/, titles: /title--(stack|xl|center|kicker|number)\b/, covers: /cover--(image|photo|center)\b/, presenter: /slide--presenter|presenter-team/ };
+const USED_BY = { count: /data-count=/, type: /data-type=/, ghost: /./, rehearse: /./, tune: /./, cover: /slide--cover/, about: /slide--about/, close: /slide--close/, mascots: /class="mascot\b/, titles: /title--(stack|xl|center|kicker|number)\b/, covers: /cover--(image|photo|center)\b/, presenter: /slide--presenter|presenter-team/ };
 
 async function componentBundles() {
   const names = [];
