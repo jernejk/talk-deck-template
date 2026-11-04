@@ -17,7 +17,9 @@ const { values: opt, positionals } = parseArgs({
     motion: { type: "boolean", default: false },
     jobs: { type: "string", default: String(Math.min(4, availableParallelism())) },
     slides: { type: "string" },
-    fast: { type: "boolean", default: false }
+    fast: { type: "boolean", default: false },
+    changed: { type: "boolean", default: false },
+    since: { type: "string" }
   }
 });
 const jobs = Number(opt.jobs);
@@ -25,6 +27,8 @@ if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole
 
 const exists = path => access(path).then(() => true, () => false);
 const repoMode = await exists(join(ROOT, "examples")) && await exists(join(ROOT, "core/deck.js"));
+const changed = opt.changed || opt.since !== undefined;
+if (changed && (positionals.length || opt.theme || opt.slides)) throw new Error("--changed picks the decks, templates and slides itself, so leave out deck paths, --theme and --slides.");
 const serveRoot = repoMode ? ROOT : join(ROOT, "site");
 const templatesDir = repoMode ? join(ROOT, "templates") : join(ROOT, "site/lib/templates");
 const sizeList = opt.fast ? opt.sizes.split(",").slice(0, 1) : opt.sizes.split(",");
@@ -35,6 +39,81 @@ const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascrip
 const CHECKED = ".title,.ask,.sub,.hint,.callout,.quote,.bubbles,.memo,.shot,.phone,.tilt,.fan,.stage,.flow,.composer,.mock,.pillars,.pipe,.facts,.tags,.chips,.legend,.stats,.counters,.recipe,.ladder,.timeline,.ledger,.compare,.cols,.sticker,.about-panel,.about-portrait,.close-text,.close-qr,.cli,.code,.chapter,.bleed-text,.video,.agenda,.cover-panel,.cover-side,.cover-frame,.cover-links,.presenter-panel,.presenter-side,.presenter-team,.presenter-facts,.stages,.versus,.findings,.log,.kpis,.matrix,.milestones,.strip,.schedule,.qr,.pets,.pet-say,.agents,.embed,.fold,.player,.diff,.zoom,.timer";
 const problems = [];
 const warnings = [];
+const note = msg => console.error(`qa --changed: ${msg}`);
+
+// --changed: the smallest set of decks, templates and slides that covers what git says changed. null means a full run.
+async function changedScope() {
+  const { USED_BY, slideSections } = await import("./lib.mjs");
+  let files;
+  try {
+    const git = (...args) => execFileSync("git", ["-C", ROOT, ...args], { encoding: "utf8", stdio: "pipe" }).split("\n").filter(Boolean);
+    files = [...new Set([...git("ls-files", "--others", "--exclude-standard"), ...git("diff", "--name-only", "--no-renames", "--relative", "--merge-base", opt.since || "HEAD")])].filter(f => f.split("/")[0] !== "node_modules").sort();
+  } catch (e) {
+    note(`git failed (${String(e.stderr || e.message).trim().split("\n")[0]}), so this is a full run.`);
+    return null;
+  }
+  note(`${files.length} file(s) changed against ${opt.since || "HEAD"}.`);
+  const examples = [];
+  for (const dir of (await readdir(join(ROOT, "examples"))).sort()) if (dir !== "catalog" && await exists(join(ROOT, "examples", dir, "index.html"))) examples.push(dir);
+  // Deck folder → templates ("*" every template, "own" the deck's own) and slide ids (null means every slide).
+  // ponytail: one slide list per deck, not per template, so mixed changes can shoot a few slides more than they need.
+  const scope = new Map();
+  const add = (deck, themes, slides = null) => {
+    const s = scope.get(deck) ?? { themes: new Set(), slides: [] };
+    for (const t of themes) s.themes.add(t);
+    s.slides = s.slides && slides ? [...new Set([...s.slides, ...slides])] : null;
+    scope.set(deck, s);
+  };
+  // The build writes components/components.* and examples/catalog/ from components/ and slides/, so they count only on their own.
+  const sources = new Set(), generated = new Set();
+  for (const f of files) {
+    const [top, name = "", ...rest] = f.split("/");
+    const why = msg => note(`  ${f} → ${msg}`);
+    if (f.endsWith(".md") || top === "docs" || f === "examples/index.html") continue;
+    if (top === "templates" && rest.length && await exists(join(ROOT, "templates", name, "theme.css"))) {
+      add("catalog", [name]);
+      for (const deck of examples) add(deck, [name]);
+      why(`the catalog and every example, in ${name}`);
+    } else if (top === "slides" && !rest.length && name.endsWith(".html") && await exists(join(ROOT, f))) {
+      sources.add("slides");
+      const ids = slideSections(await readFile(join(ROOT, f), "utf8")).map(s => s.id);
+      add("catalog", ["*"], ids);
+      why(`the catalog in every template, slides ${ids.join(",")}`);
+    } else if (top === "slides") {
+      sources.add("slides");
+      add("catalog", ["*"]);
+      why("the catalog in every template");
+    } else if (top === "components" && /^components\.(css|js)$/.test(name)) {
+      generated.add("components");
+    } else if (top === "examples" && name === "catalog") {
+      generated.add("slides");
+    } else if (top === "components" && rest.length && await exists(join(ROOT, "components", name))) {
+      sources.add("components");
+      add("catalog", ["*"]);
+      const uses = USED_BY[name] ?? new RegExp(`class="[^"]*\\b${name}\\b`);
+      const users = [];
+      for (const deck of examples) if (uses.test(await readFile(join(ROOT, "examples", deck, "index.html"), "utf8"))) { add(deck, ["own"]); users.push(deck); }
+      why(`the catalog in every template${users.length ? `, and ${users.join(", ")}` : ""}`);
+    } else if (top === "examples" && rest.length && await exists(join(ROOT, "examples", name, "index.html"))) {
+      add(name, ["own"]);
+      why(`${name} in its own template`);
+    } else {
+      why("can change any deck, so this is a full run");
+      return null;
+    }
+  }
+  if (generated.has("components") && !sources.has("components")) {
+    note("  components/components.* changed without a component folder, so this is a full run.");
+    return null;
+  }
+  if (generated.has("slides") && !sources.has("slides")) {
+    add("catalog", ["*"]);
+    note("  examples/catalog/ changed without slides/, so the catalog runs in every template.");
+  }
+  return scope;
+}
+const scope = changed && repoMode ? await changedScope() : null;
+if (changed && !repoMode) note("it is a repo-only flag, so this checks the whole deck.");
 
 async function allThemes() {
   const out = [];
@@ -51,7 +130,8 @@ async function deckIndex(path) {
 
 async function decks() {
   const found = [];
-  if (positionals.length) for (const p of positionals) found.push(await deckIndex(p));
+  if (scope) for (const dir of [...scope.keys()].sort()) found.push(join(ROOT, "examples", dir, "index.html"));
+  else if (positionals.length) for (const p of positionals) found.push(await deckIndex(p));
   else if (repoMode) {
     for (const dir of (await readdir(join(ROOT, "examples"))).sort()) {
       if (await exists(join(ROOT, "examples", dir, "index.html"))) found.push(join(ROOT, "examples", dir, "index.html"));
@@ -63,9 +143,11 @@ async function decks() {
     const html = await readFile(index, "utf8");
     const own = html.match(/templates\/([\w-]+)\/theme\.css" id="theme"/)?.[1];
     const isCatalog = basename(dirname(index)) === "catalog";
-    const themes = opt.theme === "all" || (!opt.theme && isCatalog) ? await allThemes() : opt.theme ? opt.theme.split(",") : [own];
+    const want = scope?.get(basename(dirname(index)));
+    const themes = want ? (want.themes.has("*") ? await allThemes() : [...new Set([...want.themes].map(t => t === "own" ? own : t))])
+      : opt.theme === "all" || (!opt.theme && isCatalog) ? await allThemes() : opt.theme ? opt.theme.split(",") : [own];
     const name = basename(dirname(index)) === "site" ? basename(dirname(dirname(index))) : basename(dirname(index));
-    out.push({ index, name, path: relative(serveRoot, index).split(sep).join("/"), themes });
+    out.push({ index, name, path: relative(serveRoot, index).split(sep).join("/"), themes, picks: want ? want.slides ?? undefined : picks });
   }
   return out;
 }
@@ -73,6 +155,11 @@ async function decks() {
 if (repoMode && !positionals.length) {
   try { execFileSync(process.execPath, [join(ROOT, "tools/build.mjs"), "--check"], { stdio: "pipe" }); }
   catch (e) { problems.push({ where: "build", errors: String(e.stderr || e.message).trim().split("\n") }); }
+}
+if (scope?.size === 0) {
+  note("nothing changed outside the docs, so there is nothing to shoot.");
+  console.log(JSON.stringify({ decks: {}, problems, warnings }, null, 1));
+  process.exit(problems.length ? 1 : 0);
 }
 
 const server = createServer(async (req, res) => {
@@ -116,6 +203,7 @@ async function render(deck, theme, [w, h]) {
   const flush = watch(page, where, found.problems);
   await page.goto(`${base}${deck.path}?theme=${theme}`, { waitUntil: "networkidle" });
   const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
+  const picks = deck.picks;
   if (picks) for (const pick of picks) if (!ids.some((id, i) => picked(pick, id, i + 1))) found.warnings.push({ where: deck.name, message: `--slides: no slide matches "${pick}"` });
   const dir = join(opt.out, deck.name, theme, `${w}x${h}`);
   await mkdir(dir, { recursive: true });
@@ -225,7 +313,10 @@ async function keyboard(deck) {
 
 const summary = {};
 const tasks = [];
-for (const deck of await decks()) {
+const deckList = await decks();
+if (scope) note(`checking ${deckList.map(d => `${d.name} in ${d.themes.join(" ")}${d.picks ? ` (slides ${d.picks.join(",")})` : ""}`).join(", ")}.`);
+else if (changed && repoMode) note("checking everything.");
+for (const deck of deckList) {
   summary[deck.name] = null;
   for (const theme of deck.themes) {
     if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { tasks.push(async () => ({ problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
