@@ -56,7 +56,7 @@ Component classes and options are in `docs/components.md`, slide patterns in `do
 ## Changing a deck
 
 - Add a reusable slide with `npm run add -- <deck> <pattern>` from the template repo rather than hand-copying; it keeps ids unique and copies assets.
-- After editing notes or timings, update the route table in PRESENTER.md.
+- After editing notes or timings, run `npm run route -- <deck folder>` to refresh the route table in PRESENTER.md.
 
 <!-- repo-only -->
 ## Changing the library

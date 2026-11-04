@@ -167,13 +167,14 @@ async function standaloneGuide() {
 
 export async function writeTooling(root, name) {
   await mkdir(join(root, "tools"), { recursive: true });
-  for (const f of ["tools/qa.mjs", "tools/qr.swift", "package-lock.json"]) await cp(join(REPO, f), join(root, f));
+  // inline.mjs and route.mjs import lib.mjs, so it comes too. Its REPO is then the deck folder.
+  for (const f of ["tools/qa.mjs", "tools/lint.mjs", "tools/inline.mjs", "tools/route.mjs", "tools/lib.mjs", "tools/qr.swift", "package-lock.json"]) await cp(join(REPO, f), join(root, f));
   await writeFile(join(root, "AGENTS.md"), await standaloneGuide());
   await symlink("AGENTS.md", join(root, "CLAUDE.md"));
   const { type, scripts, devDependencies } = JSON.parse(await readFile(join(REPO, "package.json"), "utf8"));
-  const pkg = { name: name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "talk-deck", private: true, type, scripts: { qa: scripts.qa }, devDependencies };
+  const pkg = { name: name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "talk-deck", private: true, type, scripts: { qa: scripts.qa, lint: scripts.lint, inline: scripts.inline, route: scripts.route }, devDependencies };
   await writeFile(join(root, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
-  await writeFile(join(root, ".gitignore"), "node_modules/\nqa/\n.DS_Store\n");
+  await writeFile(join(root, ".gitignore"), "node_modules/\nqa/\n.DS_Store\nstandalone.html\n");
 }
 
 export function libPrefix(deckDir) {
