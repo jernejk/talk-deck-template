@@ -153,10 +153,10 @@ Every `ol.agenda[data-auto]` fills from that list, with past parts done and the 
 ## Extend it
 
 - **A component:** add `components/<name>/` with CSS, plus JavaScript if it needs behaviour. See `docs/components.md`.
-- **A slide pattern:** add `slides/<name>.html` and list it in `slides/index.json`. See `docs/slides.md`.
+- **A slide pattern:** add `slides/<name>.html` and list it in `slides/index.json` with its layout. See `docs/slides.md`.
 - **A template:** add `templates/<name>/`. See `docs/styles.md`.
 
-Then run `npm run build`. It regenerates `components/components.css` and `components/components.js`, the catalog and the gallery, and checks that every component appears in a slide and that every component and slide is documented. QA fails while any of that is stale. `npm run showcase` re-renders the pictures in `docs/showcase/`; run it when a pattern or template changes how it looks.
+Then run `npm run build`. It regenerates `components/components.css` and `components/components.js`, the catalog and the gallery, and checks that every component appears in a slide, that every component and slide is documented, and that every slide has a known layout. QA fails while any of that is stale. `npm run showcase` re-renders the pictures in `docs/showcase/`; run it when a pattern or template changes how it looks.
 
 ## Writing slides
 
