@@ -165,6 +165,11 @@
     "summary": "Stage cards with a marker that moves to the current stage"
   },
   {
+    "name": "motion",
+    "layout": "flow",
+    "summary": "A small drawn diagram that moves: dots travel and orbit, a node pulses, lines draw in on Space"
+  },
+  {
     "name": "agents",
     "layout": "columns",
     "summary": "Agents working one task, their states and pets changing on Space"
