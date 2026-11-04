@@ -176,9 +176,28 @@ Each deck's `PRESENTER.md` is its route and timings, honesty ledger, extras, pre
 npm run qa                                    # build check, every example, the catalog in every template
 npm run qa -- examples/catalog --theme paper  # one deck in one template
 npm run qa -- examples/starter --sizes 1280x720,430x932 --motion
+npm run qa -- examples/starter --slides cover,3-5 --fast  # quick check of a few slides while you work
+npm run qa -- --changed                       # only what your uncommitted changes touch
+npm run qa -- --since upstream/main           # only what your branch changes
 ```
 
 QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into `qa/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each QR code that has a link and checks it matches. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion.
+
+Each deck × template × size runs as a separate job, four at a time by default (fewer on a machine with fewer cores); `--jobs 1` runs them one after another. Every run also writes `qa/<deck>/<template>/sheet-<size>.png`, all the screenshots of that run on one image. `--slides` takes slide ids or numbers (`cover,3-5`) and checks only those slides; the `file://` and keyboard checks still cover the whole deck. `--fast` checks only the first size and skips the screenshots and contact sheet, except slides with a QR code. The JSON output lists failures under `problems` and non-fatal notes under `warnings`.
+
+`--changed` reads `git diff` against `HEAD`, plus untracked files, and checks the least that covers them. `--since <ref>` does the same against the point where your branch left `<ref>`. It prints what it picked, and why, before it runs. The build check always runs.
+
+| Changed | QA checks |
+|---|---|
+| `templates/<name>/` | The catalog and every example, in that template only |
+| `slides/<pattern>.html` | The catalog in every template, that pattern's slides only |
+| other `slides/` files | The catalog in every template |
+| `components/<name>/` | The catalog in every template, plus the examples that use the component, in their own template |
+| `examples/<deck>/` | That deck in its own template |
+| Markdown files, `docs/` | Nothing to shoot: it says so and exits |
+| `core/`, `tools/`, anything else | Everything, as plain `npm run qa` |
+
+`components/components.*` and `examples/catalog/` are build output, so they count only when their source did not change. Outside a git repo, or when git fails, `--changed` runs everything. In a standalone deck it checks the whole deck.
 
 ## Layout
 

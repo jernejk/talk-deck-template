@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import { createServer } from "node:http";
 import { access, mkdir, readdir, readFile } from "node:fs/promises";
+import { availableParallelism } from "node:os";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
@@ -13,19 +14,106 @@ const { values: opt, positionals } = parseArgs({
     out: { type: "string", default: join(ROOT, "qa") },
     theme: { type: "string" },
     sizes: { type: "string", default: "1920x1080,1280x720" },
-    motion: { type: "boolean", default: false }
+    motion: { type: "boolean", default: false },
+    jobs: { type: "string", default: String(Math.min(4, availableParallelism())) },
+    slides: { type: "string" },
+    fast: { type: "boolean", default: false },
+    changed: { type: "boolean", default: false },
+    since: { type: "string" }
   }
 });
+const jobs = Number(opt.jobs);
+if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number from 1 up, not "${opt.jobs}".`);
 
 const exists = path => access(path).then(() => true, () => false);
 const repoMode = await exists(join(ROOT, "examples")) && await exists(join(ROOT, "core/deck.js"));
+const changed = opt.changed || opt.since !== undefined;
+if (changed && (positionals.length || opt.theme || opt.slides)) throw new Error("--changed picks the decks, templates and slides itself, so leave out deck paths, --theme and --slides.");
 const serveRoot = repoMode ? ROOT : join(ROOT, "site");
 const templatesDir = repoMode ? join(ROOT, "templates") : join(ROOT, "site/lib/templates");
-const sizes = opt.sizes.split(",").map(s => s.split("x").map(Number));
+const sizeList = opt.fast ? opt.sizes.split(",").slice(0, 1) : opt.sizes.split(",");
+const sizes = sizeList.map(s => s.split("x").map(Number));
+const picks = opt.slides?.split(",").map(s => s.trim()).filter(Boolean);
+const picked = (pick, id, n) => pick === id || (/^\d+(-\d+)?$/.test(pick) && n >= +pick.split("-")[0] && n <= +(pick.split("-")[1] ?? pick));
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".jpg": "image/jpeg", ".gif": "image/gif", ".json": "application/json", ".mp4": "video/mp4", ".webm": "video/webm", ".woff2": "font/woff2", ".ttf": "font/ttf" };
 const CHECKED = ".title,.ask,.sub,.hint,.callout,.quote,.bubbles,.memo,.shot,.phone,.tilt,.fan,.stage,.flow,.composer,.mock,.pillars,.pipe,.facts,.tags,.chips,.legend,.stats,.counters,.recipe,.ladder,.timeline,.ledger,.compare,.cols,.sticker,.about-panel,.about-portrait,.close-text,.close-qr,.cli,.code,.chapter,.bleed-text,.video,.agenda,.cover-panel,.cover-side,.cover-frame,.cover-links,.presenter-panel,.presenter-side,.presenter-team,.presenter-facts,.stages,.versus,.findings,.log,.kpis,.matrix,.milestones,.strip,.schedule,.qr,.pets,.pet-say,.agents,.embed,.fold,.player,.diff,.zoom,.timer";
 const problems = [];
-const qrShots = [];
+const warnings = [];
+const note = msg => console.error(`qa --changed: ${msg}`);
+
+// --changed: the smallest set of decks, templates and slides that covers what git says changed. null means a full run.
+async function changedScope() {
+  const { USED_BY, slideSections } = await import("./lib.mjs");
+  let files;
+  try {
+    const git = (...args) => execFileSync("git", ["-C", ROOT, ...args], { encoding: "utf8", stdio: "pipe" }).split("\n").filter(Boolean);
+    files = [...new Set([...git("ls-files", "--others", "--exclude-standard"), ...git("diff", "--name-only", "--no-renames", "--relative", "--merge-base", opt.since || "HEAD")])].filter(f => f.split("/")[0] !== "node_modules").sort();
+  } catch (e) {
+    note(`git failed (${String(e.stderr || e.message).trim().split("\n")[0]}), so this is a full run.`);
+    return null;
+  }
+  note(`${files.length} file(s) changed against ${opt.since || "HEAD"}.`);
+  const examples = [];
+  for (const dir of (await readdir(join(ROOT, "examples"))).sort()) if (dir !== "catalog" && await exists(join(ROOT, "examples", dir, "index.html"))) examples.push(dir);
+  // Deck folder → templates ("*" every template, "own" the deck's own) and slide ids (null means every slide).
+  // ponytail: one slide list per deck, not per template, so mixed changes can shoot a few slides more than they need.
+  const scope = new Map();
+  const add = (deck, themes, slides = null) => {
+    const s = scope.get(deck) ?? { themes: new Set(), slides: [] };
+    for (const t of themes) s.themes.add(t);
+    s.slides = s.slides && slides ? [...new Set([...s.slides, ...slides])] : null;
+    scope.set(deck, s);
+  };
+  // The build writes components/components.* and examples/catalog/ from components/ and slides/, so they count only on their own.
+  const sources = new Set(), generated = new Set();
+  for (const f of files) {
+    const [top, name = "", ...rest] = f.split("/");
+    const why = msg => note(`  ${f} → ${msg}`);
+    if (f.endsWith(".md") || top === "docs" || f === "examples/index.html") continue;
+    if (top === "templates" && rest.length && await exists(join(ROOT, "templates", name, "theme.css"))) {
+      add("catalog", [name]);
+      for (const deck of examples) add(deck, [name]);
+      why(`the catalog and every example, in ${name}`);
+    } else if (top === "slides" && !rest.length && name.endsWith(".html") && await exists(join(ROOT, f))) {
+      sources.add("slides");
+      const ids = slideSections(await readFile(join(ROOT, f), "utf8")).map(s => s.id);
+      add("catalog", ["*"], ids);
+      why(`the catalog in every template, slides ${ids.join(",")}`);
+    } else if (top === "slides") {
+      sources.add("slides");
+      add("catalog", ["*"]);
+      why("the catalog in every template");
+    } else if (top === "components" && /^components\.(css|js)$/.test(name)) {
+      generated.add("components");
+    } else if (top === "examples" && name === "catalog") {
+      generated.add("slides");
+    } else if (top === "components" && rest.length && await exists(join(ROOT, "components", name))) {
+      sources.add("components");
+      add("catalog", ["*"]);
+      const uses = USED_BY[name] ?? new RegExp(`class="[^"]*\\b${name}\\b`);
+      const users = [];
+      for (const deck of examples) if (uses.test(await readFile(join(ROOT, "examples", deck, "index.html"), "utf8"))) { add(deck, ["own"]); users.push(deck); }
+      why(`the catalog in every template${users.length ? `, and ${users.join(", ")}` : ""}`);
+    } else if (top === "examples" && rest.length && await exists(join(ROOT, "examples", name, "index.html"))) {
+      add(name, ["own"]);
+      why(`${name} in its own template`);
+    } else {
+      why("can change any deck, so this is a full run");
+      return null;
+    }
+  }
+  if (generated.has("components") && !sources.has("components")) {
+    note("  components/components.* changed without a component folder, so this is a full run.");
+    return null;
+  }
+  if (generated.has("slides") && !sources.has("slides")) {
+    add("catalog", ["*"]);
+    note("  examples/catalog/ changed without slides/, so the catalog runs in every template.");
+  }
+  return scope;
+}
+const scope = changed && repoMode ? await changedScope() : null;
+if (changed && !repoMode) note("it is a repo-only flag, so this checks the whole deck.");
 
 async function allThemes() {
   const out = [];
@@ -42,7 +130,8 @@ async function deckIndex(path) {
 
 async function decks() {
   const found = [];
-  if (positionals.length) for (const p of positionals) found.push(await deckIndex(p));
+  if (scope) for (const dir of [...scope.keys()].sort()) found.push(join(ROOT, "examples", dir, "index.html"));
+  else if (positionals.length) for (const p of positionals) found.push(await deckIndex(p));
   else if (repoMode) {
     for (const dir of (await readdir(join(ROOT, "examples"))).sort()) {
       if (await exists(join(ROOT, "examples", dir, "index.html"))) found.push(join(ROOT, "examples", dir, "index.html"));
@@ -54,9 +143,11 @@ async function decks() {
     const html = await readFile(index, "utf8");
     const own = html.match(/templates\/([\w-]+)\/theme\.css" id="theme"/)?.[1];
     const isCatalog = basename(dirname(index)) === "catalog";
-    const themes = opt.theme === "all" || (!opt.theme && isCatalog) ? await allThemes() : opt.theme ? opt.theme.split(",") : [own];
+    const want = scope?.get(basename(dirname(index)));
+    const themes = want ? (want.themes.has("*") ? await allThemes() : [...new Set([...want.themes].map(t => t === "own" ? own : t))])
+      : opt.theme === "all" || (!opt.theme && isCatalog) ? await allThemes() : opt.theme ? opt.theme.split(",") : [own];
     const name = basename(dirname(index)) === "site" ? basename(dirname(dirname(index))) : basename(dirname(index));
-    out.push({ index, name, path: relative(serveRoot, index).split(sep).join("/"), themes });
+    out.push({ index, name, path: relative(serveRoot, index).split(sep).join("/"), themes, picks: want ? want.slides ?? undefined : picks });
   }
   return out;
 }
@@ -65,16 +156,24 @@ if (repoMode && !positionals.length) {
   try { execFileSync(process.execPath, [join(ROOT, "tools/build.mjs"), "--check"], { stdio: "pipe" }); }
   catch (e) { problems.push({ where: "build", errors: String(e.stderr || e.message).trim().split("\n") }); }
 }
+if (scope?.size === 0) {
+  note("nothing changed outside the docs, so there is nothing to shoot.");
+  console.log(JSON.stringify({ decks: {}, problems, warnings }, null, 1));
+  process.exit(problems.length ? 1 : 0);
+}
 
 const server = createServer(async (req, res) => {
-  let path;
+  let path, root = serveRoot;
   try {
-    path = resolve(serveRoot, "." + decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/\/$/, "/index.html"));
+    let url = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    // The contact sheet loads this run's screenshots from /__qa-out/.
+    if (url.startsWith("/__qa-out/")) { root = resolve(opt.out); url = url.slice("/__qa-out".length); }
+    path = resolve(root, "." + url.replace(/\/$/, "/index.html"));
   } catch {
     res.writeHead(400).end();
     return;
   }
-  if (path !== serveRoot && !path.startsWith(serveRoot + sep)) { res.writeHead(403).end(); return; }
+  if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
   try {
     const body = await readFile(path);
     res.writeHead(200, { "content-type": TYPES[extname(path)] || "application/octet-stream" }).end(body);
@@ -87,7 +186,7 @@ const base = `http://127.0.0.1:${server.address().port}/`;
 
 const browser = await chromium.launch();
 
-function watch(page, where) {
+function watch(page, where, problems) {
   const errors = [];
   page.on("pageerror", e => errors.push(e.message));
   page.on("console", m => { if (m.type() === "error") errors.push(m.text()); });
@@ -96,61 +195,78 @@ function watch(page, where) {
   return () => { if (errors.length) problems.push({ where, errors }); };
 }
 
-async function renderAll(deck) {
-  for (const theme of deck.themes) {
-    if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { problems.push({ where: deck.name, errors: [`template "${theme}" not found`] }); continue; }
-    for (const [w, h] of sizes) {
-      const where = `${deck.name} ${theme} ${w}x${h}`;
-      const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
-      const flush = watch(page, where);
-      await page.goto(`${base}${deck.path}?theme=${theme}`, { waitUntil: "networkidle" });
-      const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
-      const dir = join(opt.out, deck.name, theme, `${w}x${h}`);
-      await mkdir(dir, { recursive: true });
-      for (const [i, id] of ids.entries()) {
-        await page.evaluate(id => Deck.goTo(document.getElementById(id), { stepMode: "end" }), id);
-        await page.waitForTimeout(opt.motion ? 1700 : 120);
-        const report = await page.evaluate(([id, checked, motion]) => {
-          const slide = document.getElementById(id);
-          const vw = innerWidth, vh = innerHeight;
-          const foot = slide.querySelector(".slide-foot");
-          const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : vh;
-          const out = [];
-          slide.querySelectorAll(checked).forEach(el => {
-            const r = el.getBoundingClientRect();
-            if (r.width === 0 || el.closest(".fan .shot, .inset")) return;
-            if (r.right > vw + 1 || r.left < -1 || r.bottom > footTop + 1 || r.top < -1)
-              out.push(`${el.className.split(" ")[0]} [${Math.round(r.left)},${Math.round(r.top)} → ${Math.round(r.right)},${Math.round(r.bottom)}] foot ${Math.round(footTop)}`);
-          });
-          slide.querySelectorAll(".code ol").forEach(ol => { if (ol.scrollWidth > ol.clientWidth + 1) out.push(`code line clipped by ${ol.scrollWidth - ol.clientWidth}px`); });
-          const imgs = [...slide.querySelectorAll("img")].filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
-          const videos = [...slide.querySelectorAll("video")].filter(v => v.error || v.readyState < 1 || (motion && v.closest(".video") && (v.paused || v.currentTime === 0))).map(v => v.currentSrc || v.src);
-          const scroll = slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1;
-          return { out, imgs, videos, scroll };
-        }, [id, CHECKED, opt.motion]);
-        const scrolls = h > w;
-        if ((!scrolls && (report.out.length || report.scroll)) || report.imgs.length || report.videos.length) problems.push({ where: `${where} #${id}`, ...report });
-        const shot = join(dir, `${String(i + 1).padStart(2, "0")}-${id}.png`);
-        await page.screenshot({ path: shot });
-        const qrs = await page.evaluate(id => [...document.getElementById(id).querySelectorAll("a.close-qr, a.qr-link")].map(a => a.href), id);
-        if (qrs.length) qrShots.push({ where: `${where} #${id}`, shot, expected: qrs });
-      }
-      flush();
-      await page.close();
-    }
+// One job = one deck in one template at one size. Each job returns its own findings, and they are merged in job order, so --jobs never changes the report.
+async function render(deck, theme, [w, h]) {
+  const found = { problems: [], warnings: [], qrShots: [] };
+  const where = `${deck.name} ${theme} ${w}x${h}`;
+  const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
+  const flush = watch(page, where, found.problems);
+  await page.goto(`${base}${deck.path}?theme=${theme}`, { waitUntil: "networkidle" });
+  const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
+  const picks = deck.picks;
+  if (picks) for (const pick of picks) if (!ids.some((id, i) => picked(pick, id, i + 1))) found.warnings.push({ where: deck.name, message: `--slides: no slide matches "${pick}"` });
+  const dir = join(opt.out, deck.name, theme, `${w}x${h}`);
+  await mkdir(dir, { recursive: true });
+  const shots = [];
+  for (const [i, id] of ids.entries()) {
+    if (picks && !picks.some(pick => picked(pick, id, i + 1))) continue;
+    await page.evaluate(id => Deck.goTo(document.getElementById(id), { stepMode: "end" }), id);
+    await page.waitForTimeout(opt.motion ? 1700 : 120);
+    const report = await page.evaluate(([id, checked, motion]) => {
+      const slide = document.getElementById(id);
+      const vw = innerWidth, vh = innerHeight;
+      const foot = slide.querySelector(".slide-foot");
+      const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : vh;
+      const out = [];
+      slide.querySelectorAll(checked).forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || el.closest(".fan .shot, .inset")) return;
+        if (r.right > vw + 1 || r.left < -1 || r.bottom > footTop + 1 || r.top < -1)
+          out.push(`${el.className.split(" ")[0]} [${Math.round(r.left)},${Math.round(r.top)} → ${Math.round(r.right)},${Math.round(r.bottom)}] foot ${Math.round(footTop)}`);
+      });
+      slide.querySelectorAll(".code ol").forEach(ol => { if (ol.scrollWidth > ol.clientWidth + 1) out.push(`code line clipped by ${ol.scrollWidth - ol.clientWidth}px`); });
+      const imgs = [...slide.querySelectorAll("img")].filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
+      const videos = [...slide.querySelectorAll("video")].filter(v => v.error || v.readyState < 1 || (motion && v.closest(".video") && (v.paused || v.currentTime === 0))).map(v => v.currentSrc || v.src);
+      const scroll = slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1;
+      return { out, imgs, videos, scroll };
+    }, [id, CHECKED, opt.motion]);
+    const scrolls = h > w;
+    if ((!scrolls && (report.out.length || report.scroll)) || report.imgs.length || report.videos.length) found.problems.push({ where: `${where} #${id}`, ...report });
+    const qrs = await page.evaluate(id => [...document.getElementById(id).querySelectorAll("a.close-qr, a.qr-link")].map(a => a.href), id);
+    // ponytail: --fast skips screenshots, the slowest step, but keeps the ones the QR check reads.
+    if (opt.fast && !qrs.length) continue;
+    const shot = join(dir, `${String(i + 1).padStart(2, "0")}-${id}.png`);
+    await page.screenshot({ path: shot });
+    shots.push(shot);
+    if (qrs.length) found.qrShots.push({ where: `${where} #${id}`, shot, expected: qrs });
   }
+  flush();
+  if (!opt.fast && shots.length) await contactSheet(page, shots, join(opt.out, deck.name, theme, `sheet-${w}x${h}.png`));
+  await page.close();
+  return found;
+}
+
+// All screenshots of one run as thumbnails on one image, to scan a deck at a glance.
+async function contactSheet(page, shots, path) {
+  const cells = shots.map(s => `<figure><img src="${base}__qa-out/${encodeURI(relative(resolve(opt.out), s).split(sep).join("/"))}"><figcaption>${basename(s, ".png")}</figcaption></figure>`).join("");
+  await page.setViewportSize({ width: 1600, height: 200 });
+  await page.setContent(`<!doctype html><style>body{margin:0;padding:16px;background:#222;color:#ddd;font:13px system-ui,sans-serif;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:start}figure{margin:0}img{display:block;width:100%;outline:1px solid #555}figcaption{padding-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}</style>${cells}`);
+  await page.screenshot({ path, fullPage: true });
 }
 
 async function offline(deck) {
+  const found = { problems: [] };
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  const flush = watch(page, `${deck.name} file://`);
+  const flush = watch(page, `${deck.name} file://`, found.problems);
   await page.goto(pathToFileURL(deck.index).href, { waitUntil: "load" });
   await page.waitForTimeout(300);
   flush();
   await page.close();
+  return found;
 }
 
 async function keyboard(deck) {
+  const found = { problems: [] };
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: "reduce" });
   await page.goto(`${base}${deck.path}`, { waitUntil: "networkidle" });
   const hash = () => page.evaluate(() => location.hash);
@@ -189,17 +305,34 @@ async function keyboard(deck) {
     extrasLast !== lastId && "H then End did not reach the last slide",
     hasClose && closeHash !== "#close" && "C did not jump to #close"
   ].filter(Boolean);
-  if (failures.length) problems.push({ where: `${deck.name} keyboard`, errors: failures });
+  if (failures.length) found.problems.push({ where: `${deck.name} keyboard`, errors: failures });
   await page.close();
-  return { main: mainOrder.length, slides: slideCount };
+  summary[deck.name] = { themes: deck.themes.join(" "), main: mainOrder.length, slides: slideCount };
+  return found;
 }
 
 const summary = {};
-for (const deck of await decks()) {
-  await renderAll(deck);
-  await offline(deck);
-  summary[deck.name] = { themes: deck.themes.join(" "), ...await keyboard(deck) };
+const tasks = [];
+const deckList = await decks();
+if (scope) note(`checking ${deckList.map(d => `${d.name} in ${d.themes.join(" ")}${d.picks ? ` (slides ${d.picks.join(",")})` : ""}`).join(", ")}.`);
+else if (changed && repoMode) note("checking everything.");
+for (const deck of deckList) {
+  summary[deck.name] = null;
+  for (const theme of deck.themes) {
+    if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { tasks.push(async () => ({ problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
+    for (const size of sizes) tasks.push(() => render(deck, theme, size));
+  }
+  tasks.push(() => offline(deck), () => keyboard(deck));
 }
+const results = [];
+let next = 0;
+await Promise.all(Array.from({ length: Math.min(jobs, tasks.length) }, async () => {
+  while (next < tasks.length) { const i = next++; results[i] = await tasks[i](); }
+}));
+const qrShots = results.flatMap(r => r.qrShots || []);
+for (const r of results) problems.push(...r.problems);
+const seen = new Set();
+for (const w of results.flatMap(r => r.warnings || [])) if (!seen.has(w.message + w.where)) { seen.add(w.message + w.where); warnings.push(w); }
 
 async function checkQrs() {
   if (!qrShots.length) return "none";
@@ -221,5 +354,5 @@ const qrCheck = await checkQrs();
 
 await browser.close();
 server.close();
-console.log(JSON.stringify({ decks: summary, sizes: opt.sizes, qr: qrCheck, screenshots: opt.out, problems }, null, 1));
+console.log(JSON.stringify({ decks: summary, sizes: sizeList.join(","), qr: qrCheck, screenshots: opt.out, problems, warnings }, null, 1));
 process.exitCode = problems.length ? 1 : 0;

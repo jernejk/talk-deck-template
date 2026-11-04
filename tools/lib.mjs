@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 export const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_SECTIONS = { Welcome: 1, "The hook": 1, Demo: 2, "How it works": 4, "Push for more": 3, Takeaway: 1, Extras: 0 };
 
+// Components the build cannot spot by class name alone: how it tells that some HTML uses them. qa --changed reads it too.
+export const USED_BY = { count: /data-count=/, type: /data-type=/, ghost: /./, rehearse: /./, cover: /slide--cover/, about: /slide--about/, close: /slide--close/, mascots: /class="mascot\b/, titles: /title--(stack|xl|center|kicker|number)\b/, covers: /cover--(image|photo|center)\b/, presenter: /slide--presenter|presenter-team/ };
 export const exists = path => access(path).then(() => true, () => false);
 export const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const inside = (path, root) => path === root || path.startsWith(root + sep);
