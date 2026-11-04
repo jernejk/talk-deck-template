@@ -1,0 +1,22 @@
+<section class="slide" id="question-map" data-section="Push for more" data-title="Which questions to answer first">
+  <div class="eyebrow">Question map</div>
+  <h2 class="title title--wide">Answer the <em>quick wins</em> first</h2>
+  <div class="qmap">
+    <p class="qmap-y"><span>Low value</span><span>High value</span></p>
+    <ol class="qmap-plane">
+      <li class="qmap-q is-hot"><b>Quick wins</b>
+        <ul><li style="--x:62;--y:58" data-step="wins">Does it work offline?</li><li style="--x:40;--y:24" data-step="wins">Can two of us edit?</li></ul></li>
+      <li class="qmap-q"><b>Big bets</b>
+        <ul><li style="--x:40;--y:42" data-step>Can it read a receipt?</li></ul></li>
+      <li class="qmap-q"><b>Fill-ins</b>
+        <ul><li style="--x:58;--y:62" data-step>Is there a dark mode?</li></ul></li>
+      <li class="qmap-q"><b>Skip for now</b>
+        <ul><li style="--x:40;--y:60" data-step>Will it run on a watch?</li></ul></li>
+    </ol>
+    <p class="qmap-x"><span>Low effort</span><span>High effort</span></p>
+  </div>
+  <aside class="notes">
+    <p><b>13:00–14:00.</b> Space ×4: the two quick wins first, then one question per other corner. Say which quick win you answer this week.</p>
+    <p class="src">A <code>.qmap</code>: <code>p.qmap-y</code> and <code>p.qmap-x</code> hold the low and high ends of each axis, and <code>ol.qmap-plane</code> holds four <code>li.qmap-q</code> in reading order (top left, top right, bottom left, bottom right). <code>.is-hot</code> lights one quadrant. Each item sits at <code>--x</code> and <code>--y</code>, 0 to 100 inside its quadrant, measured from the bottom left. Set <code>--c</code> on an item for its dot colour and <code>--h</code> on the map for its height. Items with <code>data-step</code> reveal on Space in source order. The questions and their places are a sample; place your own from a real backlog.</p>
+  </aside>
+</section>
