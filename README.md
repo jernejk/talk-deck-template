@@ -10,7 +10,7 @@ In the end I was copy-pasting whole old decks and remixing them, because startin
 
 Now I work AI-first. I tell a coding agent what I know and what I want to say, and it builds the slides, notes and demo fallbacks while I steer the story. I often get only a few hours' heads-up before a talk, and I still walk in with something I'm happy to put my name on.
 
-This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 63 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
+This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 64 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
 
 People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
