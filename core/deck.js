@@ -421,6 +421,8 @@
     frame.title = document.title;
     frame.width = w;
     frame.height = h;
+    frame.allow = "fullscreen; autoplay; encrypted-media; picture-in-picture";
+    frame.allowFullscreen = true;
     frame.src = url.href;
     const badge = document.createElement("div");
     badge.className = "res-badge";
