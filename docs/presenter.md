@@ -34,7 +34,7 @@ List every claim the deck makes and where it came from. The audience can't tell 
 
 ## Controls
 
-Arrow keys, Space or PageDown move forward, including step reveals. Left or PageUp goes back. N toggles notes, O opens the overview, H toggles extras, C jumps to the close, T opens the rehearsal timer, L takes a live-demo slide live and back, Home goes to the title and F requests fullscreen (use the browser menu if it's denied). Click any screenshot to enlarge it, and Esc to close. Each slide's footer shows "● Live: …" where a switch is possible.
+Arrow keys, Space or PageDown move forward, including step reveals. Left or PageUp goes back. N toggles notes, O opens the overview, H toggles extras, C jumps to the close, T opens the rehearsal timer, L takes a live-demo slide live and back, Home goes to the title and F requests fullscreen (use the browser menu if it's denied). R previews the deck at a projector size: it cycles Auto, 1920×1080, 1280×720 and 1024×768, letterboxed to fit your screen, so a phone or a small laptop shows exactly what the room will see. You can also add `?res=1920x1080`, `?res=16:9` or `?res=4:3` to the URL. Click any screenshot to enlarge it, and Esc to close. Each slide's footer shows "● Live: …" where a switch is possible.
 
 ## Before the talk
 
