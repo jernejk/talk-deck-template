@@ -6,6 +6,18 @@
   const slots = new Map(Object.entries(CONFIG.sections || {}));
   let autoSlot = 0;
   const RESERVED_KEYS = "hfnogc";
+  const query = new URLSearchParams(location.search);
+  const framed = query.get("framed") === "1";
+  const parseSize = r => {
+    const px = /^(\d{3,4})x(\d{3,4})$/.exec(r || ""), ratio = /^(\d{1,2}):(\d{1,2})$/.exec(r || "");
+    if (px) return [+px[1], +px[2]];
+    if (ratio) return [1920, Math.round(1920 * ratio[2] / ratio[1])];
+    return null;
+  };
+  const sizeKey = size => size ? `${size[0]}x${size[1]}` : "auto";
+  const defaultSize = sizeKey(parseSize(CONFIG.resolution));
+  const previewSize = parseSize(query.has("res") ? query.get("res") : CONFIG.resolution);
+  const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", defaultSize])];
   const controlKeys = new Map();
   const pendingControls = [];
 
@@ -397,11 +409,49 @@
     });
   }
 
+  // Reloads the deck in a frame of exactly w×h so vw and vh resolve as they would on the projector.
+  function hostPreview([w, h]) {
+    const url = new URL(location.href);
+    url.searchParams.set("framed", "1");
+    document.head.insertAdjacentHTML("beforeend", `<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}
+      .res-frame{position:fixed;left:50%;top:50%;border:0;transform-origin:center;background:#000}
+      .res-badge{position:fixed;left:10px;bottom:8px;font:500 12px/1 system-ui,sans-serif;color:#9aa0a6;opacity:.75}</style>`);
+    const frame = document.createElement("iframe");
+    frame.className = "res-frame";
+    frame.title = document.title;
+    frame.width = w;
+    frame.height = h;
+    frame.allow = "fullscreen; autoplay; encrypted-media; picture-in-picture";
+    frame.allowFullscreen = true;
+    frame.src = url.href;
+    const badge = document.createElement("div");
+    badge.className = "res-badge";
+    badge.textContent = `${w}×${h} preview · R changes size`;
+    document.body.replaceChildren(frame, badge);
+    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(innerWidth / w, innerHeight / h)})`; };
+    fit();
+    addEventListener("resize", fit);
+    frame.addEventListener("load", () => frame.contentWindow?.focus());
+    document.addEventListener("pointerdown", () => frame.contentWindow?.focus());
+    addEventListener("keydown", e => { if (e.key.toLowerCase() === "r") cycleSize(); else frame.contentWindow?.focus(); });
+  }
+
+  function cycleSize() {
+    const next = SIZES[(SIZES.indexOf(sizeKey(previewSize)) + 1) % SIZES.length];
+    const url = new URL(location.href);
+    url.searchParams.delete("framed");
+    if (next === defaultSize) url.searchParams.delete("res");
+    else url.searchParams.set("res", next);
+    try { (framed ? window.top : window).location.href = url.href; } catch { location.href = url.href; }
+  }
+
   function start() {
     if (deck.started) return;
     deck.started = true;
+    if (previewSize && !framed && window.top === window) { hostPreview(previewSize); return; }
     if (!$(".deck-nav")) document.body.insertAdjacentHTML("beforeend", CONTROLS);
     pendingControls.splice(0).forEach(mountControl);
+    control({ label: "Size", key: "r", action: cycleSize });
     decorate();
     deck.all.forEach(slide => emit("init", slide));
     deck.all.forEach(rise);
