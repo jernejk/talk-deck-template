@@ -6,16 +6,18 @@
   const slots = new Map(Object.entries(CONFIG.sections || {}));
   let autoSlot = 0;
   const RESERVED_KEYS = "hfnogc";
-  const SIZES = ["auto", "1920x1080", "1280x720", "1024x768"];
   const query = new URLSearchParams(location.search);
   const framed = query.get("framed") === "1";
-  const previewSize = (() => {
-    const r = query.get("res") || "";
-    const px = /^(\d{3,4})x(\d{3,4})$/.exec(r), ratio = /^(\d{1,2}):(\d{1,2})$/.exec(r);
+  const parseSize = r => {
+    const px = /^(\d{3,4})x(\d{3,4})$/.exec(r || ""), ratio = /^(\d{1,2}):(\d{1,2})$/.exec(r || "");
     if (px) return [+px[1], +px[2]];
     if (ratio) return [1920, Math.round(1920 * ratio[2] / ratio[1])];
     return null;
-  })();
+  };
+  const sizeKey = size => size ? `${size[0]}x${size[1]}` : "auto";
+  const defaultSize = sizeKey(parseSize(CONFIG.resolution));
+  const previewSize = parseSize(query.has("res") ? query.get("res") : CONFIG.resolution);
+  const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", defaultSize])];
   const controlKeys = new Map();
   const pendingControls = [];
 
@@ -433,11 +435,10 @@
   }
 
   function cycleSize() {
-    const now = previewSize ? `${previewSize[0]}x${previewSize[1]}` : "auto";
-    const next = SIZES[(SIZES.indexOf(now) + 1) % SIZES.length];
+    const next = SIZES[(SIZES.indexOf(sizeKey(previewSize)) + 1) % SIZES.length];
     const url = new URL(location.href);
     url.searchParams.delete("framed");
-    if (next === "auto") url.searchParams.delete("res");
+    if (next === defaultSize) url.searchParams.delete("res");
     else url.searchParams.set("res", next);
     try { (framed ? window.top : window).location.href = url.href; } catch { location.href = url.href; }
   }

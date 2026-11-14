@@ -103,7 +103,7 @@ async function renderAll(deck) {
       const where = `${deck.name} ${theme} ${w}x${h}`;
       const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
       const flush = watch(page, where);
-      await page.goto(`${base}${deck.path}?theme=${theme}`, { waitUntil: "networkidle" });
+      await page.goto(`${base}${deck.path}?res=auto&theme=${theme}`, { waitUntil: "networkidle" });
       const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
       const dir = join(opt.out, deck.name, theme, `${w}x${h}`);
       await mkdir(dir, { recursive: true });
@@ -144,7 +144,7 @@ async function renderAll(deck) {
 async function offline(deck) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const flush = watch(page, `${deck.name} file://`);
-  await page.goto(pathToFileURL(deck.index).href, { waitUntil: "load" });
+  await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
   await page.waitForTimeout(300);
   flush();
   await page.close();
@@ -152,7 +152,7 @@ async function offline(deck) {
 
 async function keyboard(deck) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: "reduce" });
-  await page.goto(`${base}${deck.path}`, { waitUntil: "networkidle" });
+  await page.goto(`${base}${deck.path}?res=auto`, { waitUntil: "networkidle" });
   const hash = () => page.evaluate(() => location.hash);
   const presses = await page.evaluate(() => [...document.querySelectorAll("section.slide:not([data-hidden])")].reduce((n, s) => n + 1 + Deck.stepGroups(s).length, 0));
   const seen = [];
