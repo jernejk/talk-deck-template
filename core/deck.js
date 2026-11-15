@@ -433,7 +433,24 @@
     badge.textContent = `${w}×${h} preview · R changes size`;
     document.body.replaceChildren(frame, badge);
     const root = document.documentElement;
-    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`; };
+    // Pinch-zooming a transform-scaled frame turns it black on iOS, so mobile browsers scale the page natively where they can (Safari stops at 0.25×).
+    const meta = matchMedia("(pointer: coarse)").matches && document.querySelector('meta[name="viewport"]');
+    const setMeta = content => { if (meta.content !== content) meta.content = content; };
+    const fit = () => {
+      if (meta) {
+        const vv = visualViewport, deviceWidth = vv.width * vv.scale;
+        const width = Math.max(w, Math.ceil(h * vv.width / vv.height));
+        if (deviceWidth / width >= 0.25) {
+          setMeta(`width=${width}`);
+          frame.style.transform = "translate(-50%,-50%)";
+          badge.style.fontSize = `${12 * width / deviceWidth}px`;
+          return;
+        }
+        setMeta("width=device-width,initial-scale=1");
+        badge.style.fontSize = "";
+      }
+      frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`;
+    };
     fit();
     addEventListener("resize", fit);
     frame.addEventListener("load", () => frame.contentWindow?.focus());
