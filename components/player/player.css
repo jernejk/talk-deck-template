@@ -1,6 +1,6 @@
 .player{--rise:1;margin:0;display:flex;flex-direction:column;align-items:center;min-width:0}
 .player-stage{position:relative;max-width:100%;overflow:hidden;border-radius:var(--radius);background:var(--shot-bg);border:1px solid var(--shot-border);box-shadow:0 30px 70px -30px color-mix(in srgb,var(--accent) var(--shot-glow),transparent),var(--drop)}
-.player-stage video{display:block;max-width:100%;max-height:var(--h,58vh);width:auto;height:auto}
+.player-stage video{display:block;max-width:100%;max-height:var(--h,58vh);width:auto;height:auto;background:#000 var(--poster,none) center/cover no-repeat}
 .player[data-youtube] .player-stage{width:min(100%,calc(var(--h,58vh) * 16 / 9));aspect-ratio:16 / 9}
 .player-poster{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
 .player-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--shot-bg)}

@@ -89,7 +89,7 @@ html,body{background:linear-gradient(150deg,#070b22 0%,#0b1026 45%,#141a52 100%)
     radial-gradient(48vw 34vw at var(--bx) var(--by),color-mix(in srgb,var(--a3) 18%,transparent),transparent 62%),
     radial-gradient(40vw 40vw at var(--gx2,4%) var(--gy2,100%),color-mix(in srgb,var(--a1) var(--glow-2),transparent),transparent 62%);
 }
-.slide.is-active::before{animation:aurora 48s ease-in-out infinite alternate}
+.slide.is-active::before{animation:aurora 48s steps(80) infinite alternate}
 @keyframes aurora{
   33%{--gx:76%;--gy:16%;--ax:26%;--ay:70%;--bx:52%;--by:96%}
   66%{--gx:84%;--gy:-4%;--ax:12%;--ay:92%;--bx:70%;--by:108%}

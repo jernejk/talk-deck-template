@@ -15,9 +15,11 @@
     return null;
   };
   const sizeKey = size => size ? `${size[0]}x${size[1]}` : "auto";
-  const defaultSize = sizeKey(parseSize(CONFIG.resolution));
-  const previewSize = parseSize(query.has("res") ? query.get("res") : CONFIG.resolution);
-  const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", defaultSize])];
+  // Phones that scan a QR get the native layout; the projector preview is for desks.
+  const touchOnly = matchMedia("(any-pointer: coarse)").matches && !matchMedia("(any-pointer: fine)").matches;
+  const defaultSize = sizeKey(touchOnly ? null : parseSize(CONFIG.resolution));
+  const previewSize = parseSize(query.has("res") ? query.get("res") : defaultSize);
+  const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", sizeKey(parseSize(CONFIG.resolution))])];
   const controlKeys = new Map();
   const pendingControls = [];
 
@@ -390,13 +392,15 @@
     });
 
     let touch = null;
+    // A drag while pinch-zoomed is the reader looking around, not a swipe.
+    const zoomed = () => (window.visualViewport?.scale ?? 1) > 1.01;
     document.addEventListener("touchstart", e => {
       const t = e.target;
-      if (e.touches.length !== 1 || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
+      if (e.touches.length !== 1 || zoomed() || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
       touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }, { passive: true });
     document.addEventListener("touchend", e => {
-      if (!touch) return;
+      if (!touch || e.touches.length || zoomed()) { touch = null; return; }
       const dx = e.changedTouches[0].clientX - touch.x;
       const dy = e.changedTouches[0].clientY - touch.y;
       touch = null;
@@ -428,7 +432,8 @@
     badge.className = "res-badge";
     badge.textContent = `${w}×${h} preview · R changes size`;
     document.body.replaceChildren(frame, badge);
-    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(innerWidth / w, innerHeight / h)})`; };
+    const root = document.documentElement;
+    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`; };
     fit();
     addEventListener("resize", fit);
     frame.addEventListener("load", () => frame.contentWindow?.focus());

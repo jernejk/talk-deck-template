@@ -77,7 +77,8 @@ a{color:inherit}
     radial-gradient(46vw 46vw at var(--gx) var(--gy),color-mix(in srgb,var(--accent) var(--glow-1),transparent),transparent 62%),
     radial-gradient(34vw 34vw at var(--gx2,4%) var(--gy2,100%),color-mix(in srgb,var(--accent) var(--glow-2),transparent),transparent 60%);
 }
-.slide.is-active::before{animation:glow-drift 26s ease-in-out infinite alternate}
+.slide.is-active::before{animation:glow-drift 26s steps(64) infinite alternate}
+.slide:not(.is-active),.slide:not(.is-active) *,.slide:not(.is-active)::before,.slide:not(.is-active) *::before,.slide:not(.is-active) *::after{animation-play-state:paused!important}
 @keyframes glow-drift{50%{--gx:72%;--gy:18%}100%{--gx:94%;--gy:-2%}}
 .slide::after{
   background-image:radial-gradient(var(--dots) 1px,transparent 1.4px);background-size:30px 30px;
