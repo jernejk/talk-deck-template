@@ -2,7 +2,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
-import { REPO, copyAssets, deckHtml, esc, exists, fail, inside, libPrefix, patterns, routeTable, slideSections, templates, uniqueId, vendorLib, withId, writeTooling } from "./lib.mjs";
+import { REPO, copyAssets, coverTitleHtml, deckHtml, esc, exists, fail, inside, libPrefix, patterns, plainTitle, retime, routeTable, slideSections, templates, uniqueId, vendorLib, withId, writeTooling } from "./lib.mjs";
 
 const USAGE = `Usage: npm run new -- <dir> --title "Big words.|Real demos.|*Honest fallbacks.*" [options]
 
@@ -41,13 +41,8 @@ const missing = names.filter(n => !library.some(p => p.name === n));
 if (missing.length) fail(`Unknown slides: ${missing.join(", ")}. See npm run add -- --list.`);
 const url = o.url ? new URL(o.url) : null;
 
-const plain = o.title.replace(/\|/g, " ").replace(/\*/g, "").replace(/\s+/g, " ").trim();
-const coverTitle = o.title.split("|").map(part => {
-  const t = part.trim();
-  const whole = t.match(/^\*([^*]+)\*$/);
-  if (whole) return `<em>${esc(whole[1])}</em>`;
-  return `<span>${esc(t).replace(/\*([^*]+)\*/g, "<em>$1</em>")}</span>`;
-}).join("");
+const plain = plainTitle(o.title);
+const coverTitle = coverTitleHtml(o.title);
 
 const taken = new Set();
 let slides = names.map(n => {
@@ -71,13 +66,7 @@ slides = slides.map(html => {
   return s;
 });
 
-const toClock = sec => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
-let at = 0;
-slides = slides.map(html => /^<section\b[^>]*\sdata-hidden\b/.test(html) ? html : html.replace(/(<aside class="notes">[\s\S]*?<b>)(\d+):(\d{2})–(\d+):(\d{2})(\.<\/b>)/, (_, a, m1, s1, m2, s2, b) => {
-  const from = at;
-  at += Math.max(0, m2 * 60 + +s2 - (m1 * 60 + +s1));
-  return a + toClock(from) + "–" + toClock(at) + b;
-}));
+slides = retime(slides);
 
 const deckDir = inRepo ? target : join(target, "site");
 const html = deckHtml({
