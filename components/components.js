@@ -205,7 +205,7 @@ function area(fig) {
   const s = slide.getBoundingClientRect();
   const foot = slide.querySelector(".slide-foot");
   const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
-  const vw = innerWidth / 100, vh = innerHeight / 100;
+  const root = document.documentElement, vw = root.clientWidth / 100, vh = root.clientHeight / 100;
   return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: s.top + 8 * vh, bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
 }
 

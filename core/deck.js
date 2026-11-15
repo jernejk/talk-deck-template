@@ -392,8 +392,9 @@
     });
 
     let touch = null;
-    // A drag while pinch-zoomed is the reader looking around, not a swipe.
-    const zoomed = () => (window.visualViewport?.scale ?? 1) > 1.01;
+    // A drag while pinch-zoomed is the reader looking around, not a swipe. In the preview the host page is the one zoomed.
+    const hostZoomed = () => { if (!framed) return; try { return window.parent.Deck?.previewZoomed?.(); } catch {} };
+    const zoomed = () => hostZoomed() ?? (window.visualViewport?.scale ?? 1) > 1.01;
     document.addEventListener("touchstart", e => {
       const t = e.target;
       if (e.touches.length !== 1 || zoomed() || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
@@ -413,8 +414,12 @@
     });
   }
 
+  let hosting = false;
+  const previewZoomed = () => hosting && (window.visualViewport?.width ?? Infinity) < document.documentElement.clientWidth * 0.99;
+
   // Reloads the deck in a frame of exactly w×h so vw and vh resolve as they would on the projector.
   function hostPreview([w, h]) {
+    hosting = true;
     const url = new URL(location.href);
     url.searchParams.set("framed", "1");
     document.head.insertAdjacentHTML("beforeend", `<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}
@@ -494,7 +499,7 @@
     try { plugin.enter?.(current(), api); } catch (e) { console.error(e); }
   }
 
-  window.Deck = { use, start, goTo, next, prev, show, stepGroups, current, control, config: CONFIG };
+  window.Deck = { use, start, goTo, next, prev, show, stepGroups, current, control, previewZoomed, config: CONFIG };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else queueMicrotask(start);
