@@ -16,7 +16,8 @@
   };
   const sizeKey = size => size ? `${size[0]}x${size[1]}` : "auto";
   // Phones that scan a QR get the native layout; the projector preview is for desks.
-  const defaultSize = sizeKey(matchMedia("(pointer: fine)").matches ? parseSize(CONFIG.resolution) : null);
+  const touchOnly = matchMedia("(any-pointer: coarse)").matches && !matchMedia("(any-pointer: fine)").matches;
+  const defaultSize = sizeKey(touchOnly ? null : parseSize(CONFIG.resolution));
   const previewSize = parseSize(query.has("res") ? query.get("res") : defaultSize);
   const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", sizeKey(parseSize(CONFIG.resolution))])];
   const controlKeys = new Map();
