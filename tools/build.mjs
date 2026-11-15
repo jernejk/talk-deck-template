@@ -1,7 +1,7 @@
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
-import { REPO, assetRefs, copyAssets, deckHtml, esc, exists, patterns, readDeck, templates } from "./lib.mjs";
+import { LAYOUTS, REPO, assetRefs, copyAssets, deckHtml, esc, exists, patterns, readDeck, templates } from "./lib.mjs";
 
 const { values: opt } = parseArgs({ options: { check: { type: "boolean", default: false } } });
 
@@ -106,11 +106,21 @@ for (const name of names) {
 for (const file of (await readdir(join(REPO, "slides"))).filter(f => f.endsWith(".html"))) {
   if (!list.some(p => `${p.name}.html` === file)) problems.push(`slides/${file} is missing from slides/index.json.`);
 }
+const layouts = Object.keys(LAYOUTS).join(", ");
+for (const p of list) {
+  const tag = p.html.match(/^<section\b[^>]*>/)?.[0] ?? "";
+  const html = tag.match(/\sdata-layout="([^"]*)"/)?.[1];
+  if (!p.layout) problems.push(`slides/index.json: "${p.name}" has no layout. Add "layout" with one of: ${layouts}.`);
+  else if (!Object.hasOwn(LAYOUTS, p.layout)) problems.push(`slides/index.json: "${p.name}" has layout "${p.layout}", which isn't one of: ${layouts}.`);
+  if (html === undefined) problems.push(`slides/${p.name}.html has no data-layout on its <section>. Add data-layout="${p.layout || "…"}".`);
+  else if (p.layout && html !== p.layout) problems.push(`slides/${p.name}.html has data-layout="${html}", but slides/index.json says "${p.layout ?? ""}". Make them match.`);
+}
 for (const ref of assetRefs(catalog)) if (!await exists(join(REPO, "slides", ref))) problems.push(`The catalog references ${ref}, which isn't in slides/assets/.`);
 const componentsDoc = await readFile(join(REPO, "docs/components.md"), "utf8");
 for (const name of names) if (!componentsDoc.includes(`| \`${name}\` |`)) problems.push(`components/${name} has no row in docs/components.md.`);
 const slidesDoc = await readFile(join(REPO, "docs/slides.md"), "utf8");
 for (const p of list) if (!slidesDoc.includes(`| \`${p.name}\` |`)) problems.push(`slides/${p.name}.html has no row in docs/slides.md.`);
+for (const [name, shape] of Object.entries(LAYOUTS)) if (!slidesDoc.includes(`| \`${name}\` | ${shape} |`)) problems.push(`The ${name} layout has no row in docs/slides.md, or its definition differs from tools/lib.mjs.`);
 
 if (opt.check) {
   for (const [path, body] of outputs) {

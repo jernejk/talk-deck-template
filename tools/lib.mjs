@@ -4,6 +4,19 @@ import { fileURLToPath } from "node:url";
 
 export const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const DEFAULT_SECTIONS = { Welcome: 1, "The hook": 1, Demo: 2, "How it works": 4, "Push for more": 3, Takeaway: 1, Extras: 0 };
+// The shape of each slide pattern: `layout` in slides/index.json and data-layout on its section. docs/slides.md lists them too.
+export const LAYOUTS = {
+  statement: "One big line or numeral, little else",
+  "full-bleed": "An image fills the slide, with the text on top of it",
+  media: "Text beside one large picture: a screenshot, video, live frame or portrait",
+  split: "Text beside a drawn panel of text: code, a terminal, a chat, an agenda or a QR",
+  columns: "The title above equal cards side by side, in one or two rows",
+  gallery: "The title above a row of captioned images",
+  list: "The title above full-width rows, read top to bottom",
+  table: "The title above a table of rows and columns",
+  timeline: "Dated or timed entries in order",
+  flow: "Stages joined by arrows or lines, left to right"
+};
 
 export const exists = path => access(path).then(() => true, () => false);
 export const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

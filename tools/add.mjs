@@ -17,7 +17,8 @@ const { values: o, positionals } = parseArgs({
 const library = await patterns();
 if (o.list) {
   const width = Math.max(...library.map(p => p.name.length));
-  for (const p of library) console.log(`${p.name.padEnd(width)}  ${p.summary}`);
+  const lw = Math.max(...library.map(p => (p.layout ?? "").length));
+  for (const p of library) console.log(`${p.name.padEnd(width)}  ${(p.layout ?? "").padEnd(lw)}  ${p.summary}`);
   process.exit(0);
 }
 if (o.help || positionals.length !== 2) { console.log(USAGE); process.exit(o.help ? 0 : 1); }
