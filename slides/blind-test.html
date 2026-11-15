@@ -1,0 +1,21 @@
+<section class="slide" id="blind-test" data-layout="columns" data-section="Push for more" data-title="Each judge preferred its own answer">
+  <div class="eyebrow">Blind test · two answers, labelled X and Y</div>
+  <h2 class="title title--wide">Each judge liked <em>its own answer.</em></h2>
+  <div class="scores">
+    <div class="scores-card" style="--accent:var(--a1)">
+      <h3>Judge: model A</h3>
+      <p class="scores-row is-hot"><span>Model A’s answer<small>its own</small></span><strong>8.2</strong></p>
+      <p class="scores-row"><span>Model B’s answer</span><strong>7.2</strong></p>
+    </div>
+    <div class="scores-card" style="--accent:var(--a4)" data-step>
+      <h3>Judge: model B</h3>
+      <p class="scores-row"><span>Model A’s answer</span><strong>8.1</strong></p>
+      <p class="scores-row is-hot"><span>Model B’s answer<small>its own</small></span><strong>8.5</strong></p>
+    </div>
+  </div>
+  <p class="hint" data-step><b>So the judges advise. You decide.</b>Sample scores: put your own run here.</p>
+  <aside class="notes">
+    <p><b>12:00–13:00.</b> “Neither judge knew which model wrote which answer.” Space → the second judge, then the lesson: each one scored its own model higher.</p>
+    <p class="src">The scores are a sample, not a real test. A <code>.scores</code> grid (<code>--n</code> cards, 2 by default) holds <code>.scores-card</code> panels, each coloured with <code>--accent</code>: an <code>h3</code>, then <code>p.scores-row</code> with a <code>span</code> label and a <code>strong</code> score. <code>.is-hot</code> lights a score, and a <code>small</code> in the label adds a short note after an arrow.</p>
+  </aside>
+</section>

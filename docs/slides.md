@@ -110,6 +110,7 @@ It warns, but still writes, when two neighbouring slides share a layout, when th
 | `pipeline` | flow | Stage cards with a marker that moves to the current stage | stages |
 | `motion` | flow | A small drawn diagram that moves: dots travel and orbit, a node pulses, lines draw in on Space | motion |
 | `agents` | columns | Agents working one task, their states and pets changing on Space | agents, pet |
+| `delegation` | split | A drawn agent app: a lead thread starts child threads with a tool call | facts, threads |
 | `get-the-code` | split | A mid-talk QR to the repo, with the path and steps | pipe, qr |
 | `exercise` | split | A workshop task with three steps, a hint and a countdown timer | facts, timer |
 | `rule` | table | A table whose columns reveal one step at a time | ledger |
@@ -123,6 +124,7 @@ It warns, but still writes, when two neighbouring slides share a layout, when th
 | `matrix` | table | A feature matrix with yes, no and partial cells | compare, matrix |
 | `sourced-table` | table | A table of figures with the source of every number | compare, srcline |
 | `question-map` | columns | A two-by-two map of questions by effort and value, with the quick wins lit | qmap |
+| `blind-test` | columns | Judges score the same answers blind, with each judge’s own pick flagged | scores |
 | `milestones` | timeline | A horizontal timeline whose dots reveal one by one | milestones |
 | `how-its-made` | media | Numbered steps beside a fan of screenshots | fan, pipe, shot |
 | `code` | split | A code card with the line that matters highlighted | callout, code |

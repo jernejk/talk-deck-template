@@ -175,6 +175,11 @@
     "summary": "Agents working one task, their states and pets changing on Space"
   },
   {
+    "name": "delegation",
+    "layout": "split",
+    "summary": "A drawn agent app: a lead thread starts child threads with a tool call"
+  },
+  {
     "name": "get-the-code",
     "layout": "split",
     "summary": "A mid-talk QR to the repo, with the path and steps"
@@ -238,6 +243,11 @@
     "name": "question-map",
     "layout": "columns",
     "summary": "A two-by-two map of questions by effort and value, with the quick wins lit"
+  },
+  {
+    "name": "blind-test",
+    "layout": "columns",
+    "summary": "Judges score the same answers blind, with each judge’s own pick flagged"
   },
   {
     "name": "milestones",

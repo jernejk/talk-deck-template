@@ -43,6 +43,7 @@
 @import url("recipe/recipe.css");
 @import url("rehearse/rehearse.css");
 @import url("schedule/schedule.css");
+@import url("scores/scores.css");
 @import url("scrollshot/scrollshot.css");
 @import url("shot/shot.css");
 @import url("srcline/srcline.css");
@@ -51,6 +52,7 @@
 @import url("sticker/sticker.css");
 @import url("strip/strip.css");
 @import url("tags/tags.css");
+@import url("threads/threads.css");
 @import url("tilt/tilt.css");
 @import url("timeline/timeline.css");
 @import url("timer/timer.css");

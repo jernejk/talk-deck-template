@@ -78,6 +78,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `recipe` | Coloured takeaway rows | `.recipe > .recipe-row` (`--c`; `b`, `strong`, `span`) | |
 | `rehearse` | Rehearsal timer on T: total, time on this slide, the planned window from the notes, and an on-time, behind or ahead status | no markup; optional config `duration`; adds a control through `Deck.control` | yes |
 | `schedule` | Grid of event-day time blocks | `.schedule > .slot > time + strong + span` (`--n`, `--c`, `.is-now`) | |
+| `scores` | Judge scorecards: a big score per row, the judge’s own pick flagged | `.scores` (`--n`) `> .scores-card` (`--accent`) `> h3 + p.scores-row > span + strong`; `.is-hot`; a `small` in the label adds a note | |
 | `scrollshot` | Tall capture that scrolls itself | `figure.scrollshot > .scrollshot-view > img` (`--vh`), inside `.stage` | |
 | `shot` | Screenshot with caption; click to zoom | `figure.shot > img + figcaption > b` (`--h`), `.swap`, `.inset` | yes |
 | `srcline` | One line above the footer that names where the slide’s numbers came from | `p.srcline` with an optional `b` label | |
@@ -86,6 +87,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `sticker` | Tilted label | `.sticker` (`small`), often `data-step` | |
 | `strip` | Three to five captioned images with a metric row | `.strip > figure > img + .strip-badge + figcaption > b` (`--n`, `--h`), `.strip-metrics > div > b + span` | |
 | `tags` | Pills, ticks and colour legends | `.tags > span > b`, `.chips > span`, `.legend > span` (`--c`) | |
+| `threads` | Drawn agent app: a thread list beside one open thread with messages and a tool call | `figure.threads > .threads-app > .threads-side` (`p.threads-name`, `p.threads-item` with `.is-on`, `.is-child`, `.is-run`, `--c`) `+ .threads-main` (`p.threads-head`, `p.threads-msg`, `.threads-msg--me`, `p.threads-tool`); `--h` | |
 | `tilt` | Tilted paper or receipt | `.cover-art > figure.tilt > img` (`--rh`) | |
 | `timeline` | Two-column timestamped log | `ol.timeline > li > time + span` (`--rows`) | |
 | `timer` | Exercise countdown: a ring, big digits, Start/Pause, Reset and +1 min; keeps counting across slides and ends on “Time’s up” | `.timer[data-time="5:00"]` (empty; the JS builds the face and buttons; `data-autostart` starts it when the slide opens) | yes |

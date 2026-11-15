@@ -7,7 +7,7 @@ Where to get images that cost nothing, how to make your own, and how to caption 
 | Caption | Use it for |
 |---|---|
 | `<b>Real run</b>` | A screenshot or capture of the real thing |
-| `<b>Drawn</b>` | A mock-up drawn in HTML (`.mock`, `.composer`, `.cli`) or by hand |
+| `<b>Drawn</b>` | A mock-up drawn in HTML (`.mock`, `.composer`, `.cli`, `.threads`) or by hand |
 | `<b>Sample image</b>` | A stand-in you'll replace before the talk |
 | `<b>Photo</b> Name, Unsplash` | Stock or open-licence photos, with the credit the licence asks for |
 | `<b>Generated</b> by gpt-image-2` | AI-generated images, naming the model |

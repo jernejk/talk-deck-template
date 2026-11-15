@@ -24,7 +24,7 @@ function check([html, catalog]) {
   const out = [];
   const warn = (slide, check, message) => out.push({ slide: slide?.id || null, check, message });
   const notesText = s => [...s.querySelectorAll("aside.notes")].map(n => n.textContent).join(" ");
-  const DRAWN_CLASSES = ["mock", "composer", "memo", "cli"];
+  const DRAWN_CLASSES = ["mock", "composer", "memo", "cli", "threads"];
   const DRAWN = DRAWN_CLASSES.map(c => "." + c).join(", ");
 
   // Matches how components/rehearse reads a slide's planned window.
@@ -44,7 +44,7 @@ function check([html, catalog]) {
   for (const s of slides.filter(s => s.hasAttribute("data-live"))) {
     if (!CAP.test(notesText(s))) warn(s, "live-cap", "no 20-second cap in the notes (write “20 s” or “20 seconds”)");
     // A drawn terminal or mock-up of the run stands in for the screenshot, as in the cli-run pattern.
-    if (!s.querySelector("img, picture, video[poster], .cli, .mock")) warn(s, "live-cap", "no screenshot on the slide (an img, picture, video poster, .cli or .mock)");
+    if (!s.querySelector("img, picture, video[poster], .cli, .mock, .threads")) warn(s, "live-cap", "no screenshot on the slide (an img, picture, video poster, .cli, .mock or .threads)");
   }
 
   for (const s of slides) for (const t of s.querySelectorAll(".title")) {

@@ -23,7 +23,7 @@ Every live beat has its screenshot on the slide. If a live step hasn't answered 
 List every claim the deck makes and where it came from. The audience can't tell a real capture from a mock, so this list is how you stay honest.
 
 - **Real runs:** which screenshots are real captures, the date they were taken and any timings.
-- **Drawn illustrations:** which cards are drawn (`.mock`, `.composer`, `.memo`, `.cli`). Their captions and notes must say so.
+- **Drawn illustrations:** which cards are drawn (`.mock`, `.composer`, `.memo`, `.cli`, `.threads`). Their captions and notes must say so.
 - **Gags, not measurements:** anything played for a laugh, so you never quote it as data.
 
 ## Extras (H to show, or pick from O)

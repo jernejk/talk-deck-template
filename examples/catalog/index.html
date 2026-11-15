@@ -828,6 +828,44 @@
   </aside>
 </section>
 
+<section class="slide" id="delegation" data-layout="split" data-section="How it works" data-title="One lead thread hands out the work">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow">How it works · the lead thread</div>
+      <h2 class="title title--stack"><span>One lead thread.</span> <em>Many hands.</em></h2>
+      <ul class="facts">
+        <li>The <strong>lead thread</strong> plans and merges.</li>
+        <li>One <strong>tool call</strong> starts each child thread.</li>
+        <li>Every child is a thread <strong>you can open and steer.</strong></li>
+      </ul>
+    </div>
+    <figure class="threads">
+      <div class="threads-app" role="img" aria-label="Drawn agent app: a lead thread with four child threads, two of them running, and the lead handing a fact check to a reviewer">
+        <div class="threads-side">
+          <p class="threads-name">Release notes</p>
+          <p class="threads-item is-on" style="--c:var(--a1)">Lead · planner</p>
+          <p class="threads-item is-child is-run" style="--c:var(--a4)">Fact check · reviewer</p>
+          <p class="threads-item is-child" style="--c:var(--a4)">Screenshots · image model</p>
+          <p class="threads-item is-child is-run" style="--c:var(--a1)">Draft · writer</p>
+          <p class="threads-item is-child" style="--c:var(--a4)">Timeline · keeper</p>
+        </div>
+        <div class="threads-main">
+          <p class="threads-head"><span>Lead · planner</span><span>2 running</span></p>
+          <p class="threads-msg threads-msg--me">The draft is up. Check every number before I share it.</p>
+          <p class="threads-tool" data-step><b>start_thread</b> → reviewer · high effort<br>“Check each figure against its source. List the wrong ones first.”</p>
+          <p class="threads-msg" data-step>Started the fact check. I’ll merge it with the style review when it’s back.</p>
+        </div>
+      </div>
+      <figcaption><b>Drawn</b>a sample run, not a real app</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p class="src">Pattern <code>delegation</code>: A drawn agent app: a lead thread starts child threads with a tool call. Add it with <code>npm run add -- &lt;deck&gt; delegation</code>.</p>
+    <p><b>6:00–7:00.</b> “One thread leads. It writes the brief and starts a child for each job, and every child is a thread I can open.” Space → the tool call that starts the fact check, then the lead’s reply.</p>
+    <p class="src">Drawn: no agents ran. A <code>figure.threads</code> holds <code>.threads-app</code> with <code>.threads-side</code> (a <code>p.threads-name</code>, then <code>p.threads-item</code> rows: <code>.is-on</code> for the open thread, <code>.is-child</code> to indent, <code>.is-run</code> to pulse the dot, <code>--c</code> for its colour, such as one per model provider) and <code>.threads-main</code> (<code>p.threads-head</code>, <code>p.threads-msg</code>, <code>.threads-msg--me</code> for your message, <code>p.threads-tool</code> for a tool call). Put the real app in a <code>data-live</code> beat and keep this as its fallback.</p>
+  </aside>
+</section>
+
 <section class="slide" id="get-the-code" data-layout="split" data-section="Push for more" data-title="Get the repo">
   <div class="split split--even">
     <div class="text">
@@ -1081,6 +1119,29 @@
     <p class="src">Pattern <code>question-map</code>: A two-by-two map of questions by effort and value, with the quick wins lit. Add it with <code>npm run add -- &lt;deck&gt; question-map</code>.</p>
     <p><b>13:00–14:00.</b> Space ×4: the two quick wins first, then one question per other corner. Say which quick win you answer this week.</p>
     <p class="src">A <code>.qmap</code>: <code>p.qmap-y</code> and <code>p.qmap-x</code> hold the low and high ends of each axis, and <code>ol.qmap-plane</code> holds four <code>li.qmap-q</code> in reading order (top left, top right, bottom left, bottom right). <code>.is-hot</code> lights one quadrant. Each item sits at <code>--x</code> and <code>--y</code>, 0 to 100 inside its quadrant, measured from the bottom left. Set <code>--c</code> on an item for its dot colour and <code>--h</code> on the map for its height. Items with <code>data-step</code> reveal on Space in source order. The questions and their places are a sample; place your own from a real backlog.</p>
+  </aside>
+</section>
+
+<section class="slide" id="blind-test" data-layout="columns" data-section="Push for more" data-title="Each judge preferred its own answer">
+  <div class="eyebrow">Blind test · two answers, labelled X and Y</div>
+  <h2 class="title title--wide">Each judge liked <em>its own answer.</em></h2>
+  <div class="scores">
+    <div class="scores-card" style="--accent:var(--a1)">
+      <h3>Judge: model A</h3>
+      <p class="scores-row is-hot"><span>Model A’s answer<small>its own</small></span><strong>8.2</strong></p>
+      <p class="scores-row"><span>Model B’s answer</span><strong>7.2</strong></p>
+    </div>
+    <div class="scores-card" style="--accent:var(--a4)" data-step>
+      <h3>Judge: model B</h3>
+      <p class="scores-row"><span>Model A’s answer</span><strong>8.1</strong></p>
+      <p class="scores-row is-hot"><span>Model B’s answer<small>its own</small></span><strong>8.5</strong></p>
+    </div>
+  </div>
+  <p class="hint" data-step><b>So the judges advise. You decide.</b>Sample scores: put your own run here.</p>
+  <aside class="notes">
+    <p class="src">Pattern <code>blind-test</code>: Judges score the same answers blind, with each judge’s own pick flagged. Add it with <code>npm run add -- &lt;deck&gt; blind-test</code>.</p>
+    <p><b>12:00–13:00.</b> “Neither judge knew which model wrote which answer.” Space → the second judge, then the lesson: each one scored its own model higher.</p>
+    <p class="src">The scores are a sample, not a real test. A <code>.scores</code> grid (<code>--n</code> cards, 2 by default) holds <code>.scores-card</code> panels, each coloured with <code>--accent</code>: an <code>h3</code>, then <code>p.scores-row</code> with a <code>span</code> label and a <code>strong</code> score. <code>.is-hot</code> lights a score, and a <code>small</code> in the label adds a short note after an arrow.</p>
   </aside>
 </section>
 

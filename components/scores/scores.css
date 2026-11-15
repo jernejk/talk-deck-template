@@ -1,0 +1,13 @@
+.scores{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:2.4vw;width:min(84vw,1500px);margin-top:4.4vh}
+.scores-card{--rise:1;padding:2.4vh 2vw;border-radius:var(--radius);background:var(--panel);border:1px solid var(--rule);border-top:3px solid var(--accent)}
+.scores-card h3{margin:0 0 1.4vh;font:600 clamp(1rem,1.6vw,1.8rem)/1.2 var(--sans);color:var(--muted)}
+.scores-row{display:flex;justify-content:space-between;align-items:baseline;gap:1em;margin:0;padding:.8vh 0;border-top:1px solid var(--rule);font-size:clamp(1.05rem,1.9vw,2.2rem)}
+.scores-card h3+.scores-row{border-top:0}
+.scores-row strong{font:var(--title-weight) 1.6em/1 var(--display);letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.scores-row.is-hot strong{color:var(--accent)}
+.scores-row small{margin-left:.6em;font-size:.6em;font-weight:500;color:var(--accent)}
+.scores-row small::before{content:"← "}
+
+@media screen and (max-aspect-ratio:1/1){
+  .scores{grid-template-columns:1fr;width:100%}
+}

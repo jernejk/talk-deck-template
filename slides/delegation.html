@@ -1,0 +1,36 @@
+<section class="slide" id="delegation" data-layout="split" data-section="How it works" data-title="One lead thread hands out the work">
+  <div class="split">
+    <div class="text">
+      <div class="eyebrow">How it works · the lead thread</div>
+      <h2 class="title title--stack"><span>One lead thread.</span> <em>Many hands.</em></h2>
+      <ul class="facts">
+        <li>The <strong>lead thread</strong> plans and merges.</li>
+        <li>One <strong>tool call</strong> starts each child thread.</li>
+        <li>Every child is a thread <strong>you can open and steer.</strong></li>
+      </ul>
+    </div>
+    <figure class="threads">
+      <div class="threads-app" role="img" aria-label="Drawn agent app: a lead thread with four child threads, two of them running, and the lead handing a fact check to a reviewer">
+        <div class="threads-side">
+          <p class="threads-name">Release notes</p>
+          <p class="threads-item is-on" style="--c:var(--a1)">Lead · planner</p>
+          <p class="threads-item is-child is-run" style="--c:var(--a4)">Fact check · reviewer</p>
+          <p class="threads-item is-child" style="--c:var(--a4)">Screenshots · image model</p>
+          <p class="threads-item is-child is-run" style="--c:var(--a1)">Draft · writer</p>
+          <p class="threads-item is-child" style="--c:var(--a4)">Timeline · keeper</p>
+        </div>
+        <div class="threads-main">
+          <p class="threads-head"><span>Lead · planner</span><span>2 running</span></p>
+          <p class="threads-msg threads-msg--me">The draft is up. Check every number before I share it.</p>
+          <p class="threads-tool" data-step><b>start_thread</b> → reviewer · high effort<br>“Check each figure against its source. List the wrong ones first.”</p>
+          <p class="threads-msg" data-step>Started the fact check. I’ll merge it with the style review when it’s back.</p>
+        </div>
+      </div>
+      <figcaption><b>Drawn</b>a sample run, not a real app</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>6:00–7:00.</b> “One thread leads. It writes the brief and starts a child for each job, and every child is a thread I can open.” Space → the tool call that starts the fact check, then the lead’s reply.</p>
+    <p class="src">Drawn: no agents ran. A <code>figure.threads</code> holds <code>.threads-app</code> with <code>.threads-side</code> (a <code>p.threads-name</code>, then <code>p.threads-item</code> rows: <code>.is-on</code> for the open thread, <code>.is-child</code> to indent, <code>.is-run</code> to pulse the dot, <code>--c</code> for its colour, such as one per model provider) and <code>.threads-main</code> (<code>p.threads-head</code>, <code>p.threads-msg</code>, <code>.threads-msg--me</code> for your message, <code>p.threads-tool</code> for a tool call). Put the real app in a <code>data-live</code> beat and keep this as its fallback.</p>
+  </aside>
+</section>

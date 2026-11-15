@@ -22,7 +22,7 @@ Run the `npm run` commands from the template repo. `<deck>` is a deck folder in 
 
 ## Drawn illustrations
 
-`.mock`, `.composer`, `.memo` and `.cli` are drawn. Put "drawn" or "illustration" in the caption or the notes. Fixed colours are permitted only inside these mock-ups.
+`.mock`, `.composer`, `.memo`, `.cli` and `.threads` are drawn. Put "drawn" or "illustration" in the caption or the notes. Fixed colours are permitted only inside these mock-ups.
 
 ## Live demos
 

@@ -9,7 +9,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 - Keep decks self-contained: no external scripts, styles, fonts or images.
 - Speaker notes (`aside.notes`) ship in the public HTML. Keep private links, IDs, emails and anything you wouldn't show on a slide out of them.
 - One idea per slide: an eyebrow, then a title of one or two lines with a single `<em>` on the payoff. If it needs a third line, make two slides.
-- Prefer real captures, and label them in the caption: `<figcaption><b>Real run</b>names hidden</figcaption>`. Drawn illustrations (`.mock`, `.composer`, `.memo`, `.cli`) are fine when the caption or notes say they're drawn. Generated images (`<b>Generated</b> by gpt-image-2`) are fine for backgrounds and illustrations, never for screenshots or results; keep the prompt in the notes. Sources and credits: `docs/images.md`.
+- Prefer real captures, and label them in the caption: `<figcaption><b>Real run</b>names hidden</figcaption>`. Drawn illustrations (`.mock`, `.composer`, `.memo`, `.cli`, `.threads`) are fine when the caption or notes say they're drawn. Generated images (`<b>Generated</b> by gpt-image-2`) are fine for backgrounds and illustrations, never for screenshots or results; keep the prompt in the notes. Sources and credits: `docs/images.md`.
 - Every live beat gets `data-live="App name"`, its screenshot on the same slide, and a 20-second cap in the notes.
 - Quote only numbers someone measured. Gags must read as gags, and PRESENTER.md lists which is which.
 - Crop screenshots before they go into `assets/`: tab strip and URL bar, sidebars with chat or project titles, avatars, emails, IDs and private prices. Keep originals outside the deck.

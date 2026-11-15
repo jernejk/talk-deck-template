@@ -44,7 +44,7 @@ The `@import` does the inheriting. `"extends": "community"` in `template.json` r
 | `--title-weight` `--title-leading` `--tight` `--em-style` | Headline weight, leading, tracking, and `normal` or `italic` for the accent |
 | `--radius` `--shot-bg` `--shot-border` `--shot-glow` `--drop` | Screenshots and cards: corner, backing, border, accent glow strength, drop shadow |
 | `--glow-1` `--glow-2` `--dots` `--ghost-ink` | Background glows, dot grid and ghost shape |
-| `--ui-font` `--ui-bg` `--ui-ink` `--ui-muted` `--ui-border` `--ui-chip` `--ui-chip-ink` `--ui-send` | Drawn app UI: the composer, mock cards and tiles |
+| `--ui-font` `--ui-bg` `--ui-ink` `--ui-muted` `--ui-border` `--ui-chip` `--ui-chip-ink` `--ui-send` | Drawn app UI: the composer, mock cards and tiles, and the threads app |
 | `--cli-bg` `--cli-ink` `--cli-muted` `--cli-border` `--cli-bad` `--cli-radius` | Drawn terminal (optional; dark by default) |
 | `--code-bg` `--code-ink` `--code-muted` `--code-border` `--code-radius` `--code-k` `--code-s` `--code-f` `--code-n` | Code card (optional; dark by default) |
 | `--phone-caption` `--ui-send-ink` | Caption colour inside the phone bezel, and the glyph on the composer's send button (optional) |

@@ -10,7 +10,7 @@ In the end I was copy-pasting whole old decks and remixing them, because startin
 
 Now I work AI-first. I tell a coding agent what I know and what I want to say, and it builds the slides, notes and demo fallbacks while I steer the story. I often get only a few hours' heads-up before a talk, and I still walk in with something I'm happy to put my name on.
 
-This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 66 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
+This template is the setup behind that. Decks are plain HTML and CSS with a small engine: no build step to present, no CDN, no web fonts, and every deck runs offline from `file://`. `AGENTS.md` teaches your agent the rules, `npm run new` scaffolds a talk, `npm run add` drops in any of 68 slide patterns, and `npm run qa` renders every slide and fails on overflow, broken media and console errors.
 
 People at my talks kept asking about the slides more than the content, so here it is, for anyone presenting ideas, products or demos.
 
@@ -118,8 +118,8 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | [Hook](docs/showcase/README.md#hooks) | `statement`, `opener`, `photo`, `question`, `pets` |
 | [Demo](docs/showcase/README.md#demos) | `prompt`, `cli-run`, `demo-map`, `before-after`, `zoom`, `video`, `versus`, `get-the-code` |
 | [Live and interactive](docs/showcase/README.md#live-and-interactive) | `try-it`, `live-demo`, `player`, `youtube`, `exercise` |
-| [How it works](docs/showcase/README.md#how-it-works) | `pipeline`, `agents`, `how-its-made`, `code`, `diff`, `fold`, `long-page`, `transcript`, `rule` |
-| [Evidence](docs/showcase/README.md#evidence) | `numbers`, `at-a-glance`, `poll`, `quote`, `findings`, `log-trace`, `matrix`, `sourced-table`, `question-map`, `milestones`, `photo-strip`, `iterations` |
+| [How it works](docs/showcase/README.md#how-it-works) | `pipeline`, `agents`, `delegation`, `how-its-made`, `code`, `diff`, `fold`, `long-page`, `transcript`, `rule` |
+| [Evidence](docs/showcase/README.md#evidence) | `numbers`, `at-a-glance`, `poll`, `quote`, `findings`, `log-trace`, `matrix`, `sourced-table`, `question-map`, `blind-test`, `milestones`, `photo-strip`, `iterations` |
 | [Wrap-up](docs/showcase/README.md#summaries-and-wrap-ups) | `options`, `takeaways`, `questions`, `follow-up`, `close` |
 | [Extras](docs/showcase/README.md#presenter-extras) | `x-timeline`, `x-compare`, `x-ladder`, `x-limits`, `x-cost` |
 
@@ -211,11 +211,11 @@ Each deck × template × size runs as a separate job, four at a time by default 
 | Check | Warns when |
 |---|---|
 | `clock-order` | A main slide has no clock in its notes, a clock ends before it starts, or it starts before the previous slide's clock ends. It reads the first `m:ss–m:ss` in a `<b>` in the notes, like the rehearsal timer, and skips presenter extras |
-| `live-cap` | A `data-live` slide has no `img`, `picture`, video poster, `.cli` or `.mock` on it, or its notes don't say 20 s, 20s, 20-second or 20 seconds |
+| `live-cap` | A `data-live` slide has no `img`, `picture`, video poster, `.cli`, `.mock` or `.threads` on it, or its notes don't say 20 s, 20s, 20-second or 20 seconds |
 | `one-em` | A `.title` has more than one `<em>` |
 | `curly-quotes` | Visible slide text has a straight `'` or `"`. Attributes, notes, `code`, `pre`, `kbd`, `samp`, `.cli`, `.code`, `.diff` and `.log` are skipped, because they often quote code |
 | `private-data` | Notes, or links in them, have an email, `localhost` or a private IP address, a URL with a `token=`, `key=` or similar parameter, an API key, a UUID or a hex ID of 24 characters or more. Reserved example domains such as `example.com` are fine |
-| `drawn-disclosure` | A slide has a `.mock`, `.composer`, `.memo` or `.cli`, but no caption or note on it says “drawn” or “illustration”. Or a caption says **Generated**, but the notes have no prompt |
+| `drawn-disclosure` | A slide has a `.mock`, `.composer`, `.memo`, `.cli` or `.threads`, but no caption or note on it says “drawn” or “illustration”. Or a caption says **Generated**, but the notes have no prompt |
 | `fixed-colour` | An inline `style` on a slide has a hex, `rgb()`, `hsl()` or similar colour outside a drawn mock-up. Named colours are not checked |
 | `layout-variety` | Two main slides in a row have the same `data-layout`. Slides without one are skipped |
 
