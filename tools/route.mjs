@@ -1,19 +1,21 @@
 // Rewrite the route and extras tables in a deck's PRESENTER.md from its slides.
-// usage: npm run route -- <deck> [--check]
+// usage: npm run route -- <deck> [--check]   (in a standalone deck the path is optional)
 // Number, title and clock come from index.html, and so does the live column for live slides.
 // Hand-written text (cues, "Use when", labels such as "Illustration") is kept, matched by title, else by row position.
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
-import { deckIndex, exists, fail, routeTable, slideSections } from "./lib.mjs";
+import { REPO, deckIndex, exists, fail, routeTable, slideSections } from "./lib.mjs";
 
 const { values: o, positionals } = parseArgs({ allowPositionals: true, options: { check: { type: "boolean" }, help: { type: "boolean", short: "h" } } });
-if (o.help || positionals.length !== 1) {
+// A standalone deck has no examples/, so the deck is the folder this tool lives in.
+const standalone = !await exists(join(REPO, "examples"));
+if (o.help || positionals.length > 1 || (!positionals.length && !standalone)) {
   console.log("Usage: npm run route -- <deck> [--check]\n\nRewrites the Talk route and Extras tables in PRESENTER.md. --check only reports whether they are stale.");
   process.exit(o.help ? 0 : 1);
 }
 
-const index = await deckIndex(positionals[0]);
+const index = await deckIndex(positionals[0] ?? REPO);
 const html = await readFile(index, "utf8");
 const presenter = [join(dirname(index), "PRESENTER.md"), join(dirname(index), "../PRESENTER.md")];
 const file = (await exists(presenter[0])) ? presenter[0] : (await exists(presenter[1])) ? presenter[1] : fail(`No PRESENTER.md next to ${index}.`);
@@ -60,5 +62,5 @@ md = md.slice(0, route.start) + rows.join("\n") + "\n" + md.slice(route.end);
 md = md.replace(/^\d+ main slides plus \d+ extras?\./m, `${fresh.main} main slides plus ${fresh.extraCount === 1 ? "1 extra" : `${fresh.extraCount} extras`}.`);
 
 if (md === before) console.log(`${file} is up to date.`);
-else if (o.check) fail(`${file} is stale: run npm run route -- ${positionals[0]}`);
+else if (o.check) fail(`${file} is stale: run npm run route${positionals.length ? ` -- ${positionals[0]}` : ""}`);
 else { await writeFile(file, md); console.log(`Updated ${file}.`); }
