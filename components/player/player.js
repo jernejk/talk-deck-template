@@ -64,10 +64,12 @@ function buildVideo(fig, slide) {
     paint();
   }
 
-  function tick() {
+  // The clip end is checked every frame; the controls only need repainting a few times a second.
+  let painted = -Infinity;
+  function tick(now = performance.now()) {
     raf = 0;
     if (!v.paused && v.currentTime >= endAt() - 0.02) finish();
-    paint();
+    else if (now - painted >= 200) { painted = now; paint(); }
     if (!v.paused) raf = requestAnimationFrame(tick);
   }
 
