@@ -36,6 +36,7 @@
     "add": "node tools/add.mjs",
     "outline": "node tools/outline.mjs",
     "export": "node tools/export.mjs",
+    "upgrade": "node tools/upgrade.mjs",
     "showcase": "node tools/showcase.mjs",
     "inline": "node tools/inline.mjs",
     "route": "node tools/route.mjs"

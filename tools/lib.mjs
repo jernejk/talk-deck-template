@@ -178,22 +178,47 @@ export async function vendorLib(siteDir) {
   await cp(join(REPO, "LICENSE"), join(siteDir, "lib", "LICENSE"));
 }
 
-async function standaloneGuide() {
+// The skills a standalone deck gets. The others need the template repo.
+export const DECK_SKILLS = ["deck-story", "deck-coach", "deck-demo", "deck-slides", "deck-media", "deck-notes", "deck-check", "deck-perf", "deck-publish"];
+
+async function docsBase() {
   const url = JSON.parse(await readFile(join(REPO, "package.json"), "utf8")).repository?.url;
-  const docs = url && `${url.replace(/^git\+/, "").replace(/\.git$/, "")}/blob/main/`;
+  return url && `${url.replace(/^git\+/, "").replace(/\.git$/, "")}/blob/main/`;
+}
+
+const linkDocs = (text, docs) => docs ? text.replace(/`((?:docs\/[\w-]+\.md)|docs\/showcase\/|examples\/catalog\/index\.html|MAINTAINING\.md)`/g, (_, f) => `[\`${f}\`](${docs}${f})`) : text;
+
+async function standaloneGuide(docs) {
   const guide = (await readFile(join(REPO, "AGENTS.md"), "utf8"))
     .replace(/<!-- repo-only -->[\s\S]*?<!-- \/repo-only -->(?:\r?\n|$)/g, "")
     .replace(/In the template repo, [^\n]*?`examples\/`\. In a standalone deck the library/, "The library")
     .replaceAll("<deck folder>", "site");
-  return docs ? guide.replace(/`((?:docs\/[\w-]+\.md)|docs\/showcase\/|examples\/catalog\/index\.html)`/g, (_, f) => `[\`${f}\`](${docs}${f})`) : guide;
+  return linkDocs(guide, docs);
+}
+
+async function writeSkills(root, docs) {
+  for (const name of DECK_SKILLS) {
+    const from = join(REPO, "skills", name), to = join(root, "skills", name);
+    await mkdir(to, { recursive: true });
+    for (const f of await readdir(from)) {
+      const text = await readFile(join(from, f), "utf8");
+      await writeFile(join(to, f), f.endsWith(".md") ? linkDocs(text, docs) : text);
+    }
+  }
+  for (const agent of [".claude", ".agents"]) {
+    await mkdir(join(root, agent), { recursive: true });
+    await symlink("../skills", join(root, agent, "skills"));
+  }
 }
 
 export async function writeTooling(root, name) {
   await mkdir(join(root, "tools"), { recursive: true });
   // inline.mjs and route.mjs import lib.mjs, so it comes too. Its REPO is then the deck folder.
   for (const f of ["tools/qa.mjs", "tools/perf.mjs", "tools/lint.mjs", "tools/inline.mjs", "tools/route.mjs", "tools/lib.mjs", "tools/qr.swift", "package-lock.json"]) await cp(join(REPO, f), join(root, f));
-  await writeFile(join(root, "AGENTS.md"), await standaloneGuide());
+  const docs = await docsBase();
+  await writeFile(join(root, "AGENTS.md"), await standaloneGuide(docs));
   await symlink("AGENTS.md", join(root, "CLAUDE.md"));
+  await writeSkills(root, docs);
   const { type, scripts, devDependencies } = JSON.parse(await readFile(join(REPO, "package.json"), "utf8"));
   const pkg = { name: name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "talk-deck", private: true, type, scripts: { qa: scripts.qa, perf: scripts.perf, lint: scripts.lint, inline: scripts.inline, route: scripts.route }, devDependencies };
   await writeFile(join(root, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
