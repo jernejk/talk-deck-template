@@ -225,6 +225,11 @@
     "summary": "A feature matrix with yes, no and partial cells"
   },
   {
+    "name": "sourced-table",
+    "layout": "table",
+    "summary": "A table of figures with the source of every number"
+  },
+  {
     "name": "milestones",
     "layout": "timeline",
     "summary": "A horizontal timeline whose dots reveal one by one"
