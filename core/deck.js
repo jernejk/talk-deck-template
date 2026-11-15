@@ -428,7 +428,8 @@
     badge.className = "res-badge";
     badge.textContent = `${w}×${h} preview · R changes size`;
     document.body.replaceChildren(frame, badge);
-    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(innerWidth / w, innerHeight / h)})`; };
+    const root = document.documentElement;
+    const fit = () => { frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`; };
     fit();
     addEventListener("resize", fit);
     frame.addEventListener("load", () => frame.contentWindow?.focus());
