@@ -49,4 +49,4 @@ Published images are copies in `assets/`, cropped from originals kept elsewhere.
 
 ## Verification
 
-Run `npm install` once, then `npm run qa`. It renders every slide with all steps revealed at 1920×1080 and 1280×720. It checks for overflow past the footer or edges, broken images and videos, failed requests and console errors, opens the deck from `file://`, and exercises the keyboard controls. Screenshots land in `qa/`; look at the ones you changed.
+Run `npm install` once, then `npm run qa`. It renders every slide with all steps revealed at 1920×1080 and 1280×720. It checks for overflow past the footer or edges, broken images and videos, failed requests and console errors, opens the deck from `file://`, and exercises the keyboard controls. Screenshots land in `qa/`, with one contact sheet per size; look at the ones you changed. `--slides <ids> --fast` checks a few slides at one size and skips most screenshots.
