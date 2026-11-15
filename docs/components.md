@@ -87,6 +87,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `timeline` | Two-column timestamped log | `ol.timeline > li > time + span` (`--rows`) | |
 | `timer` | Exercise countdown: a ring, big digits, Start/Pause, Reset and +1 min; keeps counting across slides and ends on “Time’s up” | `.timer[data-time="5:00"]` (empty; the JS builds the face and buttons; `data-autostart` starts it when the slide opens) | yes |
 | `titles` | Title configurations for any slide: stacked, extra large, centred, kicker, numeral | `.title--stack`, `.title--xl`, `.title--center`, `.title--kicker > small`, `.title--number > b` | |
+| `tune` | Colourway tuner, only with `?tune` in the URL: a colour picker per surface, ink and palette token, the live contrast of each colour on `--bg` (and of `--ink` on each surface) flagged against 4.5:1 and 3:1, and Copy CSS for the changed tokens | no markup; open the deck with `?tune` and press P; without the flag it adds nothing | yes |
 | `type` | Typing effect for any element | `[data-type="…"]` (`data-delay`, `data-ph`) | yes |
 | `versus` | Two panels, such as a weak and a useful prompt | `.versus > .versus-panel × 2` (`.versus-chip`, `.versus-body` with `mark`, optional `.versus-verdict > b`) | |
 | `video` | Muted clip that plays while its slide is open | `figure.video > video` (`--h`) | yes |

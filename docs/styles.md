@@ -24,7 +24,7 @@ Start at the lowest level that gets you the look.
 .mascot,.ghost{display:none}
 ```
 
-The `@import` does the inheriting. `"extends": "community"` in `template.json` records the base, and `npm run export` copies every template, so the import also works in a standalone deck. The [showcase](showcase/README.md#colourways) renders this tweak and five more colourways, each with its CSS.
+The `@import` does the inheriting. `"extends": "community"` in `template.json` records the base, and `npm run export` copies every template, so the import also works in a standalone deck. The [showcase](showcase/README.md#colourways) renders this tweak and five more colourways, each with its CSS. To find the values, open any deck with `?tune` in the URL (with `?theme=<name>` for the base) and press P. The panel changes the surface, ink and palette tokens live, shows each one's contrast against `--bg`, and copies a stylesheet like this one with only the tokens you changed.
 
 **2. Re-skin.** Copy `community/theme.css`, which sets every token, and change the values. A light theme also needs `color-scheme:light`. `paper` started here.
 
