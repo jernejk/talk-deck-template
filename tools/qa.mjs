@@ -15,6 +15,7 @@ const { values: opt, positionals } = parseArgs({
     theme: { type: "string" },
     sizes: { type: "string", default: "1920x1080,1280x720" },
     motion: { type: "boolean", default: false },
+    titles: { type: "boolean", default: false },
     jobs: { type: "string", default: String(Math.min(4, availableParallelism())) },
     slides: { type: "string" },
     fast: { type: "boolean", default: false },
@@ -235,10 +236,31 @@ async function render(deck, theme, [w, h]) {
       const imgs = [...slide.querySelectorAll("img")].filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
       const videos = [...slide.querySelectorAll("video")].filter(v => v.error || v.readyState < 1 || (motion && v.closest(".video") && (v.paused || v.currentTime === 0))).map(v => v.currentSrc || v.src);
       const scroll = slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1;
-      return { out, imgs, videos, scroll };
+      // Lines are counted from text fragments only: an element box (a block <em>) would otherwise count as a line of its own.
+      const lineCount = el => {
+        const size = parseFloat(getComputedStyle(el).fontSize) || 16, tops = [];
+        const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        for (let n; (n = walk.nextNode());) {
+          if (!n.textContent.trim()) continue;
+          const r = document.createRange();
+          r.selectNodeContents(n);
+          for (const box of r.getClientRects()) if (box.width) tops.push(box.top);
+        }
+        tops.sort((a, b) => a - b);
+        return tops.reduce((acc, t) => t - acc.last > size * .5 ? { n: acc.n + 1, last: t } : acc, { n: 0, last: -Infinity }).n;
+      };
+      const title = slide.querySelector("h2.title:not(.title--stack)");
+      const em = title?.querySelector("em");
+      const titleLines = title?.getBoundingClientRect().width ? lineCount(title) : 0;
+      const emSplit = em ? lineCount(em) > 1 : false;
+      return { out, imgs, videos, scroll, titleLines, emSplit };
     }, [id, CHECKED, opt.motion]);
     const scrolls = h > w;
-    if ((!scrolls && (report.out.length || report.scroll)) || report.imgs.length || report.videos.length) found.problems.push({ where: `${where} #${id}`, ...report });
+    const { titleLines, emSplit, ...checks } = report;
+    if ((!scrolls && (checks.out.length || checks.scroll)) || checks.imgs.length || checks.videos.length) found.problems.push({ where: `${where} #${id}`, ...checks });
+    // The catalog's placeholder titles wrap by design; real decks follow the two-line rule.
+    if (!scrolls && titleLines > 2 && deck.name !== "catalog") found.warnings.push({ where: `${where} #${id}`, check: "title-lines", message: `the title wraps to ${titleLines} lines; keep it to two` });
+    else if (opt.titles && !scrolls && emSplit) found.warnings.push({ where: `${where} #${id}`, check: "title-break", message: "the <em> payoff breaks across lines; shorten it or put it on its own line" });
     const qrs = await page.evaluate(id => [...document.getElementById(id).querySelectorAll("a.close-qr, a.qr-link")].map(a => a.href), id);
     // ponytail: --fast skips screenshots, the slowest step, but keeps the ones the QR check reads.
     if (opt.fast && !qrs.length) continue;
