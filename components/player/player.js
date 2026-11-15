@@ -20,6 +20,8 @@ function buildVideo(fig, slide) {
   v.before(stage);
   stage.append(v);
   v.controls = false;
+  // iOS Safari leaves the poster unpainted until playback, so paint it behind the video too.
+  if (v.poster) v.style.setProperty("--poster", `url("${v.getAttribute("poster")}")`);
 
   const start = parse(fig.dataset.start) ?? 0;
   const endAttr = parse(fig.dataset.end);
