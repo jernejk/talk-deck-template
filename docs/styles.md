@@ -56,7 +56,7 @@ The `@import` does the inheriting. `"extends": "community"` in `template.json` r
 
 ## The background
 
-Core draws two layers on every slide: `.slide::before` holds two radial glows in the slide's colour (`--glow-1`, `--glow-2`), drifting through the `--gx`/`--gy` positions, and `.slide::after` holds the dot grid (`--dots`). Set the tokens to `0%` and `transparent`, hide the layers with `display:none`, or override `background` and `animation` on them to draw your own; `aurora` replaces the glows with drifting aurora light. The dot grid is masked to one corner, so a full-stage pattern also resets `mask-image` on `::after`, as `blueprint` does for its drafting grid. Keep both layers inside the slide (`inset:0`), or every slide scrolls and QA fails. For a texture behind every slide, put it on `body`, as `paper` does with its grain.
+Core draws three layers on every slide. The engine adds a `.slide-glow` element whose `::before` is the drifting glow (`--glow-1`): a blob drawn once and moved by `transform`, so the compositor animates it without repainting the slide. `.slide::before` holds the still corner glow (`--glow-2`) and `.slide::after` the dot grid (`--dots`). Set the tokens to `0%` and `transparent`, hide a layer with `display:none`, or restyle `.slide-glow::before`/`::after` to draw your own drifting light (animate only `transform` and `opacity`); `aurora` drifts two blobs this way. The dot grid is masked to one corner, so a full-stage pattern also resets `mask-image` on `::after`, as `blueprint` does for its drafting grid. Keep both layers inside the slide (`inset:0`), or every slide scrolls and QA fails. For a texture behind every slide, put it on `body`, as `paper` does with its grain.
 
 ## The personality layer
 

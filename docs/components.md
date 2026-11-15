@@ -23,7 +23,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
    });
    ```
 
-   `deck` provides `config`, `slides()`, `current()`, `goTo(slide)`, `openDialog(dialog, invoker)`, `reducedMotion()` and `control({ label, key, action })`, which adds a button to the controls with a one-letter key (taken keys are refused with a warning). `components/rehearse/` uses it. A hook that throws logs an error without stopping the deck, and QA fails on the error.
+   `deck` provides `config`, `slides()`, `current()`, `goTo(slide)`, `openDialog(dialog, invoker)`, `reducedMotion()` and `control({ label, key, action, bar })`, which adds a button to the Options menu (or to the control bar with `bar: true`, for something used mid-talk) with a one-letter key (taken keys are refused with a warning). `components/rehearse/` uses it. A hook that throws logs an error without stopping the deck, and QA fails on the error.
 6. Use it in a slide pattern, new or existing (see docs/slides.md).
 7. Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template.
 

@@ -77,24 +77,24 @@
 
 html,body{background:linear-gradient(150deg,#070b22 0%,#0b1026 45%,#141a52 100%) fixed}
 
-/* Aurora: three palette blobs plus the slot colour, drifting slowly behind the content. */
-@property --ax{syntax:"<percentage>";inherits:false;initial-value:18%}
-@property --ay{syntax:"<percentage>";inherits:false;initial-value:84%}
-@property --bx{syntax:"<percentage>";inherits:false;initial-value:60%}
-@property --by{syntax:"<percentage>";inherits:false;initial-value:104%}
+/* Aurora: the slot colour and a palette blob drift on the compositor; a third blob and the corner glow stay still. */
 .slide::before{
   background:
-    radial-gradient(48vw 40vw at var(--gx) var(--gy),color-mix(in srgb,var(--accent) var(--glow-1),transparent),transparent 64%),
-    radial-gradient(52vw 46vw at var(--ax) var(--ay),color-mix(in srgb,var(--a2) 24%,transparent),transparent 64%),
-    radial-gradient(48vw 34vw at var(--bx) var(--by),color-mix(in srgb,var(--a3) 18%,transparent),transparent 62%),
+    radial-gradient(48vw 34vw at 60% 104%,color-mix(in srgb,var(--a3) 18%,transparent),transparent 62%),
     radial-gradient(40vw 40vw at var(--gx2,4%) var(--gy2,100%),color-mix(in srgb,var(--a1) var(--glow-2),transparent),transparent 62%);
 }
-.slide.is-active::before{animation:aurora 48s steps(80) infinite alternate}
-@keyframes aurora{
-  33%{--gx:76%;--gy:16%;--ax:26%;--ay:70%;--bx:52%;--by:96%}
-  66%{--gx:84%;--gy:-4%;--ax:12%;--ay:92%;--bx:70%;--by:108%}
-  100%{--gx:70%;--gy:22%;--ax:30%;--ay:78%;--bx:48%;--by:100%}
+.slide-glow::before{
+  left:calc(88% - 30.72vw);top:calc(6% - 25.6vw);width:61.44vw;height:51.2vw;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) var(--glow-1),transparent),transparent);
 }
+.slide-glow::after{
+  left:calc(18% - 33.28vw);top:calc(84% - 29.44vw);width:66.56vw;height:58.88vw;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--a2) 24%,transparent),transparent);
+}
+.slide.is-active .slide-glow::before{animation:aurora-g 48s ease-in-out infinite alternate}
+.slide.is-active .slide-glow::after{animation:aurora-a 48s ease-in-out infinite alternate}
+@keyframes aurora-g{33%{transform:translate(-12vw,10vh)}66%{transform:translate(-4vw,-10vh)}100%{transform:translate(-18vw,16vh)}}
+@keyframes aurora-a{33%{transform:translate(8vw,-14vh)}66%{transform:translate(-6vw,8vh)}100%{transform:translate(12vw,-6vh)}}
 
 /* Type */
 .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:clamp(.8rem,1.05vw,1.15rem);font-weight:600}
@@ -150,5 +150,5 @@ html,body{background:linear-gradient(150deg,#070b22 0%,#0b1026 45%,#141a52 100%)
 dialog.overlay::backdrop{background:rgba(5,8,26,.7)}
 
 @media (prefers-reduced-motion:reduce){
-  .slide.is-active::before{animation:none!important}
+  .slide.is-active .slide-glow::before,.slide.is-active .slide-glow::after{animation:none!important}
 }

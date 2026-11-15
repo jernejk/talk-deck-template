@@ -72,7 +72,7 @@
   --code-n:#ffd166;
 }
 
-.slide::before,.slide::after{display:none}
+.slide::before,.slide::after,.slide-glow{display:none}
 .ghost,.pet,.mascot{display:none}
 .orb,.sparks{display:none}
 

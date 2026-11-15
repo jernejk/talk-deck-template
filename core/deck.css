@@ -69,17 +69,19 @@ a{color:inherit}
 .slide.is-active [data-r]{animation:rise .7s var(--ease) both;animation-delay:calc(var(--i,0) * 80ms + 100ms)}
 
 /* Ambient background */
-@property --gx{syntax:"<percentage>";inherits:false;initial-value:88%}
-@property --gy{syntax:"<percentage>";inherits:false;initial-value:6%}
 .slide::before,.slide::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
-.slide::before{
-  background:
-    radial-gradient(46vw 46vw at var(--gx) var(--gy),color-mix(in srgb,var(--accent) var(--glow-1),transparent),transparent 62%),
-    radial-gradient(34vw 34vw at var(--gx2,4%) var(--gy2,100%),color-mix(in srgb,var(--accent) var(--glow-2),transparent),transparent 60%);
+.slide::before{background:radial-gradient(34vw 34vw at var(--gx2,4%) var(--gy2,100%),color-mix(in srgb,var(--accent) var(--glow-2),transparent),transparent 60%)}
+/* The drifting glow is its own blob moved by transform, so the compositor animates it without repainting the slide. */
+.slide-glow{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.slide-glow::before,.slide-glow::after{content:"";position:absolute}
+.slide-glow::before{
+  left:calc(88% - 28.5vw);top:calc(6% - 28.5vw);width:57vw;height:57vw;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) var(--glow-1),transparent),transparent);
 }
-.slide.is-active::before{animation:glow-drift 26s steps(64) infinite alternate}
+.slide.is-active .slide-glow::before{animation:glow-drift 26s ease-in-out infinite alternate}
 .slide:not(.is-active),.slide:not(.is-active) *,.slide:not(.is-active)::before,.slide:not(.is-active) *::before,.slide:not(.is-active) *::after{animation-play-state:paused!important}
-@keyframes glow-drift{50%{--gx:72%;--gy:18%}100%{--gx:94%;--gy:-2%}}
+:root.is-resting .slide.is-active,:root.is-resting .slide.is-active *,:root.is-resting .slide.is-active::before,:root.is-resting .slide.is-active *::before,:root.is-resting .slide.is-active *::after{animation-play-state:paused!important}
+@keyframes glow-drift{50%{transform:translate(-16vw,12vh)}100%{transform:translate(6vw,-8vh)}}
 .slide::after{
   background-image:radial-gradient(var(--dots) 1px,transparent 1.4px);background-size:30px 30px;
   -webkit-mask-image:radial-gradient(42vw 38vw at 88% 10%,#000,transparent 75%);mask-image:radial-gradient(42vw 38vw at 88% 10%,#000,transparent 75%);
@@ -109,11 +111,36 @@ a{color:inherit}
   border:1px solid var(--rule);border-radius:12px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(6px);
   opacity:.3;transition:opacity .2s ease;
 }
-.deck-nav:hover,.deck-nav:focus-within{opacity:1}
+.deck-nav:hover,.deck-nav:focus-within,.deck-nav.is-open{opacity:1}
 .deck-nav button{border:0;border-radius:9px;background:transparent;color:var(--ink);cursor:pointer;padding:.5rem .7rem;font:500 .74rem/1 var(--sans)}
 .deck-nav button:hover,.deck-nav button[aria-pressed="true"]{background:var(--panel-2)}
 .deck-nav kbd{font:inherit;color:var(--muted);margin-left:.35em}
 .deck-nav .nav-arrow{font-size:1rem;padding:.3rem .65rem}
+.deck-nav [aria-expanded="true"]{background:var(--panel-2)}
+.deck-options{
+  position:fixed;top:calc(1.4vh + 2.75rem);right:1.2vw;z-index:21;width:max-content;max-width:min(26rem,calc(100vw - 2.4vw));
+  display:grid;gap:.5rem;padding:.65rem;border:1px solid var(--rule);border-radius:12px;
+  background:var(--panel);color:var(--ink);box-shadow:0 22px 60px -24px rgba(0,0,0,.7);font:500 .76rem/1.2 var(--sans);
+}
+.deck-options[hidden]{display:none}
+.opt-head{display:flex;justify-content:space-between;padding:0 .2rem;color:var(--muted);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.opt-head kbd{letter-spacing:0}
+.opt-sizes{display:flex;flex-wrap:wrap;gap:4px}
+.opt-list{display:grid;gap:2px;padding-top:.5rem;border-top:1px solid var(--rule)}
+.deck-options button{display:flex;justify-content:space-between;align-items:center;gap:1.2em;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer;padding:.5rem .65rem;font:inherit;text-align:left}
+.opt-sizes button{border-color:var(--rule);font-variant-numeric:tabular-nums}
+.deck-options button:hover,.deck-options button[aria-pressed="true"]{background:var(--panel-2)}
+.opt-sizes button[aria-pressed="true"]{border-color:var(--signal);color:var(--signal)}
+.deck-options button[hidden]{display:none}
+.deck-options kbd{font:inherit;color:var(--muted)}
+.deck-hint{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:22;transform:translateX(-50%);
+  max-width:calc(100vw - 32px);padding:.7rem 1rem;border:1px solid var(--rule);border-radius:999px;
+  background:var(--panel);color:var(--ink);font:500 .85rem/1.3 var(--sans);text-align:center;box-shadow:0 14px 40px -18px rgba(0,0,0,.7);
+  transition:opacity .4s ease;
+}
+.deck-hint.is-gone{opacity:0}
+@media (pointer:coarse){.deck-nav button{min-height:40px;min-width:40px}}
 
 .notes-panel{
   position:fixed;left:0;right:0;bottom:0;z-index:18;max-height:42vh;overflow:auto;
@@ -151,7 +178,7 @@ dialog.overlay::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(3px)}
 @media (prefers-reduced-motion:reduce){
   .slide,.progress,.notes-panel,.deck-nav,[data-step]{transition:none!important}
   .slide{transform:none}
-  .slide.is-active [data-r],.slide.is-active::before,.flow-arrow{animation:none!important}
+  .slide.is-active [data-r],.slide.is-active::before,.slide-glow::before,.slide-glow::after,.flow-arrow{animation:none!important}
   .slide [data-step]:not(.is-shown){transform:none}
 }
 
@@ -172,6 +199,6 @@ dialog.overlay::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(3px)}
 @media print{
   html,body{overflow:visible;height:auto}
   .slide{position:relative;opacity:1;visibility:visible;transform:none;break-after:page;height:100vh}
-  .deck-nav,.progress,.notes-panel,.badge{display:none}
+  .deck-nav,.deck-options,.progress,.notes-panel,.badge{display:none}
   [data-r],[data-step]{animation:none!important;opacity:1!important;transform:none!important}
 }

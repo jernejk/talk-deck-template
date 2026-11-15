@@ -217,7 +217,7 @@ Deck.use({
     }
     if (liveControl || !fallbackIn(slide)) return;
     liveControl = deck.control({
-      label: "Live", key: "l", pressed: false,
+      label: "Live", key: "l", pressed: false, bar: true,
       action() {
         const fig = fallbackIn(deck.current());
         if (!fig) return;

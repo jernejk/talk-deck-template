@@ -5,7 +5,7 @@
   const deck = { all: [], visible: [], index: 0, active: null, showExtras: false, started: false };
   const slots = new Map(Object.entries(CONFIG.sections || {}));
   let autoSlot = 0;
-  const RESERVED_KEYS = "hfnogc";
+  const RESERVED_KEYS = "hfnogcr";
   const query = new URLSearchParams(location.search);
   const framed = query.get("framed") === "1";
   const parseSize = r => {
@@ -33,10 +33,17 @@
   <button type="button" class="nav-arrow" data-action="next" aria-label="Next slide">›</button>
   <button type="button" data-action="overview" aria-haspopup="dialog">Slides<kbd>O</kbd></button>
   <button type="button" data-action="notes" aria-controls="notes-panel" aria-pressed="false">Notes<kbd>N</kbd></button>
-  <button type="button" data-action="extras" aria-pressed="false">Extras<kbd>H</kbd></button>
-  <button type="button" data-action="close">To close<kbd>C</kbd></button>
+  <button type="button" data-action="options" aria-controls="deck-options" aria-expanded="false">Options</button>
   <button type="button" data-action="fullscreen">Full<kbd>F</kbd></button>
 </nav>
+<div id="deck-options" class="deck-options" role="group" aria-label="Deck options" hidden>
+  <div class="opt-head">Size<kbd>R</kbd></div>
+  <div class="opt-sizes" role="group" aria-label="Size"></div>
+  <div class="opt-list">
+    <button type="button" data-action="extras" aria-pressed="false">Extras<kbd>H</kbd></button>
+    <button type="button" data-action="close">To close<kbd>C</kbd></button>
+  </div>
+</div>
 <div id="badge" class="badge" hidden>Extras on</div>
 <div id="progress" class="progress"></div>
 <section id="notes-panel" class="notes-panel" aria-label="Speaker notes">
@@ -67,9 +74,10 @@
 
   function current() { return deck.visible[deck.index]; }
 
-  function control({ label, key, action, pressed }) {
+  function control({ label, key, action, pressed, bar = false }) {
     const btn = document.createElement("button");
     btn.type = "button";
+    if (bar) btn.dataset.place = "bar";
     btn.textContent = label;
     if (pressed !== undefined) btn.setAttribute("aria-pressed", String(Boolean(pressed)));
     btn.addEventListener("click", e => { e.preventDefault(); action(btn); });
@@ -89,7 +97,29 @@
   function mountControl(btn) {
     const nav = $(".deck-nav");
     if (!nav) return;
-    nav.insertBefore(btn, nav.querySelector('[data-action="fullscreen"]'));
+    if (btn.dataset.place === "bar") nav.insertBefore(btn, nav.querySelector('[data-action="options"]'));
+    else $("#deck-options .opt-list").append(btn);
+  }
+
+  function toggleOptions(force) {
+    const panel = $("#deck-options");
+    const open = force ?? panel.hidden;
+    panel.hidden = !open;
+    $('[data-action="options"]').setAttribute("aria-expanded", String(open));
+    $(".deck-nav").classList.toggle("is-open", open);
+  }
+
+  function sizeButtons() {
+    const box = $("#deck-options .opt-sizes");
+    SIZES.forEach(size => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = size === "auto" ? "Auto" : size.replace("x", "×");
+      btn.setAttribute("aria-pressed", String(size === sizeKey(previewSize)));
+      if (size === defaultSize) btn.title = "This deck's default";
+      btn.addEventListener("click", () => setSize(size));
+      box.append(btn);
+    });
   }
 
   function slotFor(section) {
@@ -119,6 +149,7 @@
       const slot = slotFor(slide.dataset.section || "");
       slide.dataset.slot = slot;
       if (!slide.style.getPropertyValue("--accent")) slide.style.setProperty("--accent", `var(--a${slot})`);
+      if (!slide.querySelector(":scope > .slide-glow")) slide.insertAdjacentHTML("afterbegin", `<div class="slide-glow" aria-hidden="true"></div>`);
       if (!slide.querySelector(".slide-foot")) {
         const foot = document.createElement("div");
         foot.className = "slide-foot";
@@ -176,6 +207,7 @@
   }
 
   function show(n, { updateHash = true, stepMode = "start" } = {}) {
+    wake();
     const before = deck.active;
     deck.index = Math.max(0, Math.min(deck.visible.length - 1, n));
     const active = current();
@@ -277,7 +309,7 @@
 
   function openDialog(dialog, invoker) {
     if (!dialog.dataset.wired) {
-      dialog.dataset.wired = "";
+      dialog.dataset.wired = "1";
       dialog.addEventListener("close", () => {
         const target = dialog.returnFocusTo;
         dialog.returnFocusTo = null;
@@ -341,6 +373,7 @@
     notes: () => toggleNotes(),
     extras: toggleExtras,
     close: jumpToClose,
+    options: () => toggleOptions(),
     fullscreen: toggleFullscreen
   };
 
@@ -368,6 +401,8 @@
       }
       const closer = e.target.closest("dialog [data-close]");
       if (closer) closer.closest("dialog").close();
+      const panel = $("#deck-options");
+      if (!panel.hidden && (e.target.closest(".opt-list button") || !e.target.closest('#deck-options, [data-action="options"]'))) toggleOptions(false);
     });
 
     document.addEventListener("keydown", e => {
@@ -387,7 +422,9 @@
       else if (k === "n" || k === "N") { e.preventDefault(); toggleNotes(); }
       else if (k === "o" || k === "O" || k === "g" || k === "G") { e.preventDefault(); openOverview(); }
       else if (k === "c" || k === "C") { e.preventDefault(); jumpToClose(); }
+      else if (k === "Escape" && !$("#deck-options").hidden) { toggleOptions(false); }
       else if (k === "Escape" && $("#notes-panel").classList.contains("is-open")) { toggleNotes(false); }
+      else if (k === "r" || k === "R") { e.preventDefault(); cycleSize(); }
       else if (controlKeys.has(k.toLowerCase())) { e.preventDefault(); controlKeys.get(k.toLowerCase())(); }
     });
 
@@ -407,11 +444,46 @@
       touch = null;
       if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) (dx < 0 ? next : prev)();
     }, { passive: true });
+    document.addEventListener("touchcancel", () => { touch = null; }, { passive: true });
+
+    ["keydown", "pointerdown", "pointermove", "wheel", "touchstart"].forEach(type => document.addEventListener(type, wake, { passive: true, capture: true }));
+    if (IDLE_MS) setInterval(() => { if (!resting && Date.now() - lastInput > IDLE_MS) rest(); }, 5000);
 
     window.addEventListener("hashchange", () => {
       const target = slideFromHash();
       if (target && target !== current()) goTo(target, { updateHash: false });
     });
+  }
+
+  // Idle rest: with no input for a while, the active slide's looping motion pauses, so a deck left open drains nothing.
+  const IDLE_MS = Math.max(0, Number(CONFIG.idle ?? 90)) * 1000;
+  const restPaused = new Set();
+  let lastInput = Date.now(), resting = false;
+  function rest() {
+    resting = true;
+    document.documentElement.classList.add("is-resting");
+    current()?.querySelectorAll("svg").forEach(svg => { if (svg.animationsPaused && !svg.animationsPaused()) { svg.pauseAnimations(); restPaused.add(svg); } });
+  }
+  function wake() {
+    lastInput = Date.now();
+    if (!resting) return;
+    resting = false;
+    document.documentElement.classList.remove("is-resting");
+    restPaused.forEach(svg => svg.unpauseAnimations());
+    restPaused.clear();
+  }
+
+  function touchHint() {
+    if (!touchOnly || framed) return;
+    try { if (localStorage.getItem("deck-hint-seen")) return; localStorage.setItem("deck-hint-seen", "1"); } catch { /* private mode still gets the hint once per load */ }
+    const hint = document.createElement("div");
+    hint.className = "deck-hint";
+    hint.setAttribute("role", "status");
+    hint.textContent = "Swipe for the next slide · Slides lists them all";
+    document.body.append(hint);
+    const gone = () => { hint.classList.add("is-gone"); setTimeout(() => hint.remove(), 400); };
+    setTimeout(gone, 6000);
+    document.addEventListener("touchstart", gone, { once: true, passive: true });
   }
 
   let hosting = false;
@@ -423,8 +495,7 @@
     const url = new URL(location.href);
     url.searchParams.set("framed", "1");
     document.head.insertAdjacentHTML("beforeend", `<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}
-      .res-frame{position:fixed;left:50%;top:50%;border:0;transform-origin:center;background:#000}
-      .res-badge{position:fixed;left:10px;bottom:8px;font:500 12px/1 system-ui,sans-serif;color:#9aa0a6;opacity:.75}</style>`);
+      .res-frame{position:fixed;left:50%;top:50%;border:0;transform-origin:center;background:#000}</style>`);
     const frame = document.createElement("iframe");
     frame.className = "res-frame";
     frame.title = document.title;
@@ -433,10 +504,7 @@
     frame.allow = "fullscreen; autoplay; encrypted-media; picture-in-picture";
     frame.allowFullscreen = true;
     frame.src = url.href;
-    const badge = document.createElement("div");
-    badge.className = "res-badge";
-    badge.textContent = `${w}×${h} preview · R changes size`;
-    document.body.replaceChildren(frame, badge);
+    document.body.replaceChildren(frame);
     const root = document.documentElement;
     // Pinch-zooming a transform-scaled frame turns it black on iOS, so mobile browsers scale the page natively where they can (Safari stops at 0.25×).
     const meta = matchMedia("(pointer: coarse)").matches && document.querySelector('meta[name="viewport"]');
@@ -448,11 +516,9 @@
         if (deviceWidth / width >= 0.25) {
           setMeta(`width=${width}`);
           frame.style.transform = "translate(-50%,-50%)";
-          badge.style.fontSize = `${12 * width / deviceWidth}px`;
           return;
         }
         setMeta("width=device-width,initial-scale=1");
-        badge.style.fontSize = "";
       }
       frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`;
     };
@@ -463,8 +529,7 @@
     addEventListener("keydown", e => { if (e.key.toLowerCase() === "r") cycleSize(); else frame.contentWindow?.focus(); });
   }
 
-  function cycleSize() {
-    const next = SIZES[(SIZES.indexOf(sizeKey(previewSize)) + 1) % SIZES.length];
+  function setSize(next) {
     const url = new URL(location.href);
     url.searchParams.delete("framed");
     if (next === defaultSize) url.searchParams.delete("res");
@@ -472,13 +537,15 @@
     try { (framed ? window.top : window).location.href = url.href; } catch { location.href = url.href; }
   }
 
+  function cycleSize() { setSize(SIZES[(SIZES.indexOf(sizeKey(previewSize)) + 1) % SIZES.length]); }
+
   function start() {
     if (deck.started) return;
     deck.started = true;
     if (previewSize && !framed && window.top === window) { hostPreview(previewSize); return; }
     if (!$(".deck-nav")) document.body.insertAdjacentHTML("beforeend", CONTROLS);
     pendingControls.splice(0).forEach(mountControl);
-    control({ label: "Size", key: "r", action: cycleSize });
+    sizeButtons();
     decorate();
     deck.all.forEach(slide => emit("init", slide));
     deck.all.forEach(rise);
@@ -487,6 +554,7 @@
     refreshVisible(null, { updateHash: false });
     const entry = slideFromHash();
     if (entry) goTo(entry, { updateHash: false });
+    touchHint();
   }
 
   function use(plugin) {

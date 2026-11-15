@@ -81,7 +81,7 @@
   inset:2.2vh 1.4vw;border:1px solid rgba(255,255,255,.3);
   background:radial-gradient(120% 100% at 50% 40%,transparent 55%,rgba(0,10,40,.35));
 }
-.slide.is-active::before{animation:none}
+.slide-glow{display:none}
 .slide::after{
   -webkit-mask:none;mask:none;
   background-image:
