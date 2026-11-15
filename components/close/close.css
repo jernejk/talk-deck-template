@@ -8,10 +8,12 @@
 .close-socials a b{font-weight:500;font-size:.78em;color:var(--accent)}
 .close-socials a:hover{border-color:var(--accent)}
 .close-qr{position:relative;justify-self:center;display:flex;flex-direction:column;align-items:center;text-decoration:none;color:inherit}
-@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
-.qr-ring{position:relative;padding:5px;border-radius:30px;background:conic-gradient(from var(--a,0deg),var(--a1),var(--a6),var(--a4),var(--a2),var(--a3),var(--a1));box-shadow:0 30px 80px -20px color-mix(in srgb,var(--a1) calc(var(--shot-glow) * 1.2),transparent)}
-.slide.is-active .qr-ring{animation:spin-ring 6s linear infinite,qr-in .9s cubic-bezier(.34,1.56,.64,1) .2s both}
-@keyframes spin-ring{to{--a:360deg}}
+.qr-ring{position:relative;padding:5px;border-radius:30px;overflow:hidden;isolation:isolate;box-shadow:0 30px 80px -20px color-mix(in srgb,var(--a1) calc(var(--shot-glow) * 1.2),transparent)}
+/* The ring turns a gradient square behind the card, clipped by the ring's corners, so the compositor spins it without repainting. */
+.qr-ring::before{content:"";position:absolute;inset:-50%;z-index:-1;background:conic-gradient(var(--a1),var(--a6),var(--a4),var(--a2),var(--a3),var(--a1))}
+.slide.is-active .qr-ring{animation:qr-in .9s cubic-bezier(.34,1.56,.64,1) .2s both}
+.slide.is-active .qr-ring::before{animation:spin-ring 6s linear infinite}
+@keyframes spin-ring{to{transform:rotate(1turn)}}
 @keyframes qr-in{from{opacity:0;transform:scale(.7) rotate(-6deg)}to{opacity:1;transform:none}}
 .qr-card{display:block;padding:4.4vh;border-radius:26px;background:#fff}
 .qr-card img{display:block;width:min(21vw,40vh);height:auto;image-rendering:pixelated}
@@ -32,7 +34,7 @@
 .close-pet{left:6.5vw;bottom:5vh;--pw:7vw;z-index:3}
 
 @media (prefers-reduced-motion:reduce){
-  .close-title em,.slide.is-active .qr-ring,.slide.is-active .close-qr .mascot{animation:none!important}
+  .close-title em,.slide.is-active .qr-ring,.slide.is-active .qr-ring::before,.slide.is-active .close-qr .mascot{animation:none!important}
   .close-qr .mascot{opacity:1}
 }
 @media screen and (max-aspect-ratio:1/1){
