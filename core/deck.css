@@ -9,12 +9,12 @@ a{color:inherit}
   position:absolute;inset:0;isolation:isolate;
   padding:8vh 7vw 13vh;
   display:flex;flex-direction:column;justify-content:center;
-  opacity:0;pointer-events:none;
+  opacity:0;pointer-events:none;visibility:hidden;
   transform:translateY(-10px);
-  transition:opacity .32s ease,transform .32s ease;
+  transition:opacity .32s ease,transform .32s ease,visibility 0s linear .32s;
 }
 .slide:focus{outline:none}
-.slide.is-active{opacity:1;pointer-events:auto;transform:none}
+.slide.is-active{opacity:1;pointer-events:auto;transform:none;visibility:visible;transition:opacity .32s ease,transform .32s ease}
 .slide aside.notes{display:none}
 
 /* Type */
@@ -171,7 +171,7 @@ dialog.overlay::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(3px)}
 
 @media print{
   html,body{overflow:visible;height:auto}
-  .slide{position:relative;opacity:1;transform:none;break-after:page;height:100vh}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;break-after:page;height:100vh}
   .deck-nav,.progress,.notes-panel,.badge{display:none}
   [data-r],[data-step]{animation:none!important;opacity:1!important;transform:none!important}
 }
