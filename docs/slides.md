@@ -122,6 +122,7 @@ It warns, but still writes, when two neighbouring slides share a layout, when th
 | `log-trace` | table | An event log whose bad row is highlighted | log |
 | `matrix` | table | A feature matrix with yes, no and partial cells | compare, matrix |
 | `sourced-table` | table | A table of figures with the source of every number | compare, srcline |
+| `question-map` | columns | A two-by-two map of questions by effort and value, with the quick wins lit | qmap |
 | `milestones` | timeline | A horizontal timeline whose dots reveal one by one | milestones |
 | `how-its-made` | media | Numbered steps beside a fan of screenshots | fan, pipe, shot |
 | `code` | split | A code card with the line that matters highlighted | callout, code |

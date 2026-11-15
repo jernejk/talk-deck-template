@@ -235,6 +235,11 @@
     "summary": "A table of figures with the source of every number"
   },
   {
+    "name": "question-map",
+    "layout": "columns",
+    "summary": "A two-by-two map of questions by effort and value, with the quick wins lit"
+  },
+  {
     "name": "milestones",
     "layout": "timeline",
     "summary": "A horizontal timeline whose dots reveal one by one"
