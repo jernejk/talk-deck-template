@@ -164,7 +164,7 @@ Then run `npm run build`. It regenerates `components/components.css` and `compon
 
 ## Writing slides
 
-`AGENTS.md` is the authoring guide for people and coding agents: the rules, the slide anatomy and every `data-` attribute. For pictures and fonts, `docs/images.md` lists free sources, how to generate an image, and how to caption each kind. In short:
+`AGENTS.md` is the authoring guide for people and coding agents: the rules, the slide anatomy and every `data-` attribute. Coding agents that read `SKILL.md` folders also get one skill for each job in `skills/`: see "Agent skills" in [docs/guide.md](docs/guide.md#agent-skills). For pictures and fonts, `docs/images.md` lists free sources, how to generate an image, and how to caption each kind. In short:
 
 - One idea per slide: an eyebrow, then a title with one `<em>` on the payoff.
 - Captions say what's real (`<b>Real run</b>names hidden`) and notes say what's drawn.
@@ -213,6 +213,7 @@ slides/        slide patterns, index.json and sample assets
 templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
 tools/         build, new, add, outline, export, qa, lint, showcase, qr.swift (macOS QR generator that decodes what it writes)
+skills/        agent skills, one folder per job; .claude/skills and .agents/skills link here
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
 AGENTS.md      authoring guide; CLAUDE.md links here
 ```
