@@ -108,6 +108,7 @@ It warns, but still writes, when two neighbouring slides share a layout, when th
 | `youtube` | media | A YouTube video behind a local poster, loaded only when you press play | player |
 | `versus` | columns | A weak and a useful prompt side by side, with a verdict line | versus |
 | `pipeline` | flow | Stage cards with a marker that moves to the current stage | stages |
+| `motion` | flow | A small drawn diagram that moves: dots travel and orbit, a node pulses, lines draw in on Space | motion |
 | `agents` | columns | Agents working one task, their states and pets changing on Space | agents, pet |
 | `get-the-code` | split | A mid-talk QR to the repo, with the path and steps | pipe, qr |
 | `exercise` | split | A workshop task with three steps, a hint and a countdown timer | facts, timer |

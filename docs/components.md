@@ -27,7 +27,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 6. Use it in a slide pattern, new or existing (see docs/slides.md).
 7. Run `npm run build`, then `npm run qa`, and look at the catalog screenshots in every template.
 
-`components/cli/` is a compact worked example: tokens with fallbacks, `--rise`, a reduced-motion rule, a portrait rule, and a four-line plugin that numbers the lines so CSS can stream them in.
+`components/cli/` is a compact worked example: tokens with fallbacks, `--rise`, a reduced-motion rule, a portrait rule, and a four-line plugin that numbers the lines so CSS can stream them in. For animated diagrams and custom motion that starts and stops with its slide, see [motion.md](motion.md).
 
 ## Reference
 
@@ -65,6 +65,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `memo` | Transcript with annotated mistakes | `figure.memo > .label + .wave[data-n] + p > mark > i` | yes |
 | `milestones` | Horizontal timeline of dots | `ol.milestones > li > time + strong + span` (`--n` columns, `--c` per item, `.is-now`, `data-step`) | |
 | `mock` | Drawn app card with tiles | `.mock > .mock-title + .mock-sub + .tiles > .tile` (`--t`, `.is-hit`) | |
+| `motion` | Animated helpers for drawn SVG diagrams: strokes that draw in, a pulse, orbiting dots and dots that travel along a path; they stop off the slide and stand still with reduced motion. Recipes in [motion.md](motion.md) | `figure.motion > svg + figcaption > b` (`--w`, `--h`; `.mx-node`, `.mx-hub`, `.mx-line`); `path.mx-draw[pathLength="1"]` (`--t`, `--d`, on a step it draws when revealed); `.mx-pulse` (`--t`, `--d`, `--s`); `g.mx-orbit[transform] > circle` (`--r`, `--t`, `--i`); `g.mx-travel > path + circle` (`--t`, `--i`); `--c` colours any of them | yes |
 | `pet` | Pixel sprite in four poses; templates bring their own images, and the default is a drawn robot | `i.pet[data-pose="wave"]` (`coding`, `thinking`, `facepalm`), `.pet--corner`, `--pw`; `p.pet-say` speech bubble (`--tail`); `ol.pets > li > p.pet-say + i.pet + b + span` lineup; `"petWalk": true` in the config walks the pet along the progress bar | yes |
 | `phone` | Phone frame | `figure.phone > img` (`--ph`) | |
 | `pillars` | Numbered parts with colour rules | `.pillars > .pillar` (`--c`; `i`, `strong`, `span`) | |
