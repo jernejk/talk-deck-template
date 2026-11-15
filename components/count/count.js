@@ -8,10 +8,13 @@ Deck.use({
       const tick = now => {
         const t = Math.min(1, Math.max(0, (now - start) / 1100));
         el.textContent = Math.round(to * (1 - Math.pow(1 - t, 3)));
-        if (t < 1) requestAnimationFrame(tick);
+        if (t < 1) el._frame = requestAnimationFrame(tick);
       };
       el.textContent = 0;
-      requestAnimationFrame(tick);
+      el._frame = requestAnimationFrame(tick);
     });
+  },
+  leave(slide) {
+    slide.querySelectorAll("[data-count]").forEach(el => { cancelAnimationFrame(el._frame); el.textContent = el.dataset.count; });
   }
 });

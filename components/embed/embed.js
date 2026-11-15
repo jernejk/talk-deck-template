@@ -29,6 +29,17 @@ function area(fig) {
   return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: s.top + 8 * vh, bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
 }
 
+// data-logical renders the page that many CSS pixels wide and scales it in; two spare pixels hide the hairline a fractional scale leaves.
+const fitter = typeof ResizeObserver === "function" ? new ResizeObserver(entries => entries.forEach(e => fitLogical(e.target.closest(".embed")))) : null;
+function fitLogical(fig) {
+  const lw = Number(fig?.dataset.logical), view = fig?.querySelector(".embed-view"), frame = fig?.querySelector(".embed-frame");
+  if (!lw || !view || !frame) return;
+  const { width, height } = view.getBoundingClientRect();
+  if (!width) return;
+  const z = width / lw;
+  Object.assign(frame.style, { width: `${lw + 2}px`, height: `${Math.ceil(height / z) + 2}px`, transform: `scale(${z})`, transformOrigin: "0 0" });
+}
+
 function place(fig, r) {
   const op = fig.offsetParent || fig.closest(".slide");
   const o = op.getBoundingClientRect();
@@ -165,6 +176,7 @@ function setup(fig, slide, deck) {
   const bar = fig.querySelector(".embed-bar");
   const frame = fig.querySelector(".embed-frame");
   if (!bar || !frame || bar.querySelector(".embed-btn")) return;
+  if (fig.dataset.logical) { fitter?.observe(fig.querySelector(".embed-view")); fitLogical(fig); }
   fig.embedFallback = Boolean(fig.querySelector(".embed-shot"));
   frame.addEventListener("load", () => {
     if (frame.dataset.state === "loading") frame.dataset.state = "on";

@@ -153,11 +153,14 @@ Deck.use({
       const tick = now => {
         const t = Math.min(1, Math.max(0, (now - start) / 1100));
         el.textContent = Math.round(to * (1 - Math.pow(1 - t, 3)));
-        if (t < 1) requestAnimationFrame(tick);
+        if (t < 1) el._frame = requestAnimationFrame(tick);
       };
       el.textContent = 0;
-      requestAnimationFrame(tick);
+      el._frame = requestAnimationFrame(tick);
     });
+  },
+  leave(slide) {
+    slide.querySelectorAll("[data-count]").forEach(el => { cancelAnimationFrame(el._frame); el.textContent = el.dataset.count; });
   }
 });
 })();
@@ -207,6 +210,17 @@ function area(fig) {
   const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
   const root = document.documentElement, vw = root.clientWidth / 100, vh = root.clientHeight / 100;
   return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: s.top + 8 * vh, bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
+}
+
+// data-logical renders the page that many CSS pixels wide and scales it in; two spare pixels hide the hairline a fractional scale leaves.
+const fitter = typeof ResizeObserver === "function" ? new ResizeObserver(entries => entries.forEach(e => fitLogical(e.target.closest(".embed")))) : null;
+function fitLogical(fig) {
+  const lw = Number(fig?.dataset.logical), view = fig?.querySelector(".embed-view"), frame = fig?.querySelector(".embed-frame");
+  if (!lw || !view || !frame) return;
+  const { width, height } = view.getBoundingClientRect();
+  if (!width) return;
+  const z = width / lw;
+  Object.assign(frame.style, { width: `${lw + 2}px`, height: `${Math.ceil(height / z) + 2}px`, transform: `scale(${z})`, transformOrigin: "0 0" });
 }
 
 function place(fig, r) {
@@ -345,6 +359,7 @@ function setup(fig, slide, deck) {
   const bar = fig.querySelector(".embed-bar");
   const frame = fig.querySelector(".embed-frame");
   if (!bar || !frame || bar.querySelector(".embed-btn")) return;
+  if (fig.dataset.logical) { fitter?.observe(fig.querySelector(".embed-view")); fitLogical(fig); }
   fig.embedFallback = Boolean(fig.querySelector(".embed-shot"));
   frame.addEventListener("load", () => {
     if (frame.dataset.state === "loading") frame.dataset.state = "on";
@@ -1150,7 +1165,8 @@ function typeIn(root, deck) {
 Deck.use({
   name: "type",
   enter(slide, deck) { typeIn(slide, deck); },
-  step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); }
+  step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); },
+  leave(slide) { slide.querySelectorAll("[data-type]").forEach(el => clearTimeout(el._timer)); }
 });
 })();
 

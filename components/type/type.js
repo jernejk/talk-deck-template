@@ -21,5 +21,6 @@ function typeIn(root, deck) {
 Deck.use({
   name: "type",
   enter(slide, deck) { typeIn(slide, deck); },
-  step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); }
+  step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); },
+  leave(slide) { slide.querySelectorAll("[data-type]").forEach(el => clearTimeout(el._timer)); }
 });
