@@ -183,6 +183,7 @@ npm run qa -- examples/starter --sizes 1280x720,430x932 --motion
 npm run qa -- examples/starter --slides cover,3-5 --fast  # quick check of a few slides while you work
 npm run qa -- --changed                       # only what your uncommitted changes touch
 npm run qa -- --since upstream/main           # only what your branch changes
+npm run perf -- examples/starter              # idle CPU and stray animations per slide
 ```
 
 QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into `qa/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each QR code that has a link and checks it matches. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion.

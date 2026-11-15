@@ -62,6 +62,7 @@ An agent following `AGENTS.md` will:
 | `deck-media` | Add screenshots, generated images and live demos, with honest captions |
 | `deck-notes` | Write notes and clocks, add extras and update `PRESENTER.md` |
 | `deck-check` | Run QA and the lint, read the screenshots and pass the "done" list |
+| `deck-perf` | Find what makes a deck run hot or stutter, with `npm run perf` |
 | `deck-style` | Make a colourway or a template, and check contrast |
 | `deck-publish` | Export, inline, refresh the QR, and publish after you say yes |
 | `deck-library` | Change components, patterns and templates in this repo |
