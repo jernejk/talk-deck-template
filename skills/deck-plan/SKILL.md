@@ -7,7 +7,7 @@ description: Plan a new talk deck and build its first draft in this talk-deck re
 
 Use this skill to go from a topic to a deck with real titles, sections and clocks. Write the slide text after this, with `deck-slides` and `deck-notes`.
 
-Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else. A standalone deck has only `npm run qa`.
+Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else.
 
 ## Read first
 
@@ -17,7 +17,7 @@ Run the `npm run` commands from the template repo. `<deck>` is a deck folder in 
 
 ## Steps
 
-1. Get the facts from the user: audience, duration, the parts of the talk, the template, and the demos. Ask when one is missing.
+1. Get the facts from the user: the one idea the audience must leave with, the audience, the slot and the venue, the hook, the parts of the talk, the template and the demos. Ask once for what only the presenter has: real numbers, stories, photos, logos and their current title (`deck-coach`). Shape the arc with `deck-story` before you write the outline.
 2. Write the outline as JSON. Give each slide a `pattern`, a `title` (`*…*` marks the `<em>`), a `section`, `minutes` and, if you need it, an `id`.
 3. Use a different layout on neighbouring slides. `docs/agent-index.md` gives the layout of each pattern.
 4. Make the deck folder. Use a temporary pattern list, because `outline` replaces it:
@@ -40,4 +40,4 @@ For more than about 12 slides, fix the shared inputs first, then give one agent 
 - `npm run outline -- <deck> outline.json --dry-run` gives no warnings that you did not accept.
 - Each slide has a title, a section and a clock, and the clocks fit `duration`.
 - `npm run lint -- <deck>` shows no `layout-variety` warnings.
-- Then use `deck-slides` for the slide text, and `deck-check` before you call the deck done.
+- Then use `deck-slides` for the slide text, `deck-coach` to show the draft, and `deck-check` before you call the deck done.

@@ -5,7 +5,7 @@ description: Find and fix what makes a talk deck run hot, drain a phone's batter
 
 # Diagnose deck performance
 
-Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else. A standalone deck runs `npm run perf` on its own `site/`.
+In the template repo, run the `npm run` commands from the repo root. `<deck>` is a deck folder in `examples/` or anywhere else. In a standalone deck, run them in the deck folder and leave out `<deck>`: it has `qa`, `perf`, `lint`, `inline` and `route`. `add`, `new`, `outline` and `export` need the template repo.
 
 ## Read first
 

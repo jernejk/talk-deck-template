@@ -5,7 +5,7 @@ description: Put screenshots, photos, videos, generated images and live demos in
 
 # Screenshots, images and live demos
 
-Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else. A standalone deck has only `npm run qa`.
+In the template repo, run the `npm run` commands from the repo root. `<deck>` is a deck folder in `examples/` or anywhere else. In a standalone deck, run them in the deck folder and leave out `<deck>`: it has `qa`, `perf`, `lint`, `inline` and `route`. `add`, `new`, `outline` and `export` need the template repo.
 
 ## Read first
 

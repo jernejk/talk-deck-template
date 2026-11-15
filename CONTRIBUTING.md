@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping. Issues and pull requests are welcome: bugs, new slide patterns, components and templates.
+Thanks for helping. Issues and pull requests are welcome: bugs, new slide patterns, components and templates. Maintainers: see `MAINTAINING.md` for reviewing, merging and device testing.
 
 ## Set up
 

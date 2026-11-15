@@ -94,7 +94,7 @@ npm run new -- ~/talks/my-talk --template community-codex \
   --url https://my-talk.surge.sh
 ```
 
-Outside this repo, `new` makes a self-contained folder: `site/` is the deck you publish, with the engine, components and templates copied into `site/lib/`. It also writes `PRESENTER.md`, `AGENTS.md` and its own tooling: `npm run qa`, `lint`, `inline` and `route`, which need no deck path there. Inside `examples/`, the deck links the shared library instead. In `--title`, `|` starts a new cover line and `*…*` marks the accent. Without `--slides`, the deck gets the template's default slide list.
+Outside this repo, `new` makes a self-contained folder: `site/` is the deck you publish, with the engine, components and templates copied into `site/lib/`. It also writes `PRESENTER.md`, `AGENTS.md`, the deck agent skills and its own tooling: `npm run qa`, `perf`, `lint`, `inline` and `route`, which need no deck path there. `npm run upgrade` brings a standalone deck up to date with this repo later. Inside `examples/`, the deck links the shared library instead. In `--title`, `|` starts a new cover line and `*…*` marks the accent. Without `--slides`, the deck gets the template's default slide list.
 
 | Task | Command |
 |---|---|
@@ -102,6 +102,7 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | Add one to a deck | `npm run add -- ~/talks/my-talk numbers` (or `--before <id>`, `--after <id>`) |
 | Build the slides from an outline | `npm run outline -- ~/talks/my-talk outline.json --force` (or `--dry-run`; see `docs/slides.md`) |
 | Make an example standalone | `npm run export -- examples/codex-lightning ~/talks/codex` |
+| Bring a standalone deck up to date | `npm run upgrade -- ~/talks/my-talk` (lists the changes; `--write` applies them) |
 | One offline HTML file to email or put on a USB stick | `npm run inline -- examples/codex-lightning` (writes `standalone.html` next to `index.html`) |
 | Refresh the PRESENTER.md route table after editing slides | `npm run route -- examples/my-talk` (`--check` only reports) |
 | Check a deck | `cd ~/talks/my-talk && npm install && npm run qa` |
@@ -229,10 +230,11 @@ components/    one folder per component; components.css and components.js are ge
 slides/        slide patterns, index.json and sample assets
 templates/     one folder per style: theme.css, template.json, optional assets/
 examples/      example decks, catalog/ (generated) and index.html (generated gallery)
-tools/         build, new, add, outline, export, qa, lint, showcase, qr.swift (macOS QR generator that decodes what it writes)
+tools/         build, new, add, outline, export, upgrade, qa, lint, perf, inline, route, showcase, qr.swift (macOS QR generator that decodes what it writes)
 skills/        agent skills, one folder per job; .claude/skills and .agents/skills link here
 docs/          guide.md, images.md, styles.md, components.md, slides.md, presenter.md, showcase/ (generated pictures)
 AGENTS.md      authoring guide; CLAUDE.md links here
+MAINTAINING.md reviewing, merging, device testing and harvesting from decks
 ```
 
 ## Licence and credits

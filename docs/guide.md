@@ -57,17 +57,21 @@ An agent following `AGENTS.md` will:
 
 | Skill | Use it to |
 |---|---|
+| `deck-story` | Shape the story: the one idea, the arc from hook to close, bridges, show-not-tell. `arc.md` is a worked example |
+| `deck-coach` | Work with the presenter: what to ask first, how to show a draft, feedback rounds, versions |
 | `deck-plan` | Plan a talk and build the first draft from an outline. `fanout.md` splits a long deck across agents |
 | `deck-slides` | Add, change and reorder slides, and pick patterns |
 | `deck-media` | Add screenshots, generated images and live demos, with honest captions |
+| `deck-demo` | Build demos that always work: live, recorded, replayed, drawn or simulated |
 | `deck-notes` | Write notes and clocks, add extras and update `PRESENTER.md` |
 | `deck-check` | Run QA and the lint, read the screenshots and pass the "done" list |
 | `deck-perf` | Find what makes a deck run hot or stutter, with `npm run perf` |
 | `deck-style` | Make a colourway or a template, and check contrast |
 | `deck-publish` | Export, inline, refresh the QR, and publish after you say yes |
 | `deck-library` | Change components, patterns and templates in this repo |
+| `deck-harvest` | Bring widgets and fixes from a finished deck back into the library |
 
-`.claude/skills` (Claude Code) and `.agents/skills` (Codex and other agents that read `SKILL.md` folders) are links to `skills/`, so the agents find the skills when they open this repo. On Windows, git checks out a link as a small text file unless symlinks are on (`git config core.symlinks true`, which needs Developer Mode). If they are off, copy `skills/` to the folder your agent reads. The skills are plain Markdown: delete `skills/`, `.claude/` and `.agents/` if you do not want them.
+`.claude/skills` (Claude Code) and `.agents/skills` (Codex and other agents that read `SKILL.md` folders) are links to `skills/`, so the agents find the skills when they open this repo. A standalone deck from `npm run new` or `npm run export` gets its own copy of the deck skills (`deck-story`, `deck-coach`, `deck-demo`, `deck-slides`, `deck-media`, `deck-notes`, `deck-check`, `deck-perf` and `deck-publish`) with the same links. `npm run upgrade -- <deck>` refreshes them, with the library and the tools. On Windows, git checks out a link as a small text file unless symlinks are on (`git config core.symlinks true`, which needs Developer Mode). If they are off, copy `skills/` to the folder your agent reads. The skills are plain Markdown: delete `skills/`, `.claude/` and `.agents/` if you do not want them.
 
 ## Make it yours
 

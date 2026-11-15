@@ -52,16 +52,30 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 The `#deck-config` block in the head sets `title`, footer `brand` and `sections`, which map section names to slots 1–6 (0 is muted). Unlisted sections cycle through slots 1–5, the ones with a ghost shape. Optional keys: `agenda`, the parts (`section`, `title`, `note`, `time`) behind agenda lists and footer dots, which otherwise come from the sections in slide order; `"agendaDots": false` to hide the dots; `duration` (`"15:00"`) for the rehearsal timer; `"petWalk": true` to walk the template's pet along the progress bar; and `resolution` (`"1920x1080"`, `"16:9"` or `"auto"`, the default) to show the deck at that size, letterboxed, wherever there's a mouse or trackpad (phones keep the native layout); `?res=` in the URL overrides it. The close slide's id must be `close`; C jumps to it.
 
 To pick patterns, read `docs/agent-index.md` first: one line for each pattern and component, grouped by layout. Component classes and options are in `docs/components.md`, slide patterns in `docs/slides.md`, and template tokens in `docs/styles.md`. The catalog (`examples/catalog/index.html`) shows every pattern, and its notes say how each works. For pictures, open `docs/showcase/`: every pattern in a mix of templates, six example talks and six colourways, labelled pattern · template.
-<!-- repo-only -->
 
-Agent skills in `skills/` give the steps and commands for each job, from planning a deck to publishing it. See "Agent skills" in `docs/guide.md`.
-<!-- /repo-only -->
+Agent skills in `skills/` give the steps for each job, from shaping the story to publishing the deck. `.claude/skills` and `.agents/skills` link to them. See "Agent skills" in `docs/guide.md`.
+
+## Telling the story
+
+- Know the one idea the audience must leave with. Each main slide serves it; the rest become presenter extras.
+- Open with the most surprising real thing you have: a clip, a number, or a joke on yourself. Not the agenda.
+- Show the problem before the fix. Show more than you tell: a picture, a drawn app or one big number beats a paragraph.
+- End each slide's notes with the line that leads into the next slide.
+- Make it readable from the back row: big content, little text, checked at the projector size.
+- Close with one action, a way to take it (a link or QR), and a bonus for after questions.
+
+## Working with the presenter
+
+- Before you build, ask once for what only the presenter has: real numbers and stories, photos, logos, their current title, the venue and the slot. List what is still missing in PRESENTER.md, not in the notes.
+- Hand over a whole draft that you checked yourself, with the contact sheet and the open questions. The presenter must not be the first to see a cut-off title or a clashing logo.
+- Do every point of their feedback, and write each decision in PRESENTER.md so that later agents keep it.
 
 ## Changing a deck
 
 - Add a reusable slide with `npm run add -- <deck> <pattern>` from the template repo rather than hand-copying; it keeps ids unique and copies assets.
 - After editing notes or timings, run `npm run route -- <deck folder>` to refresh the route table in PRESENTER.md.
 - If a deck runs hot, drains a phone or stutters, run `npm run perf` and follow `docs/performance.md`.
+- A standalone deck keeps the library it was made with. To take later fixes, run `npm run upgrade -- <path to the deck>` from the template repo; it lists the changes before `--write` applies them.
 
 <!-- repo-only -->
 ## Changing the library

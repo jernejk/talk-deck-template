@@ -7,7 +7,7 @@ description: Get a talk deck from this repo ready to share, and publish it only 
 
 Ask the user before you upload anything. A publish puts the slides and the notes on the public web. Get a clear "yes" for each upload. Get the host and the URL from the user.
 
-Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else. A standalone deck has only `npm run qa`.
+In the template repo, run the `npm run` commands from the repo root. `<deck>` is a deck folder in `examples/` or anywhere else. In a standalone deck, run them in the deck folder and leave out `<deck>`: it has `qa`, `perf`, `lint`, `inline` and `route`. `add`, `new`, `outline` and `export` need the template repo.
 
 ## Read first
 

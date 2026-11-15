@@ -5,7 +5,7 @@ description: Check a talk deck from this repo before you call it done. Use when 
 
 # Check a deck
 
-Run the `npm run` commands from the template repo. `<deck>` is a deck folder in `examples/` or anywhere else. A standalone deck has only `npm run qa`.
+In the template repo, run the `npm run` commands from the repo root. `<deck>` is a deck folder in `examples/` or anywhere else. In a standalone deck, run them in the deck folder and leave out `<deck>`: it has `qa`, `perf`, `lint`, `inline` and `route`. `add`, `new`, `outline` and `export` need the template repo.
 
 ## Read first
 
@@ -33,10 +33,15 @@ npm run lint -- <deck>
 4. Read each item under `warnings`. Fix it, or know why it stays. The check ids are `clock-order`, `live-cap`, `one-em`, `curly-quotes`, `private-data`, `drawn-disclosure`, `fixed-colour` and `layout-variety`.
 5. Read the screenshots in `qa/<deck>/<template>/<size>/` of each slide you changed, in each template you ship. `qa/<deck>/<template>/sheet-<size>.png` shows the full deck on one image.
 6. QA finds layout bugs, not ugly slides. In each screenshot, look for:
-   - text that is too small, or a title on three lines;
+   - text that is too small for the back row, or a title on three lines;
+   - content cut off at an edge, or too close to the footer;
+   - items that do not line up;
    - two neighbouring slides that look the same;
+   - a logo that is wrong, out of date, or clashes with its background;
+   - a photo or drawing of a person that they would not like;
    - a caption without a label, or a crop that shows something private;
    - colours that are hard to read.
+   Fix these before the presenter sees the deck. They must not be the first to find them.
 7. Fix, then run step 1 again.
 
 ## Done when
