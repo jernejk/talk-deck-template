@@ -18,6 +18,8 @@ export const LAYOUTS = {
   flow: "Stages joined by arrows or lines, left to right"
 };
 
+// Components the build cannot spot by class name alone: how it tells that some HTML uses them. qa --changed reads it too.
+export const USED_BY = { count: /data-count=/, type: /data-type=/, ghost: /./, rehearse: /./, tune: /./, cover: /slide--cover/, about: /slide--about/, close: /slide--close/, mascots: /class="mascot\b/, titles: /title--(stack|xl|center|kicker|number)\b/, covers: /cover--(image|photo|center)\b/, presenter: /slide--presenter|presenter-team/ };
 export const exists = path => access(path).then(() => true, () => false);
 export const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const inside = (path, root) => path === root || path.startsWith(root + sep);
