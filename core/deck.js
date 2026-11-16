@@ -236,7 +236,11 @@
       if (before) emit("leave", before);
       emit("enter", active);
     }
-    if (updateHash && active.id) history.replaceState(null, "", "#" + active.id);
+    if (updateHash && active.id) {
+      history.replaceState(null, "", "#" + active.id);
+      // The preview host is the page a reload restores, so it carries the slide too.
+      if (framed) try { if (window.parent.Deck) window.parent.history.replaceState(null, "", "#" + active.id); } catch {}
+    }
   }
 
   function next() {
@@ -506,24 +510,22 @@
     frame.src = url.href;
     document.body.replaceChildren(frame);
     const root = document.documentElement;
-    // Pinch-zooming a transform-scaled frame turns it black on iOS, so mobile browsers scale the page natively where they can (Safari stops at 0.25×).
+    // A transform-scaled frame goes black or crashes the tab when pinch-zoomed on iOS, so touch browsers scale natively; an explicit minimum-scale passes Safari's 0.25× floor.
     const meta = matchMedia("(pointer: coarse)").matches && document.querySelector('meta[name="viewport"]');
     const setMeta = content => { if (meta.content !== content) meta.content = content; };
     const fit = () => {
       if (meta) {
-        const vv = visualViewport, deviceWidth = vv.width * vv.scale;
-        const width = Math.max(w, Math.ceil(h * vv.width / vv.height));
-        if (deviceWidth / width >= 0.25) {
-          setMeta(`width=${width}`);
-          frame.style.transform = "translate(-50%,-50%)";
-          return;
-        }
-        setMeta("width=device-width,initial-scale=1");
+        const vv = visualViewport;
+        const width = Math.max(w, Math.ceil(h * vv.width / vv.height)), fitScale = Math.floor(vv.width * vv.scale / width * 1000) / 1000;
+        setMeta(`width=${width},minimum-scale=${fitScale},initial-scale=${fitScale}`);
+        frame.style.transform = "translate(-50%,-50%)";
+        return;
       }
       frame.style.transform = `translate(-50%,-50%) scale(${Math.min(root.clientWidth / w, root.clientHeight / h)})`;
     };
     fit();
     addEventListener("resize", fit);
+    addEventListener("hashchange", () => { try { frame.contentWindow.location.hash = location.hash; } catch {} });
     frame.addEventListener("load", () => frame.contentWindow?.focus());
     document.addEventListener("pointerdown", () => frame.contentWindow?.focus());
     addEventListener("keydown", e => { if (e.key.toLowerCase() === "r") cycleSize(); else frame.contentWindow?.focus(); });
