@@ -1,9 +1,12 @@
-// Content lint: checks a deck's HTML against the authoring rules in AGENTS.md. Findings are warnings; they never fail QA.
-// No imports from the rest of tools/, so a standalone deck can carry this file next to qa.mjs.
+// Content lint is advisory by default. --baseline opts into a scoped no-new-warning contract.
 import { chromium } from "playwright";
-import { access, readdir, readFile } from "node:fs/promises";
+import { access, readdir, readFile, realpath } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
+import { selectSlides, slideSections } from "./qa-scope.mjs";
+import { acquireResourceLock } from "./qa-lock.mjs";
+import { atomicJSON } from "./qa-receipt.mjs";
 
 export const CHECKS = {
   "clock-order": "Notes clocks run in talk order: each main slide's window starts at or after the previous one ends",
@@ -111,44 +114,81 @@ function check([html, catalog]) {
 // Lints one deck's HTML. Pass a browser to reuse it (qa does); otherwise this launches its own.
 export async function lint(html, { browser, catalog = false } = {}) {
   const own = !browser;
-  browser ||= await chromium.launch();
+  const release = own ? await acquireResourceLock({ kind: "qa", slots: 1 }) : null;
   try {
+    browser ||= await chromium.launch();
     const page = await browser.newPage();
-    const found = await page.evaluate(check, [html, catalog]);
-    await page.close();
-    return found;
+    try { return await page.evaluate(check, [html, catalog]); }
+    finally { await page.close(); }
   } finally {
-    if (own) await browser.close();
+    if (own) { await browser?.close(); await release?.(); }
   }
+}
+
+export function lintRecords(value) {
+  if (!Array.isArray(value.lint)) throw new Error("Expected a saved lint report or QA receipt with lint coverage.");
+  return value.lint;
+}
+
+export function compareLint(baseline, current, { slides = new Map(), checks = Object.keys(CHECKS) } = {}) {
+  for (const check of checks) if (!CHECKS[check]) throw new Error(`Unknown lint check: ${check}`);
+  for (const record of current) {
+    const selected = checks.some(c => ["clock-order", "layout-variety"].includes(c)) ? record.slideIds : slides.get(record.index) ?? record.slideIds;
+    const previous = baseline.find(b => b.index === record.index);
+    if (!previous || selected.some(id => !previous.slideIds.includes(id))) throw new Error(`Lint baseline has no coverage for ${record.index}: ${selected.join(", ")}.`);
+  }
+  const key = w => JSON.stringify([w.slide, w.check, w.message]);
+  return current.flatMap(record => {
+    const selected = slides.get(record.index) ?? record.slideIds;
+    const old = new Set(baseline.find(b => b.index === record.index).findings.map(key));
+    return record.findings.filter(w => (w.slide === null || selected.includes(w.slide) || ["clock-order", "layout-variety"].includes(w.check)) && checks.includes(w.check) && !old.has(key(w))).map(w => ({ index: record.index, ...w }));
+  });
 }
 
 const exists = path => access(path).then(() => true, () => false);
 
 async function deckIndex(path) {
   const abs = resolve(path);
-  if (abs.endsWith(".html")) return abs;
-  for (const candidate of [join(abs, "index.html"), join(abs, "site/index.html")]) if (await exists(candidate)) return candidate;
+  if (abs.endsWith(".html")) return realpath(abs);
+  for (const candidate of [join(abs, "index.html"), join(abs, "site/index.html")]) if (await exists(candidate)) return realpath(candidate);
   throw new Error(`No deck at ${path}: expected index.html or site/index.html.`);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && await realpath(process.argv[1]) === await realpath(fileURLToPath(import.meta.url))) {
+  try {
   const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-  let paths = process.argv.slice(2);
+  const { values: opt, positionals } = parseArgs({ allowPositionals: true, options: {
+    slides: { type: "string" }, baseline: { type: "string" }, checks: { type: "string" }, out: { type: "string" }
+  } });
+  let paths = [...positionals];
   if (!paths.length) {
     if (await exists(join(ROOT, "examples"))) {
       for (const dir of (await readdir(join(ROOT, "examples"))).sort()) if (await exists(join(ROOT, "examples", dir, "index.html"))) paths.push(join(ROOT, "examples", dir));
     } else paths = [ROOT];
   }
-  const browser = await chromium.launch();
-  const decks = {}, warnings = [];
-  for (const p of paths) {
-    const index = await deckIndex(p);
-    const name = basename(dirname(index)) === "site" ? basename(dirname(dirname(index))) : basename(dirname(index));
-    const found = await lint(await readFile(index, "utf8"), { browser, catalog: basename(dirname(index)) === "catalog" });
-    decks[name] = found.length;
-    warnings.push(...found.map(({ slide, check, message }) => ({ where: slide ? `${name} #${slide}` : name, check, message })));
+  const release = await acquireResourceLock({ kind: "qa", slots: 1 });
+  let browser;
+  try {
+    browser = await chromium.launch();
+    const decks = {}, warnings = [], records = [], selected = new Map();
+    for (const p of paths) {
+      const index = await deckIndex(p);
+      const name = basename(dirname(index)) === "site" ? basename(dirname(dirname(index))) : basename(dirname(index));
+      const html = await readFile(index, "utf8"), slideIds = slideSections(html).map(s => s.id);
+      selected.set(index, selectSlides(slideIds, opt.slides));
+      const found = await lint(html, { browser, catalog: basename(dirname(index)) === "catalog" });
+      records.push({ index, slideIds, findings: found });
+      decks[name] = found.length;
+      warnings.push(...found.map(({ slide, check, message }) => ({ where: slide ? `${name} #${slide}` : name, check, message })));
+    }
+    const added = opt.baseline ? compareLint(lintRecords(JSON.parse(await readFile(resolve(opt.baseline), "utf8"))), records, { slides: selected, checks: opt.checks?.split(",") }) : [];
+    const result = { schema: "talk-deck-lint/v1", decks, warnings, lint: records, newWarnings: added, advisory: !opt.baseline };
+    if (opt.out) await atomicJSON(resolve(opt.out), result);
+    console.log(JSON.stringify(result, null, 1));
+    process.exitCode = added.length ? 1 : 0;
+  } finally { await browser?.close(); await release(); }
+  } catch (e) {
+    console.log(JSON.stringify({ schema: "talk-deck-lint/v1", problems: [{ where: "lint", errors: [e.message] }], warnings: [] }));
+    process.exitCode = 1;
   }
-  await browser.close();
-  // Warnings only for now, so the exit code stays 0.
-  console.log(JSON.stringify({ decks, warnings }, null, 1));
 }

@@ -37,6 +37,7 @@ function buildVideo(fig, slide) {
   stage.lastChild.append(toggle, seek, time, mute);
 
   let started = false;
+  let seekOnMetadata = false;
   let scrubbing = false;
   let raf = 0;
 
@@ -74,6 +75,7 @@ function buildVideo(fig, slide) {
   }
 
   function play() {
+    if (v.readyState < 1) seekOnMetadata = true;
     if (v.currentTime >= endAt() - 0.05 || v.currentTime < start - 0.05) v.currentTime = start;
     v.play().catch(swallow);
   }
@@ -84,6 +86,7 @@ function buildVideo(fig, slide) {
     reset() {
       v.pause();
       started = false;
+      seekOnMetadata = v.readyState < 1;
       v.currentTime = start;
       paint();
     }
@@ -92,7 +95,11 @@ function buildVideo(fig, slide) {
 
   v.addEventListener("play", () => { started = true; if (!raf) raf = requestAnimationFrame(tick); paint(); });
   ["pause", "ended", "seeked", "volumechange", "durationchange"].forEach(t => v.addEventListener(t, paint));
-  v.addEventListener("loadedmetadata", () => { if (!started) v.currentTime = start; paint(); });
+  v.addEventListener("loadedmetadata", () => {
+    if (!started || seekOnMetadata) v.currentTime = start;
+    seekOnMetadata = false;
+    paint();
+  });
   v.addEventListener("ended", finish);
   v.addEventListener("click", () => v.paused ? play() : v.pause());
   big.addEventListener("click", play);

@@ -7,7 +7,7 @@
 .slot.is-now time{color:var(--c)}
 .slot.is-now time::after{content:" · now";font-weight:700}
 
-@media screen and (max-aspect-ratio:1/1){
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   .schedule{grid-template-columns:1fr;gap:1.6vh;max-width:none}
   .slot{padding:1.6vh 4vw}
 }

@@ -54,7 +54,7 @@ Arrow keys, Space or PageDown move forward, including step reveals. Left or Page
 
 ## Before the talk
 
-1. Open the live deck once so it's cached. It is self-contained and also runs offline from its `index.html`.
+1. Keep the complete exported deck and assets locally, then walk through every demo with the network disabled, including cold video playback and reverse steps. Opening the cover does not cache lazy clips or embeds. Rehearse native portrait → landscape → portrait on a phone; verify the local fallbacks when a live app is unavailable.
 2. Reset every live demo to a known state, and write the reset command here.
 3. Check the usage limits of anything you'll call live, and stop rehearsing it in the hour before your slot.
 4. Turn on Do Not Disturb, check projector readability and keep the screenshots folder open.

@@ -97,3 +97,7 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 | `versus` | Two panels, such as a weak and a useful prompt | `.versus > .versus-panel × 2` (`.versus-chip`, `.versus-body` with `mark`, optional `.versus-verdict > b`) | |
 | `video` | Muted clip that plays while its slide is open | `figure.video > video` (`--h`) | yes |
 | `zoom` | Screenshot that zooms to regions on Space, with captions that light up | `figure.zoom > .zoom-frame > img` (`--ar` frame ratio, default 16/10; keep it equal to the image's) beside `ol.zoom-steps > li[data-step][data-zoom="x% y% scale"]`; one per slide | yes |
+
+## Interactive workshop regions
+
+Put `data-deck-interactive` on a custom editor or control container to keep its keyboard and touch gestures inside the demo. Use only the interactive subtree, not the slide. Native form fields, editable content and media controls already own their input. Click or Tab outside to return slide keys and PageDown/PageUp clickers to the deck. Plain muted clips without controls still allow slide swipes.

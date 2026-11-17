@@ -18,7 +18,7 @@
 @media (prefers-reduced-motion:reduce){
   .slide.is-active .about-portrait{animation:none!important}
 }
-@media screen and (max-aspect-ratio:1/1){
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   .slide--about{overflow-y:auto}
   .about-panel{width:92%;padding:7vh 6vw 4vh;height:auto}
   .about-portrait{position:static;width:auto;transform:none;margin:0 6vw 6vh}

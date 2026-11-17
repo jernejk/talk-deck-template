@@ -1,9 +1,10 @@
+const typedIn = root => root.matches?.("[data-type]") ? [root] : [...root.querySelectorAll("[data-type]")];
+
 function typeIn(root, deck) {
-  const targets = root.matches?.("[data-type]") ? [root] : root.querySelectorAll("[data-type]");
-  targets.forEach(el => {
+  typedIn(root).forEach(el => {
     const text = el.dataset.type;
     clearTimeout(el._timer);
-    el.classList.remove("is-typed");
+    el.classList.remove("is-typed", "is-typing");
     if (el.closest("[data-step]:not(.is-shown)")) { el.textContent = ""; return; }
     if (deck.reducedMotion()) { el.textContent = text; el.classList.add("is-typed"); return; }
     el.textContent = "";
@@ -18,9 +19,14 @@ function typeIn(root, deck) {
   });
 }
 
+function stopType(root) {
+  typedIn(root).forEach(el => { clearTimeout(el._timer); el.classList.remove("is-typing"); });
+}
+
 Deck.use({
   name: "type",
   enter(slide, deck) { typeIn(slide, deck); },
   step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); },
-  leave(slide) { slide.querySelectorAll("[data-type]").forEach(el => clearTimeout(el._timer)); }
+  unstep(els) { els.forEach(stopType); },
+  leave(slide) { stopType(slide); }
 });

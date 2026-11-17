@@ -5,3 +5,4 @@ qa/
 .env.*
 *.log
 standalone.html
+PENDING.json

@@ -1,11 +1,15 @@
-import { chromium } from "playwright";
+import { chromium, webkit } from "playwright";
 import { createServer } from "node:http";
-import { access, mkdir, readdir, readFile } from "node:fs/promises";
+import { access, mkdir, readdir, readFile, realpath } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
+import { selectSlides, slideSections } from "./qa-scope.mjs";
+import { acquireOutputLock, acquireResourceLock } from "./qa-lock.mjs";
+import { artifact, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
+import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const { values: opt, positionals } = parseArgs({
@@ -20,11 +24,14 @@ const { values: opt, positionals } = parseArgs({
     slides: { type: "string" },
     fast: { type: "boolean", default: false },
     changed: { type: "boolean", default: false },
-    since: { type: "string" }
+    since: { type: "string" },
+    status: { type: "boolean", default: false },
+    "lint-baseline": { type: "string" },
+    "lint-checks": { type: "string" }
   }
 });
 const jobs = Number(opt.jobs);
-if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number from 1 up, not "${opt.jobs}".`);
+if (!Number.isInteger(jobs) || jobs < 1 || jobs > 4) throw new Error(`--jobs must be a whole number from 1 to 4, not "${opt.jobs}".`);
 
 const exists = path => access(path).then(() => true, () => false);
 const repoMode = await exists(join(ROOT, "examples")) && await exists(join(ROOT, "core/deck.js"));
@@ -34,8 +41,8 @@ const serveRoot = repoMode ? ROOT : join(ROOT, "site");
 const templatesDir = repoMode ? join(ROOT, "templates") : join(ROOT, "site/lib/templates");
 const sizeList = opt.fast ? opt.sizes.split(",").slice(0, 1) : opt.sizes.split(",");
 const sizes = sizeList.map(s => s.split("x").map(Number));
-const picks = opt.slides?.split(",").map(s => s.trim()).filter(Boolean);
-const picked = (pick, id, n) => pick === id || (/^\d+(-\d+)?$/.test(pick) && n >= +pick.split("-")[0] && n <= +(pick.split("-")[1] ?? pick));
+if (sizeList.some(s => !/^\d+x\d+$/.test(s)) || sizes.some(s => s.some(n => !Number.isInteger(n) || n < 100 || n > 10000)) || new Set(sizeList).size !== sizeList.length) throw new Error("--sizes needs unique WIDTHxHEIGHT pairs between 100 and 10000 pixels.");
+const picks = opt.slides?.split(",").map(s => s.trim());
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp", ".jpg": "image/jpeg", ".gif": "image/gif", ".json": "application/json", ".mp4": "video/mp4", ".webm": "video/webm", ".woff2": "font/woff2", ".ttf": "font/ttf" };
 const CHECKED = ".title,.ask,.sub,.hint,.callout,.quote,.bubbles,.memo,.shot,.phone,.tilt,.fan,.stage,.flow,.composer,.mock,.threads,.scores,.pillars,.pipe,.facts,.tags,.chips,.legend,.stats,.counters,.recipe,.ladder,.timeline,.ledger,.compare,.cols,.sticker,.about-panel,.about-portrait,.close-text,.close-qr,.cli,.code,.chapter,.bleed-text,.video,.agenda,.cover-panel,.cover-side,.cover-frame,.cover-links,.presenter-panel,.presenter-side,.presenter-team,.presenter-facts,.stages,.versus,.findings,.log,.kpis,.matrix,.milestones,.strip,.schedule,.qr,.pets,.pet-say,.agents,.embed,.fold,.player,.diff,.zoom,.timer";
 const problems = [];
@@ -124,8 +131,8 @@ async function allThemes() {
 
 async function deckIndex(path) {
   const abs = resolve(path);
-  if (abs.endsWith(".html")) return abs;
-  for (const candidate of [join(abs, "index.html"), join(abs, "site/index.html")]) if (await exists(candidate)) return candidate;
+  if (abs.endsWith(".html")) return realpath(abs);
+  for (const candidate of [join(abs, "index.html"), join(abs, "site/index.html")]) if (await exists(candidate)) return realpath(candidate);
   throw new Error(`No deck at ${path}: expected index.html or site/index.html.`);
 }
 
@@ -148,27 +155,57 @@ async function decks() {
     const themes = want ? (want.themes.has("*") ? await allThemes() : [...new Set([...want.themes].map(t => t === "own" ? own : t))])
       : opt.theme === "all" || (!opt.theme && isCatalog) ? await allThemes() : opt.theme ? opt.theme.split(",") : [own];
     const name = basename(dirname(index)) === "site" ? basename(dirname(dirname(index))) : basename(dirname(index));
-    out.push({ index, name, path: relative(serveRoot, index).split(sep).join("/"), themes, picks: want ? want.slides ?? undefined : picks });
+    if (themes.some(t => !t?.trim()) || new Set(themes).size !== themes.length) throw new Error(`${name}: templates must be non-empty and unique.`);
+    const selectors = want ? want.slides ?? undefined : picks;
+    const allIds = slideSections(html).map(s => s.id), selectedIds = selectSlides(allIds, selectors);
+    out.push({ index, name, html, allIds, selectedIds, path: relative(serveRoot, index).split(sep).join("/"), themes, picks: selectors });
   }
   return out;
 }
 
+const deckList = await decks();
+if (new Set(deckList.map(d => d.name)).size !== deckList.length) throw new Error("Deck names must be unique within a QA run.");
+if (opt.status) {
+  const status = await qaStatus(resolve(opt.out), deckList.map(d => d.index));
+  console.log(JSON.stringify(status, null, 1));
+  process.exitCode = status.currentFull && status.latest.problems === 0 ? 0 : 1;
+} else {
+  try { await runQA(); }
+  catch (e) {
+    console.log(JSON.stringify({ decks: {}, problems: [{ where: "qa", errors: [e.message] }], warnings: [], pending: ["QA did not complete"] }));
+    process.exitCode = 1;
+  }
+}
+
+async function runQA() {
+const started = performance.now(), startedAt = new Date().toISOString();
+const plan = fingerprintPlan(ROOT, repoMode);
+const out = resolve(opt.out);
+if (plan.inputs.some(p => out === p || out.startsWith(p + sep)) || out === serveRoot) throw new Error("--out must be outside served input folders (use the deck's qa/ folder or an external evidence folder).");
+await assertOutputBoundary(out, plan.inputs, [serveRoot]);
+const releaseOutput = await acquireOutputLock(out);
+let releaseResources, server, browser, webkitBrowser;
+try {
+releaseResources = await acquireResourceLock({ kind: "qa", slots: jobs });
+const run = await createRun(out);
+const config = { sizes: sizeList, motion: opt.motion, titles: opt.titles, jobs, fast: opt.fast, theme: opt.theme ?? null, selectors: picks ?? null, changed, since: opt.since ?? null, targets: positionals.map(p => resolve(p)), lintBaseline: opt["lint-baseline"] ? resolve(opt["lint-baseline"]) : null, lintChecks: opt["lint-checks"]?.split(",") ?? null };
+if (config.lintBaseline) plan.tools.push(config.lintBaseline);
+const before = await fingerprint(plan, config);
+const limitations = [opt.fast && "--fast", picks && "--slides", changed && "--changed/--since", opt.theme && "--theme", !["1920x1080", "1280x720"].every(size => sizeList.includes(size)) && "custom sizes omit a default size"].filter(Boolean);
+const receiptScope = { kind: opt.fast ? "fast" : limitations.length ? "scoped" : "full", limitations, universe: repoMode && !positionals.length ? "engine" : "decks", decks: deckList.map(({ index, name, themes, allIds, selectedIds }) => ({ index, name, themes, allIds, selectedIds })) };
+const pending = [];
 if (repoMode && !positionals.length) {
   try { execFileSync(process.execPath, [join(ROOT, "tools/build.mjs"), "--check"], { stdio: "pipe" }); }
   catch (e) { problems.push({ where: "build", errors: String(e.stderr || e.message).trim().split("\n") }); }
 }
-if (scope?.size === 0) {
-  note("nothing changed outside the docs, so there is nothing to shoot.");
-  console.log(JSON.stringify({ decks: {}, problems, warnings }, null, 1));
-  process.exit(problems.length ? 1 : 0);
-}
+if (scope?.size === 0) note("nothing changed outside the docs; this records an empty scoped run, never full evidence.");
 
-const server = createServer(async (req, res) => {
+server = createServer(async (req, res) => {
   let path, root = serveRoot;
   try {
     let url = decodeURIComponent(new URL(req.url, "http://x").pathname);
     // The contact sheet loads this run's screenshots from /__qa-out/.
-    if (url.startsWith("/__qa-out/")) { root = resolve(opt.out); url = url.slice("/__qa-out".length); }
+    if (url.startsWith("/__qa-out/")) { root = run.artifactRoot; url = url.slice("/__qa-out".length); }
     path = resolve(root, "." + url.replace(/\/$/, "/index.html"));
   } catch {
     res.writeHead(400).end();
@@ -177,7 +214,15 @@ const server = createServer(async (req, res) => {
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
   try {
     const body = await readFile(path);
-    res.writeHead(200, { "content-type": TYPES[extname(path)] || "application/octet-stream" }).end(body);
+    const headers = { "content-type": TYPES[extname(path)] || "application/octet-stream", "accept-ranges": "bytes" };
+    if (req.headers.range) {
+      const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
+      const start = match?.[1] ? Number(match[1]) : Math.max(0, body.length - Number(match?.[2]));
+      const end = match?.[1] && match[2] ? Math.min(body.length - 1, Number(match[2])) : body.length - 1;
+      if (!match || !Number.isInteger(start) || start < 0 || start >= body.length || end < start) { res.writeHead(416, { "content-range": `bytes */${body.length}` }).end(); return; }
+      const chunk = body.subarray(start, end + 1);
+      res.writeHead(206, { ...headers, "content-range": `bytes ${start}-${end}/${body.length}`, "content-length": chunk.length }).end(req.method === "HEAD" ? undefined : chunk);
+    } else res.writeHead(200, { ...headers, "content-length": body.length }).end(req.method === "HEAD" ? undefined : body);
   } catch {
     res.writeHead(404).end();
   }
@@ -185,57 +230,61 @@ const server = createServer(async (req, res) => {
 await new Promise(r => server.listen(0, "127.0.0.1", r));
 const base = `http://127.0.0.1:${server.address().port}/`;
 
-const browser = await chromium.launch();
-// The content lint adds warnings, never problems. Standalone decks made before lint.mjs was copied into them skip it.
+browser = await chromium.launch();
+// Missing standalone lint is visible and leaves its evidence pending.
 const lintFile = join(ROOT, "tools/lint.mjs");
-const lint = await exists(lintFile) ? (await import(pathToFileURL(lintFile).href)).lint : null;
+const lintModule = await exists(lintFile) ? await import(pathToFileURL(lintFile).href) : null;
+const lint = lintModule?.lint;
 async function lintDeck(deck) {
+  if (!lint) return { problems: [], warnings: [{ where: deck.name, check: "lint-missing", message: "Content lint was not run: tools/lint.mjs is missing. Run npm run upgrade from the engine." }], pending: [`${deck.name}: content lint`], completed: false };
   const found = await lint(await readFile(deck.index, "utf8"), { browser, catalog: basename(dirname(deck.index)) === "catalog" });
-  return { problems: [], warnings: found.map(({ slide, check, message }) => ({ where: slide ? `${deck.name} #${slide}` : deck.name, check, message })) };
+  return { problems: [], lintRecord: { index: deck.index, slideIds: deck.allIds, findings: found }, warnings: found.map(({ slide, check, message }) => ({ where: slide ? `${deck.name} #${slide}` : deck.name, check, message })) };
 }
 
-function watch(page, where, problems) {
-  const errors = [];
-  page.on("pageerror", e => errors.push(e.message));
-  page.on("console", m => { if (m.type() === "error") errors.push(m.text()); });
-  page.on("requestfailed", r => errors.push(`failed: ${r.url()}`));
-  page.on("response", r => { if (r.status() >= 400) errors.push(`${r.status()}: ${r.url()}`); });
-  return () => { if (errors.length) problems.push({ where, errors }); };
+function watch(page, where, problems, warnings) {
+  return watchPage(page, where, problems, warnings);
 }
 
 // One job = one deck in one template at one size. Each job returns its own findings, and they are merged in job order, so --jobs never changes the report.
 async function render(deck, theme, [w, h]) {
-  const found = { problems: [], warnings: [], qrShots: [] };
+  const found = { problems: [], warnings: [], qrShots: [], artifacts: [], checkedIds: [], qrIds: [] };
   const where = `${deck.name} ${theme} ${w}x${h}`;
   const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
-  const flush = watch(page, where, found.problems);
+  page.setDefaultTimeout(5000);
+  page.setDefaultNavigationTimeout(15000);
+  const flush = watch(page, where, found.problems, found.warnings);
+  try {
   await page.goto(`${base}${deck.path}?res=auto&theme=${theme}`, { waitUntil: "networkidle" });
   const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
-  const picks = deck.picks;
-  if (picks) for (const pick of picks) if (!ids.some((id, i) => picked(pick, id, i + 1))) found.warnings.push({ where: deck.name, message: `--slides: no slide matches "${pick}"` });
-  const dir = join(opt.out, deck.name, theme, `${w}x${h}`);
+  if (JSON.stringify(ids) !== JSON.stringify(deck.allIds)) throw new Error("Runtime slide IDs differ from the input snapshot.");
+  const dir = join(run.artifactRoot, encodeURIComponent(deck.name), encodeURIComponent(theme), `${w}x${h}`);
   await mkdir(dir, { recursive: true });
   const shots = [];
   for (const [i, id] of ids.entries()) {
-    if (picks && !picks.some(pick => picked(pick, id, i + 1))) continue;
+    if (!deck.selectedIds.includes(id)) continue;
     await page.evaluate(id => Deck.goTo(document.getElementById(id), { stepMode: "end" }), id);
+    if (deck.info.slides.find(s => s.id === id).features.length) {
+      try { await readySlide(page, id); }
+      catch (e) { found.problems.push({ where: `${where} #${id}`, check: "readiness", errors: [e.message] }); }
+    }
     await page.waitForTimeout(opt.motion ? 1700 : 120);
     const report = await page.evaluate(([id, checked, motion]) => {
       const slide = document.getElementById(id);
       const vw = innerWidth, vh = innerHeight;
+      const scrolls = ["auto", "scroll"].includes(getComputedStyle(slide).overflowY);
       const foot = slide.querySelector(".slide-foot");
       const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : vh;
       const out = [];
       slide.querySelectorAll(checked).forEach(el => {
         const r = el.getBoundingClientRect();
         if (r.width === 0 || el.closest(".fan .shot, .inset")) return;
-        if (r.right > vw + 1 || r.left < -1 || r.bottom > footTop + 1 || r.top < -1)
+        if (r.right > vw + 1 || r.left < -1 || (!scrolls && (r.bottom > footTop + 1 || r.top < -1)))
           out.push(`${el.className.split(" ")[0]} [${Math.round(r.left)},${Math.round(r.top)} → ${Math.round(r.right)},${Math.round(r.bottom)}] foot ${Math.round(footTop)}`);
       });
       slide.querySelectorAll(".code ol").forEach(ol => { if (ol.scrollWidth > ol.clientWidth + 1) out.push(`code line clipped by ${ol.scrollWidth - ol.clientWidth}px`); });
       const imgs = [...slide.querySelectorAll("img")].filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src);
       const videos = [...slide.querySelectorAll("video")].filter(v => v.error || v.readyState < 1 || (motion && v.closest(".video") && (v.paused || v.currentTime === 0))).map(v => v.currentSrc || v.src);
-      const scroll = slide.scrollHeight > slide.clientHeight + 1 || slide.scrollWidth > slide.clientWidth + 1;
+      const scroll = (!scrolls && slide.scrollHeight > slide.clientHeight + 1) || slide.scrollWidth > slide.clientWidth + 1;
       // Lines are counted from text fragments only: an element box (a block <em>) would otherwise count as a line of its own.
       const lineCount = el => {
         const size = parseFloat(getComputedStyle(el).fontSize) || 16, tops = [];
@@ -253,31 +302,38 @@ async function render(deck, theme, [w, h]) {
       const em = title?.querySelector("em");
       const titleLines = title?.getBoundingClientRect().width ? lineCount(title) : 0;
       const emSplit = em ? lineCount(em) > 1 : false;
-      return { out, imgs, videos, scroll, titleLines, emSplit };
+      return { out, imgs, videos, scroll, scrolls, titleLines, emSplit };
     }, [id, CHECKED, opt.motion]);
-    const scrolls = h > w;
-    const { titleLines, emSplit, ...checks } = report;
-    if ((!scrolls && (checks.out.length || checks.scroll)) || checks.imgs.length || checks.videos.length) found.problems.push({ where: `${where} #${id}`, ...checks });
+    const { titleLines, emSplit, scrolls, ...checks } = report;
+    if ((checks.out.length || checks.scroll) || checks.imgs.length || checks.videos.length) found.problems.push({ where: `${where} #${id}`, ...checks });
     // The catalog's placeholder titles wrap by design; real decks follow the two-line rule.
     if (!scrolls && titleLines > 2 && deck.name !== "catalog") found.warnings.push({ where: `${where} #${id}`, check: "title-lines", message: `the title wraps to ${titleLines} lines; keep it to two` });
     else if (opt.titles && !scrolls && emSplit) found.warnings.push({ where: `${where} #${id}`, check: "title-break", message: "the <em> payoff breaks across lines; shorten it or put it on its own line" });
     const qrs = await page.evaluate(id => [...document.getElementById(id).querySelectorAll("a.close-qr, a.qr-link")].map(a => a.href), id);
+    found.checkedIds.push(id);
+    if (qrs.length) found.qrIds.push(id);
     // ponytail: --fast skips screenshots, the slowest step, but keeps the ones the QR check reads.
     if (opt.fast && !qrs.length) continue;
-    const shot = join(dir, `${String(i + 1).padStart(2, "0")}-${id}.png`);
+    const shot = join(dir, `${String(i + 1).padStart(2, "0")}-${encodeURIComponent(id)}.png`);
     await page.screenshot({ path: shot });
     shots.push(shot);
+    found.artifacts.push(await artifact(run.artifactRoot, shot, { kind: "slide", index: deck.index, slide: id, theme, size: `${w}x${h}` }));
     if (qrs.length) found.qrShots.push({ where: `${where} #${id}`, shot, expected: qrs });
   }
-  flush();
-  if (!opt.fast && shots.length) await contactSheet(page, shots, join(opt.out, deck.name, theme, `sheet-${w}x${h}.png`));
-  await page.close();
+  found.lateErrors = await lateErrors(page);
+  if (!opt.fast && shots.length) {
+    const sheet = join(run.artifactRoot, encodeURIComponent(deck.name), encodeURIComponent(theme), `sheet-${w}x${h}.png`);
+    await contactSheet(page, shots, sheet);
+    found.artifacts.push(await artifact(run.artifactRoot, sheet, { kind: "sheet", index: deck.index, theme, size: `${w}x${h}` }));
+  }
+  } catch (e) { found.completed = false; found.problems.push({ where, errors: [e.message] }); }
+  finally { await flush(); await page.close(); }
   return found;
 }
 
 // All screenshots of one run as thumbnails on one image, to scan a deck at a glance.
 async function contactSheet(page, shots, path) {
-  const cells = shots.map(s => `<figure><img src="${base}__qa-out/${encodeURI(relative(resolve(opt.out), s).split(sep).join("/"))}"><figcaption>${basename(s, ".png")}</figcaption></figure>`).join("");
+  const cells = shots.map(s => `<figure><img src="${base}__qa-out/${relative(run.artifactRoot, s).split(sep).map(encodeURIComponent).join("/")}"><figcaption>${basename(s, ".png")}</figcaption></figure>`).join("");
   await page.setViewportSize({ width: 1600, height: 200 });
   await page.setContent(`<!doctype html><style>body{margin:0;padding:16px;background:#222;color:#ddd;font:13px system-ui,sans-serif;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:start}figure{margin:0}img{display:block;width:100%;outline:1px solid #555}figcaption{padding-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}</style>${cells}`);
   await page.screenshot({ path, fullPage: true });
@@ -286,23 +342,33 @@ async function contactSheet(page, shots, path) {
 async function offline(deck) {
   const found = { problems: [] };
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
-  const flush = watch(page, `${deck.name} file://`, found.problems);
+  page.setDefaultNavigationTimeout(15000);
+  const flush = watch(page, `${deck.name} file://`, found.problems, found.warnings ??= []);
+  try {
   await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
   await page.waitForTimeout(300);
-  flush();
-  await page.close();
+  } finally { await flush(); await page.close(); }
   return found;
 }
 
 async function keyboard(deck) {
   const found = { problems: [] };
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, reducedMotion: "reduce" });
+  page.setDefaultTimeout(5000);
+  page.setDefaultNavigationTimeout(15000);
+  const flush = watch(page, `${deck.name} keyboard`, found.problems, found.warnings ??= []);
+  try {
   await page.goto(`${base}${deck.path}?res=auto`, { waitUntil: "networkidle" });
   const hash = () => page.evaluate(() => location.hash);
   const presses = await page.evaluate(() => [...document.querySelectorAll("section.slide:not([data-hidden])")].reduce((n, s) => n + 1 + Deck.stepGroups(s).length, 0));
   const seen = [];
   for (let i = 0; i < presses + 2; i++) {
     seen.push((await hash()) || "#" + await page.evaluate(() => document.querySelector("section.slide").id));
+    const id = await page.evaluate(() => Deck.current()?.id);
+    if (deck.info.slides.some(s => s.id === id && s.features.length)) {
+      await readySlide(page, id);
+      await page.waitForLoadState("networkidle", { timeout: 5000 });
+    }
     await page.keyboard.press("ArrowRight");
   }
   const mainOrder = [...new Set(seen)];
@@ -335,32 +401,59 @@ async function keyboard(deck) {
     hasClose && closeHash !== "#close" && "C did not jump to #close"
   ].filter(Boolean);
   if (failures.length) found.problems.push({ where: `${deck.name} keyboard`, errors: failures });
-  await page.close();
   summary[deck.name] = { themes: deck.themes.join(" "), main: mainOrder.length, slides: slideCount };
+  } finally { await flush(); await page.close(); }
   return found;
 }
 
 const summary = {};
 const tasks = [];
-const deckList = await decks();
+const addTask = (kind, deck, run, metadata = {}) => tasks.push({ kind, index: deck.index, deck: deck.name, ...metadata, run });
+for (const deck of deckList) {
+  deck.info = await inspectDeck(deck.html, browser);
+  if (JSON.stringify(deck.info.slides.map(s => s.id)) !== JSON.stringify(deck.allIds)) throw new Error(`${deck.name}: parsed slide IDs disagree.`);
+  deck.features = featureScope(deck.info, deck.selectedIds);
+}
+let webkitError;
+if (deckList.some(d => d.features.relevant)) {
+  try { webkitBrowser = await webkit.launch(); }
+  catch (e) { webkitError = e.message.split("\n").slice(0, 3).join(" "); }
+}
 if (scope) note(`checking ${deckList.map(d => `${d.name} in ${d.themes.join(" ")}${d.picks ? ` (slides ${d.picks.join(",")})` : ""}`).join(", ")}.`);
 else if (changed && repoMode) note("checking everything.");
 for (const deck of deckList) {
   summary[deck.name] = null;
   for (const theme of deck.themes) {
-    if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { tasks.push(async () => ({ problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
-    for (const size of sizes) tasks.push(() => render(deck, theme, size));
+    if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { addTask("template", deck, async () => ({ completed: false, problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
+    for (const size of sizes) addTask("render", deck, () => render(deck, theme, size), { theme, size: size.join("x") });
   }
-  tasks.push(() => offline(deck), () => keyboard(deck));
-  if (lint) tasks.push(() => lintDeck(deck));
+  for (const [kind, check] of [["offline", offline], ["keyboard", keyboard]]) {
+    addTask(kind, deck, () => opt.fast
+      ? { completed: false, problems: [], pending: [`${deck.name}: full ${kind} verification deferred by --fast`] }
+      : check(deck));
+  }
+  addTask("lint", deck, () => lintDeck(deck));
+  addTask("features-chromium", deck, () => checkFeatures({ browser, browserName: "chromium", deck, base, scope: deck.features }));
+  addTask("features-webkit", deck, () => {
+    if (!deck.features.relevant) return { problems: [], checks: [{ check: "features", state: "not-applicable", reason: "No feature slides in scope." }] };
+    if (!webkitBrowser) {
+      const item = { where: deck.name, check: "webkit-missing", message: `Playwright WebKit is unavailable: ${webkitError}` };
+      return { completed: false, problems: receiptScope.kind === "full" ? [item] : [], warnings: receiptScope.kind === "full" ? [] : [item], pending: [`${deck.name}: Playwright WebKit feature checks`] };
+    }
+    return checkFeatures({ browser: webkitBrowser, browserName: "webkit", deck, base, scope: deck.features });
+  });
 }
 const results = [];
 let next = 0;
 await Promise.all(Array.from({ length: Math.min(jobs, tasks.length) }, async () => {
-  while (next < tasks.length) { const i = next++; results[i] = await tasks[i](); }
+  while (next < tasks.length) {
+    const i = next++, { run, ...task } = tasks[i], start = performance.now();
+    try { const found = await run(); results[i] = { ...task, completed: true, ...found, durationMs: Math.round((performance.now() - start) * 1000) / 1000 }; }
+    catch (e) { results[i] = { ...task, completed: false, durationMs: Math.round((performance.now() - start) * 1000) / 1000, problems: [{ where: `${task.deck} ${task.kind}`, errors: [e.message] }] }; }
+  }
 }));
 const qrShots = results.flatMap(r => r.qrShots || []);
-for (const r of results) problems.push(...r.problems);
+for (const r of results) { problems.push(...(r.problems || [])); pending.push(...(r.pending || [])); }
 const seen = new Set();
 for (const w of results.flatMap(r => r.warnings || [])) if (!seen.has(w.message + w.where)) { seen.add(w.message + w.where); warnings.push(w); }
 
@@ -381,8 +474,28 @@ async function checkQrs() {
   return `${qrShots.length} checked`;
 }
 const qrCheck = await checkQrs();
-
-await browser.close();
-server.close();
-console.log(JSON.stringify({ decks: summary, sizes: sizeList.join(","), qr: qrCheck, screenshots: opt.out, problems, warnings }, null, 1));
+if (qrCheck.startsWith("skipped")) pending.push(`QR decoding ${qrCheck}`);
+const lintRecords = results.flatMap(r => r.lintRecord ? [r.lintRecord] : []);
+if (config.lintBaseline) {
+  try {
+    if (!lintModule) throw new Error("Content lint is missing.");
+    const added = lintModule.compareLint(lintModule.lintRecords(JSON.parse(await readFile(config.lintBaseline, "utf8"))), lintRecords, { slides: new Map(deckList.map(d => [d.index, d.selectedIds])), checks: config.lintChecks ?? undefined });
+    for (const w of added) problems.push({ where: `${basename(dirname(w.index))} #${w.slide}`, check: "new-lint-warning", lintCheck: w.check, message: w.message });
+  } catch (e) { problems.push({ where: "lint baseline", errors: [e.message] }); }
+}
+const after = await fingerprint(plan, config);
+if (before.digest !== after.digest) { problems.push({ where: "fingerprint", errors: ["Inputs/tools/browser changed during QA. This run cannot be current evidence."] }); pending.push("rerun after inputs stop changing"); }
+const artifacts = results.flatMap(r => r.artifacts || []);
+const screenshotCounts = { slides: artifacts.filter(a => a.kind === "slide").length, sheets: artifacts.filter(a => a.kind === "sheet").length, total: artifacts.length };
+const receipt = { schema: QA_SCHEMA, ...run, root: ROOT, startedAt, finishedAt: new Date().toISOString(), durationMs: Math.round((performance.now() - started) * 1000) / 1000, config, scope: receiptScope, fingerprint: before, browserVersions: { chromium: browser.version(), webkit: webkitBrowser?.version() ?? null }, tasks: results.map(({ artifacts, qrShots, lintRecord, ...r }) => r), lint: lintRecords, artifacts, screenshotCounts, qr: qrCheck, problems, warnings, pending, physicalPhone: { status: "unverified", reason: "Desktop/emulated checks do not verify a physical phone." } };
+const receiptPath = await writeReceipt(out, receipt);
+console.log(JSON.stringify({ decks: summary, scope: receiptScope.kind, sizes: sizeList.join(","), qr: qrCheck, screenshots: run.artifactRoot, screenshotCounts, receipt: receiptPath, durationMs: receipt.durationMs, tasks: results.length, pending, physicalPhone: receipt.physicalPhone, problems, warnings }, null, 1));
 process.exitCode = problems.length ? 1 : 0;
+} finally {
+  await webkitBrowser?.close();
+  await browser?.close();
+  if (server) await new Promise(r => server.close(r));
+  await releaseResources?.();
+  await releaseOutput();
+}
+}

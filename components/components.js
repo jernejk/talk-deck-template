@@ -143,25 +143,35 @@ Deck.use({
 
 // count
 (() => {
+const countsIn = root => root.matches?.("[data-count]") ? [root] : [...root.querySelectorAll("[data-count]")];
+
+function countIn(root, deck) {
+  countsIn(root).forEach(el => {
+    cancelAnimationFrame(el._frame);
+    if (el.closest("[data-step]:not(.is-shown)")) return;
+    const to = Number(el.dataset.count);
+    if (deck.reducedMotion()) { el.textContent = to; return; }
+    const start = performance.now() + 450;
+    const tick = now => {
+      const t = Math.min(1, Math.max(0, (now - start) / 1100));
+      el.textContent = Math.round(to * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) el._frame = requestAnimationFrame(tick);
+    };
+    el.textContent = 0;
+    el._frame = requestAnimationFrame(tick);
+  });
+}
+
+function stopCount(root) {
+  countsIn(root).forEach(el => { cancelAnimationFrame(el._frame); el.textContent = el.dataset.count; });
+}
+
 Deck.use({
   name: "count",
-  enter(slide, deck) {
-    slide.querySelectorAll("[data-count]").forEach(el => {
-      const to = Number(el.dataset.count);
-      if (deck.reducedMotion()) { el.textContent = to; return; }
-      const start = performance.now() + 450;
-      const tick = now => {
-        const t = Math.min(1, Math.max(0, (now - start) / 1100));
-        el.textContent = Math.round(to * (1 - Math.pow(1 - t, 3)));
-        if (t < 1) el._frame = requestAnimationFrame(tick);
-      };
-      el.textContent = 0;
-      el._frame = requestAnimationFrame(tick);
-    });
-  },
-  leave(slide) {
-    slide.querySelectorAll("[data-count]").forEach(el => { cancelAnimationFrame(el._frame); el.textContent = el.dataset.count; });
-  }
+  enter(slide, deck) { countIn(slide, deck); },
+  step(els, slide, deck) { els.forEach(el => countIn(el, deck)); },
+  unstep(els) { els.forEach(stopCount); },
+  leave(slide) { stopCount(slide); }
 });
 })();
 
@@ -634,6 +644,7 @@ function buildVideo(fig, slide) {
   stage.lastChild.append(toggle, seek, time, mute);
 
   let started = false;
+  let seekOnMetadata = false;
   let scrubbing = false;
   let raf = 0;
 
@@ -671,6 +682,7 @@ function buildVideo(fig, slide) {
   }
 
   function play() {
+    if (v.readyState < 1) seekOnMetadata = true;
     if (v.currentTime >= endAt() - 0.05 || v.currentTime < start - 0.05) v.currentTime = start;
     v.play().catch(swallow);
   }
@@ -681,6 +693,7 @@ function buildVideo(fig, slide) {
     reset() {
       v.pause();
       started = false;
+      seekOnMetadata = v.readyState < 1;
       v.currentTime = start;
       paint();
     }
@@ -689,7 +702,11 @@ function buildVideo(fig, slide) {
 
   v.addEventListener("play", () => { started = true; if (!raf) raf = requestAnimationFrame(tick); paint(); });
   ["pause", "ended", "seeked", "volumechange", "durationchange"].forEach(t => v.addEventListener(t, paint));
-  v.addEventListener("loadedmetadata", () => { if (!started) v.currentTime = start; paint(); });
+  v.addEventListener("loadedmetadata", () => {
+    if (!started || seekOnMetadata) v.currentTime = start;
+    seekOnMetadata = false;
+    paint();
+  });
   v.addEventListener("ended", finish);
   v.addEventListener("click", () => v.paused ? play() : v.pause());
   big.addEventListener("click", play);
@@ -1144,12 +1161,13 @@ if (new URLSearchParams(location.search).has("tune")) {
 
 // type
 (() => {
+const typedIn = root => root.matches?.("[data-type]") ? [root] : [...root.querySelectorAll("[data-type]")];
+
 function typeIn(root, deck) {
-  const targets = root.matches?.("[data-type]") ? [root] : root.querySelectorAll("[data-type]");
-  targets.forEach(el => {
+  typedIn(root).forEach(el => {
     const text = el.dataset.type;
     clearTimeout(el._timer);
-    el.classList.remove("is-typed");
+    el.classList.remove("is-typed", "is-typing");
     if (el.closest("[data-step]:not(.is-shown)")) { el.textContent = ""; return; }
     if (deck.reducedMotion()) { el.textContent = text; el.classList.add("is-typed"); return; }
     el.textContent = "";
@@ -1164,32 +1182,45 @@ function typeIn(root, deck) {
   });
 }
 
+function stopType(root) {
+  typedIn(root).forEach(el => { clearTimeout(el._timer); el.classList.remove("is-typing"); });
+}
+
 Deck.use({
   name: "type",
   enter(slide, deck) { typeIn(slide, deck); },
   step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); },
-  leave(slide) { slide.querySelectorAll("[data-type]").forEach(el => clearTimeout(el._timer)); }
+  unstep(els) { els.forEach(stopType); },
+  leave(slide) { stopType(slide); }
 });
 })();
 
 // video
 (() => {
+const videosIn = root => root.matches?.(".video video") ? [root] : [...root.querySelectorAll(".video video")];
+
 function play(root, deck) {
   if (deck.reducedMotion()) return;
-  root.querySelectorAll(".video video").forEach(v => {
+  videosIn(root).forEach(v => {
     if (v.closest("[data-step]:not(.is-shown)")) return;
     v.muted = true;
-    v.play().catch(e => { if (e.name !== "AbortError") console.error(`Video didn't start: ${e.message}`); });
+    v.play().catch(e => {
+      if (e.name === "NotAllowedError") v.controls = true;
+      else if (e.name !== "AbortError") console.error(`Video didn't start: ${e.message}`);
+    });
   });
+}
+
+function stop(root) {
+  videosIn(root).forEach(v => { v.pause(); v.currentTime = 0; });
 }
 
 Deck.use({
   name: "video",
   enter(slide, deck) { play(slide, deck); },
   step(els, slide, deck) { els.forEach(el => play(el, deck)); },
-  leave(slide) {
-    slide.querySelectorAll(".video video").forEach(v => { v.pause(); v.currentTime = 0; });
-  }
+  unstep(els) { els.forEach(stop); },
+  leave(slide) { stop(slide); }
 });
 })();
 

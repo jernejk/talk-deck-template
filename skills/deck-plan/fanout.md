@@ -21,12 +21,12 @@ Give one agent each section of 3 to 6 slides. Each brief contains:
 - the check: `npm run qa -- <deck> --slides <its ids> --fast`, then `npm run lint -- <deck>`, with no new warnings on its slides.
 - the result to report: the ids it changed, the facts it used, and any warning that it did not fix.
 
-Use a model that is good at layout and text. Do not use the smallest model.
+Use a model that is good at layout and text. Do not use the smallest model. `skills/deck-slides/delegate.md` has the brief, the checks you run yourself before you accept a result, and the limits: at most four results waiting for review, one retry, and when to stop fanning out.
 
 When two agents edit the same `index.html` at the same time, their edits can conflict. To prevent this, let each agent write its slides to its own fragment file. Then the main agent pastes the fragments into `index.html` in outline order.
 
 ## 3. Join and check (main agent)
 
 1. Put the sections in outline order. Keep the ids from the outline.
-2. Run `npm run qa -- <deck>` once in full, and read `qa/<deck>/<template>/sheet-1920x1080.png`. Look for slides that look the same next to each other, and for a section that has a different style.
+2. Run `npm run qa -- <deck>` once in full, and read the contact sheets listed in that run’s receipt. The section agents' `--fast` checks omitted normal screenshots, so this is the first look at their slides. Look for slides that look the same next to each other, and for a section that has a different style.
 3. Run `npm run route -- <deck>` and finish `PRESENTER.md` (`deck-notes`).

@@ -28,9 +28,11 @@ A demo proves the talk's idea. It must work on a bad network, on a strange lapto
 1. Each live beat has its screenshot on the same slide, a 20-second cap in the notes and a reset step in `PRESENTER.md`.
 2. A simulation says that it is one: "Demo · a simulated run" in the eyebrow, or **Drawn** in the caption. Put real words and real screenshots from the run inside it, where you have them.
 3. Let Space drive each step, so that the speaker sets the pace. Do not use timers that run past the slide.
-4. Stop all motion when the slide leaves. Start it in `enter` and stop it in `leave` (`Deck.use`). Hidden slides must not run timers or loops.
+4. Start motion only when its slide and reveal step are visible. Stop it on `unstep` as well as `leave` (`Deck.use`); re-revealing a plain video restarts it. Hidden slides and reversed steps must not run media, timers or loops.
 5. Do not ship secrets. Embedded pages and replays ship with the deck: no tokens, `localhost`, private IPs or private data.
-6. Keep fixed colours inside the drawn mock-up only. Use palette slots everywhere else.
+6. Demo controls own their keys and touch gestures. For a custom editor or interactive region, put `data-deck-interactive` on its local container; the deck leaves keyboard and swipes there to the app. Do not put it on the whole slide. Click or Tab outside that region to hand slide keys (including PageDown/PageUp clickers) back to the deck.
+7. Local video patterns use `preload="none"` and a poster. Choose eager loading only for an imminent clip after checking its network cost. Test a trimmed clip from a cold start, then reverse and revisit it. Plain clips still accept slide swipes; native/custom players keep their control gestures. If autoplay is refused, plain clips expose native play controls.
+8. Keep fixed colours inside the drawn mock-up only. Use palette slots everywhere else.
 
 ## Build a simulated app
 
@@ -39,7 +41,14 @@ A demo proves the talk's idea. It must work on a bad network, on a strange lapto
 3. Put each beat in its own `data-step`. Give elements that appear together the same step name.
 4. Use the real wording from the run.
 5. Run `npm run qa -- <deck> --slides <id> --motion` and read the screenshots.
-6. Run `npm run perf -- <deck> --slide <id>`.
+6. Run `npm run perf -- <deck> --slide <id>`, with nothing else running.
+
+## Build a replay
+
+1. Build the page with a script. Copy each page or data file it reads from outside the deck into the deck, record its hash, and refresh that copy only on purpose, after reading the diff. A timing edit must never pull in someone else's changes.
+2. Give the builder a check that rebuilds in memory and compares with the built page. Never fix the built page by hand: change the builder, rebuild, and read the diff.
+3. Give the replay a way to seek and to report its state (playing, how far, done), so checks wait for states instead of timers. Give each wait a limit that fails with a clear message.
+4. Seeking proves a state, not smoothness. Keep one real-time pass for the motion, run alone.
 
 ## Test where it will run
 

@@ -10,6 +10,7 @@ In the template repo, `core/`, `components/`, `slides/` and `templates/` are the
 - Speaker notes (`aside.notes`) ship in the public HTML. Keep private links, IDs, emails and anything you wouldn't show on a slide out of them.
 - One idea per slide: an eyebrow, then a title of one or two lines with a single `<em>` on the payoff. If it needs a third line, make two slides.
 - Prefer real captures, and label them in the caption: `<figcaption><b>Real run</b>names hidden</figcaption>`. Drawn illustrations (`.mock`, `.composer`, `.memo`, `.cli`, `.threads`) are fine when the caption or notes say they're drawn. Generated images (`<b>Generated</b> by gpt-image-2`) are fine for backgrounds and illustrations, never for screenshots or results; keep the prompt in the notes. Sources and credits: `docs/images.md`.
+- Workshop demos: keep local posters and screenshot fallbacks, lazy `data-src` embeds and `preload="none"` video patterns. Reverse reveals must stop their media; custom editors can claim their local keys/swipes with `data-deck-interactive`. Deep-link to the slide section ID, not an unrevealed child.
 - Every live beat gets `data-live="App name"`, its screenshot on the same slide, and a 20-second cap in the notes.
 - Quote only numbers someone measured. Gags must read as gags, and PRESENTER.md lists which is which.
 - Crop screenshots before they go into `assets/`: tab strip and URL bar, sidebars with chat or project titles, avatars, emails, IDs and private prices. Keep originals outside the deck.
@@ -88,9 +89,12 @@ Agent skills in `skills/` give the steps for each job, from shaping the story to
 
 ## Before calling a deck done
 
-1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one. While you work, `--slides <ids> --fast` checks only the slides you changed; run it in full before you finish. In the template repo, `--changed` checks only what your git changes touch.
+1. `npm run qa` reports no problems. In the template repo it covers every example, the catalog in every template and the build check; pass a deck path to check one. While you work, `--slides <ids> --fast` checks only the slides you changed and normally omits screenshots (QR captures are the exception); run it in full before you finish. In the template repo, `--changed` checks only what your git changes touch.
 2. Read the `warnings` in the QA output. The content lint lists there what breaks the rules above: clocks out of order, live beats without a cap or a screenshot, extra `<em>`, straight quotes, private data in notes, undisclosed drawings, fixed colours and repeated layouts. Fix each one, or know why it stays.
-3. Look at the `qa/` screenshots of every slide you touched, in each template you ship. `sheet-<size>.png` beside them shows the whole deck at once.
-4. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
-5. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
-6. Update PRESENTER.md: route table, timings, what's real, extras.
+3. For a phone-facing workshop, also check dense code/schedules/demos in native portrait and short landscape, rotate after scrolling/expanding an embed, and test Notes, overview and Back/Close. Emulation never clears the physical-phone row.
+4. Look at the screenshots from that full run of every slide you touched, in each template you ship. `sheet-<size>.png` beside them shows the whole deck at once.
+5. If the slides URL changed, regenerate the QR with `swift tools/qr.swift <url> <deck folder>/assets/qr-slides.png` (it decodes what it wrote and fails on a mismatch), then update `.qr-url` and `CNAME`.
+6. Read the notes as a stranger would: nothing private, and every drawn illustration disclosed.
+7. Update PRESENTER.md: route table, timings, what's real, extras.
+
+Some of these checks can wait until a batch of changes is done; `skills/deck-check/tiers.md` says which. Write each one you put off into `PENDING.json` and clear it only with its output. A batch with an open row isn't done.

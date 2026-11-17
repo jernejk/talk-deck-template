@@ -30,12 +30,14 @@ To see a pattern, open `docs/showcase/README.md` or `examples/catalog/index.html
 5. Make a slide that needs a third title line into two slides.
 6. Use `data-step` for reveals. Give elements that reveal together the same name.
 7. Set the clock in the notes. Use `deck-notes` for the notes, and `deck-media` for screenshots and live demos.
-8. Check the slides you changed: `npm run qa -- <deck> --slides <ids> --fast`, then read the screenshots in `qa/`.
+8. Check the slides you changed: `npm run qa -- <deck> --slides <ids> --fast` finds layout problems and errors, but writes no screenshots. To see the slides, run `npm run qa -- <deck> --slides <ids> --out <new folder>` and read the screenshots in that folder.
 
 To remove a slide, delete its `<section>`. To move a slide, move its `<section>`. Then run `npm run route -- <deck>` to refresh `PRESENTER.md`.
+
+To give slides to another agent, follow `delegate.md` in this folder.
 
 ## Done when
 
 - `npm run lint -- <deck>` gives no new `one-em`, `curly-quotes`, `fixed-colour` or `layout-variety` warnings.
-- `npm run qa -- <deck> --slides <ids>` reports no problems, and you read each screenshot.
+- `npm run qa -- <deck> --slides <ids>` reports no problems, and you read each screenshot that run wrote.
 - Before you call the deck done, use `deck-check`.

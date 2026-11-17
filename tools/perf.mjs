@@ -4,6 +4,7 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { acquireResourceLock } from "./qa-lock.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const { values: opt, positionals } = parseArgs({
@@ -36,6 +37,9 @@ if (!index.startsWith(serveRoot + sep)) throw new Error(`${index} is outside ${s
 const [width, height] = opt.size.split("x").map(Number);
 const settle = +opt.settle, span = +opt.window, maxCpu = +opt["max-cpu"], maxTotal = +opt["max-total"];
 
+const releaseResources = await acquireResourceLock({ kind: "perf" });
+let measuredBrowser, measuredServer;
+try {
 const server = createServer(async (req, res) => {
   let path;
   try { path = resolve(serveRoot, "." + decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/\/$/, "/index.html")); }
@@ -44,11 +48,13 @@ const server = createServer(async (req, res) => {
   try { res.writeHead(200, { "content-type": TYPES[extname(path)] || "application/octet-stream" }).end(await readFile(path)); }
   catch { res.writeHead(404).end(); }
 });
+measuredServer = server;
 await new Promise(r => server.listen(0, "127.0.0.1", r));
 
 // Headless Chromium composites on the CPU unless asked for the GPU, which makes any animation look far costlier than on a real laptop.
 const gpu = ["--enable-gpu", "--ignore-gpu-blocklist", ...(process.platform === "darwin" ? ["--use-angle=metal"] : [])];
 const browser = await chromium.launch({ args: gpu });
+measuredBrowser = browser;
 const page = await browser.newPage({ viewport: { width, height } });
 // CPU seconds per browser process (browser, renderer, GPU, utilities), so compositing and raster work count too.
 const browserCdp = await browser.newBrowserCDPSession();
@@ -118,9 +124,6 @@ for (const [i, id] of ids.entries()) {
   rows.push({ n: i + 1, id, cpu, total, layouts: per("LayoutCount"), styles: per("RecalcStyleCount"), running: anim.running, repaint: anim.repaint, offSlide: anim.offSlide, frames: anim.frames, flags });
 }
 
-await browser.close();
-server.close();
-
 const avg = key => rows.length ? +(rows.reduce((s, r) => s + (r[key] ?? 0), 0) / rows.length).toFixed(1) : 0;
 if (opt.json) console.log(JSON.stringify({ rows, averages: { main: avg("cpu"), all: rows.some(r => r.total === null) ? null : avg("total") } }, null, 1));
 else {
@@ -139,3 +142,8 @@ else {
   console.log(`\nMain thread averages ${avg("cpu")}% of one core.${hour} ${flagged.length ? `${flagged.length} slide(s) flagged.` : "Nothing flagged."}`);
 }
 if (rows.some(r => r.flags.length)) process.exitCode = 1;
+} finally {
+  await measuredBrowser?.close();
+  measuredServer?.close();
+  await releaseResources();
+}

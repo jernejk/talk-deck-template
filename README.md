@@ -28,7 +28,7 @@ You need Node.js 20 or later.
 2. `cd my-decks && npm install`
 3. `npm run new -- ~/talks/my-talk --title "Big words.|Real demos.|*Honest fallbacks.*"`, then open `~/talks/my-talk/site/index.html` in a browser.
 
-QA needs Playwright's browser once: `npx playwright install chromium`.
+QA needs Playwright's browser once: `npx playwright install chromium webkit`.
 
 ## How I actually use it
 
@@ -187,9 +187,9 @@ npm run qa -- --since upstream/main           # only what your branch changes
 npm run perf -- examples/starter              # idle CPU and stray animations per slide
 ```
 
-QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into `qa/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each QR code that has a link and checks it matches. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion. It warns when a title wraps past two lines; `--titles` also flags an `<em>` payoff that breaks across lines, for a polish pass.
+QA renders every slide with all steps revealed at 1920×1080 and 1280×720 and screenshots it into a fresh `qa/runs/<run-id>/<deck>/<template>/<size>/`. It fails on overflow past the footer or edges, landscape slides that scroll, broken images or videos, failed requests and console errors. It also opens each deck from `file://`, drives the keyboard controls and, on macOS, decodes each QR code that has a link and checks it matches. Portrait sizes scroll by design, so they're only checked for errors and media. `--motion` waits for animations instead of using reduced motion. It warns when a title wraps past two lines; `--titles` also flags an `<em>` payoff that breaks across lines, for a polish pass.
 
-Each deck × template × size runs as a separate job, four at a time by default (fewer on a machine with fewer cores); `--jobs 1` runs them one after another. Every run also writes `qa/<deck>/<template>/sheet-<size>.png`, all the screenshots of that run on one image. `--slides` takes slide ids or numbers (`cover,3-5`) and checks only those slides; the `file://` and keyboard checks still cover the whole deck. `--fast` checks only the first size and skips the screenshots and contact sheet, except slides with a QR code. The JSON output lists failures under `problems` and non-fatal notes under `warnings`.
+Each deck × template × size runs as a separate job, up to four at a time; `--jobs 1` runs them one after another. Task-owned QA processes share a four-slot budget with a bounded queue (180 seconds by default); use `--jobs 1` for parallel helpers. Perf reserves the budget exclusively. Every non-fast run also writes a contact sheet beneath its fresh run directory, all the screenshots of that run on one image. `--slides` takes slide ids or numbers (`cover,3-5`) and checks only those slides; normal runs keep full-deck `file://` and keyboard coverage. `--fast` explicitly defers those two gates in its pending record and can never satisfy final acceptance. `--fast` checks only the first size, defers offline/keyboard gates, and skips normal screenshots/contact sheets except QR captures. The JSON output lists failures under `problems` and non-fatal notes under `warnings`.
 
 `--changed` reads `git diff` against `HEAD`, plus untracked files, and checks the least that covers them. `--since <ref>` does the same against the point where your branch left `<ref>`. It prints what it picked, and why, before it runs. The build check always runs.
 
@@ -205,9 +205,23 @@ Each deck × template × size runs as a separate job, four at a time by default 
 
 `components/components.*` and `examples/catalog/` are build output, so they count only when their source did not change. Outside a git repo, or when git fails, `--changed` runs everything. In a standalone deck it checks the whole deck.
 
+### Evidence and bounded edits
+
+Read [change tiers](skills/deck-check/tiers.md) before choosing iteration checks. Plain prose needs no browser; generated guidance needs a scratch-copy check. Deferred final gates remain in the pending record.
+
+Each QA result includes `receipt`, `artifactRoot`, checked slide IDs, task timings and screenshot counts. Read only the artifacts named in that receipt. `npm run qa -- --status --out <same-output-root>` verifies current inputs, tools, browser configuration and artifact hashes without launching QA; scoped or fast evidence cannot become full evidence. Unknown slide IDs fail. WebKit, forced-resolution, touch, nested embeds, posters and lifecycle contracts run once for relevant feature slides. Physical-phone behavior remains unverified. In macOS WebKit mobile emulation, three anonymous native video-control icon failures also reproduce on a bare video page; QA retains these exact diagnostics as `webkit-native-controls` warnings. Application-origin console errors remain failures, and media/poster checks still run.
+
+```sh
+npm run lint -- <deck> --out /tmp/deck-lint-before.json
+# Edit supplied wording, then enforce only selected warning classes on owned slides:
+npm run lint -- <deck> --slides cover --baseline /tmp/deck-lint-before.json --checks curly-quotes,one-em
+```
+
+`npm run accept -- fragment-out <deck> --slides <stable-id> --text <targets.json> --out <new-contract-folder>` freezes one fragment and supplied `{slide, selector, text, attribute?}` targets. The integrator runs `fragment-in --contract <contract.json> --fragment <returned.html>`, fresh scoped QA, then `check --contract <contract.json> --receipt <receipt.json>`. It recomputes scope, exact text, shared-library stability, lint delta and current captures. `--allow-pending` reports partial acceptance while full QA and senior visual review remain due; it never declares the batch complete. See [helper contracts](skills/deck-slides/delegate.md).
+
 ### Content lint
 
-`npm run lint -- <deck>` reads a deck's HTML and checks the authoring rules in `AGENTS.md`, without screenshots. QA runs it on every deck it checks and adds the findings to `warnings`, each with its check id. For now the findings are warnings only: they never fail QA or change the exit code.
+`npm run lint -- <deck>` reads a deck's HTML and checks the authoring rules in `AGENTS.md`, without screenshots. QA runs it on every deck it checks and adds the findings to `warnings`, each with its check id. Findings are advisory by default. Opt into a scoped no-new-warning contract with a saved baseline; historical warnings remain advisory.
 
 | Check | Warns when |
 |---|---|

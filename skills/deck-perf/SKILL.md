@@ -13,7 +13,7 @@ In the template repo, run the `npm run` commands from the repo root. `<deck>` is
 
 ## Steps
 
-1. Measure: `npm run perf -- <deck>`. Add `--size 390x844` for a phone viewport, and `--slide <id or number>` to look at one slide.
+1. Measure: `npm run perf -- <deck>`. Add `--size 390x844` for a phone viewport, and `--slide <id or number>` to look at one slide. Run it alone: QA, demo checks or other browsers at the same time make the numbers noise.
 2. Fix anything flagged as running off-slide first. Every slide pays for it.
 3. Then fix `repaints:` lines over a large share of the screen: a looping animation of anything but `transform` or `opacity`. Draw the effect once on its own element and move that element instead, as the core glow and the close slide's QR ring do. `steps()` is not a fix: it still recalculates style every frame and looks choppy.
 4. Then look at slides over the `main%` or `all%` limits, or flagged for style recalcs, and decide whether that cost is the point of the slide (a live graph, a playing replay) or a leak. Name a running animation in the browser console on that slide: `document.getAnimations().filter(a => a.playState === "running").map(a => [a.animationName, a.effect.target])`.

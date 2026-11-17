@@ -24,6 +24,6 @@
 @media (prefers-reduced-motion:reduce){
   .slide.is-active .cli-line{animation:none!important}
 }
-@media screen and (max-aspect-ratio:1/1){
-  .cli{max-width:none}
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
+  .cli{max-width:none;overflow-wrap:anywhere}
 }

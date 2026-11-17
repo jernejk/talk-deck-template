@@ -23,6 +23,8 @@ For people who review and merge changes to this repo. `CONTRIBUTING.md` covers h
 - A change to `core/`, `tools/qa.mjs` or a standalone tool: make a deck with `npm run new` in a scratch folder, then run its `qa`, `lint`, `inline` and `route`.
 - A change to the agent guide or a skill: read it as an agent would. Each skill points to the docs and does not copy them.
 - For a large change, ask a reviewer, or a model from a different lab than the one that wrote it.
+- Changes to `core/`, `components/`, `templates/`, `slides/` or `tools/` are tier T3 in `skills/deck-check/tiers.md`: checks may wait while the batch is open, but every one above passes before it's done, and anything put off sits in the pending record until its output clears it.
+- One person builds at a time. QA and reviewers read generated files only after the build that writes them has finished.
 
 ## Merge
 
@@ -37,17 +39,23 @@ Decks are opened on phones far more than you expect, from the QR code on the clo
 
 - iOS Safari reports the zoomed, visible area in `innerWidth` and `innerHeight`. Measure the layout with `document.documentElement.clientWidth` and `clientHeight`.
 - With `resolution` or `?res=`, the deck runs inside a frame on a host page. The frame cannot see the host's pinch zoom; it asks `Deck.previewZoomed()` on the host.
-- Safari will not zoom out below 0.25×. A 1920-wide preview fits natively only on screens at least 480 points wide.
+- The explicit touch preview uses a native viewport with a computed `minimum-scale` rather than transform scaling. Keep the default phone layout native; a desktop preview or old Safari scaling rule does not establish current real-device compatibility.
 - The iOS simulator uses the Mac's graphics memory. A blank or black screen on a real phone may not show in the simulator, so test on a phone.
-- Pinch-zoom and drag on slides with embeds, video and animation before a release.
+- Test native portrait → landscape → portrait on dense code, schedules and demos (including 320×568, 390×844, 568×320, 844×390, 915×412 and 932×430). Short native screens scroll; the forced projector frame keeps its fixed layout. Check all content and navigation remain reachable, including Notes, Options, overview, the image viewer and expired live countdowns.
+- Pinch-zoom and drag on slides with embeds, video and animation before a release. Check background/resume, text entry and reverse reveals too. Touch/keyboard gestures inside a demo control must stay with that control.
+- Keep that as a manual row in the release's pending record. Desktop, emulated, WebKit and simulator checks never clear it: it stays unverified until someone tries a real phone, and the release says so.
 
 ## Performance
 
-A deck runs for an hour on a laptop or a phone battery. Hidden slides pause their animations and stop painting. Run `npm run perf` on the examples after a change to `core/` or to a component that moves. `docs/performance.md` lists the usual causes.
+A deck runs for an hour on a laptop or a phone battery. Hidden slides pause their animations and stop painting. Run `npm run perf` on the examples after a change to `core/` or to a component that moves, with nothing else running: QA, demo checks or other browsers at the same time turn its numbers into noise. `docs/performance.md` lists the usual causes.
 
 ## Standalone decks
 
-`npm run new` and `npm run export` copy the library into `site/lib/`, the tools into `tools/`, the agent guide into `AGENTS.md`, and the deck skills into `skills/`. These copies do not change when this repo changes. `npm run upgrade -- <deck>` shows what a refresh would change, and `--write` applies it. It never touches the deck's `index.html`, `PRESENTER.md` or assets.
+`npm run new` and `npm run export` copy the library into `site/lib/`, the tools into `tools/`, the agent guide into `AGENTS.md`, and the deck skills into `skills/`. These copies do not change when this repo changes. `npm run upgrade -- <deck>` shows what a refresh would change, and `--write` applies it. It never touches the deck's `index.html`, `PRESENTER.md` or assets. In a batch, one person refreshes each deck, after the engine's tools have stopped changing: a dry run, a read of the list, then `--write`. Never copy tools or bundles by hand.
+
+## Delegating work
+
+Helper agents follow `skills/deck-slides/delegate.md`: one fragment, supplied text, one check, one retry, at most four results waiting for review, and the lead's own read of every result before it counts. Scripts do the mechanical jobs. No small model becomes the default for a kind of task until a trial on real decks shows it meets the bar, with review and repair time counted, and the lead keeps the shared style, the engine, visual sign-off and anything ambiguous.
 
 ## Harvest from decks
 

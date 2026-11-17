@@ -10,7 +10,7 @@
 .code .n{color:var(--code-n,var(--a6))}
 .code .c,.code li.c{color:var(--code-muted,#8b9099);font-style:italic}
 
-@media screen and (max-aspect-ratio:1/1){
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   .code{max-width:none}
-  .code li{white-space:pre-wrap}
+  .code li{white-space:pre-wrap;overflow-wrap:anywhere}
 }

@@ -61,7 +61,7 @@
 @media (prefers-reduced-motion:reduce){
   .slide.is-active .presenter-badge,.slide.is-active .presenter-banner img{animation:none!important}
 }
-@media screen and (max-aspect-ratio:1/1){
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   .slide--presenter{overflow-y:auto}
   .presenter-panel{width:92%;padding:7vh 6vw 4vh;height:auto}
   .presenter-links{grid-template-columns:1fr;max-width:none}

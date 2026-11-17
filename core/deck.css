@@ -182,9 +182,10 @@ dialog.overlay::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(3px)}
   .slide [data-step]:not(.is-shown){transform:none}
 }
 
-@media screen and (max-aspect-ratio:1/1){
+@media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   html,body{overflow:hidden}
   .slide{justify-content:flex-start;overflow-y:auto;padding:9vh 6vw 14vh}
+  .slide > *{flex-shrink:0}
   .split,.split--wide,.split--even,.split--hero,.cols,.flow{display:flex;flex-direction:column;align-items:stretch;gap:3vh;height:auto}
   .slide-foot{position:static;margin-top:5vh}
   .stage{height:auto;flex-direction:column;gap:3vh}

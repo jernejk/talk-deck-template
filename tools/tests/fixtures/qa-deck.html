@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA contract fixture</title>
+<script id="deck-config" type="application/json">{"title":"QA fixture","resolution":"1920x1080","sections":{"Test":1}}</script>
+<link rel="stylesheet" href="lib/core/deck.css"><link rel="stylesheet" href="lib/components/components.css">
+<link rel="stylesheet" href="lib/templates/community/theme.css" id="theme">
+</head><body>
+<section class="slide" id="intro" data-section="Test" data-layout="statement" data-title="Fixture one">
+  <div class="eyebrow">01 · fixture</div><h2 class="title">Fixture <em>one.</em></h2>
+  <p class="sub">Original wording.</p><aside class="notes"><p><b>0:00–0:10.</b> Fixture notes.</p></aside>
+</section>
+<section class="slide" id="embed" data-section="Test" data-layout="media" data-title="Nested page">
+  <div class="eyebrow">02 · fixture</div><h2 class="title">Nested <em>page.</em></h2>
+  <figure class="embed" style="--h:40vh"><div class="embed-bar"><span class="embed-url">child.html</span></div>
+    <div class="embed-view"><img class="embed-shot" src="poster.png" alt="Fixture fallback capture"><iframe class="embed-frame" data-src="child.html" title="Nested fixture"></iframe></div>
+    <figcaption><b>Fixture</b>same-origin nested page</figcaption>
+  </figure><aside class="notes"><p><b>0:10–0:20.</b> Fixture notes.</p></aside>
+</section>
+<section class="slide" id="media" data-section="Test" data-layout="split" data-title="Decoded poster">
+  <div class="eyebrow">03 · fixture</div><h2 class="title">Decoded <em>poster.</em></h2>
+  <figure class="video" style="--h:35vh"><video src="demo.mp4" poster="poster.png" muted loop playsinline preload="auto" aria-label="Fixture sample clip"></video><figcaption><b>Sample clip</b>test media</figcaption></figure>
+  <aside class="notes"><p><b>0:20–0:30.</b> Fixture notes.</p></aside>
+</section>
+<section class="slide" id="close" data-section="Test" data-layout="statement" data-title="Complete">
+  <div class="eyebrow">04 · fixture</div><h2 class="title">Fixture <em>complete.</em></h2>
+  <aside class="notes"><p><b>0:30–0:40.</b> Fixture notes.</p></aside>
+</section>
+<script src="lib/core/deck.js"></script><script src="lib/components/components.js"></script>
+</body></html>

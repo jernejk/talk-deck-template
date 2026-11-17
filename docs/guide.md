@@ -60,11 +60,11 @@ An agent following `AGENTS.md` will:
 | `deck-story` | Shape the story: the one idea, the arc from hook to close, bridges, show-not-tell. `arc.md` is a worked example |
 | `deck-coach` | Work with the presenter: what to ask first, how to show a draft, feedback rounds, versions |
 | `deck-plan` | Plan a talk and build the first draft from an outline. `fanout.md` splits a long deck across agents |
-| `deck-slides` | Add, change and reorder slides, and pick patterns |
+| `deck-slides` | Add, change and reorder slides, and pick patterns. `delegate.md` briefs a helper agent and says how to accept its work |
 | `deck-media` | Add screenshots, generated images and live demos, with honest captions |
 | `deck-demo` | Build demos that always work: live, recorded, replayed, drawn or simulated |
 | `deck-notes` | Write notes and clocks, add extras and update `PRESENTER.md` |
-| `deck-check` | Run QA and the lint, read the screenshots and pass the "done" list |
+| `deck-check` | Run QA and the lint, read the screenshots and pass the "done" list. `tiers.md` says which checks can wait while you work, and how to keep track of them |
 | `deck-perf` | Find what makes a deck run hot or stutter, with `npm run perf` |
 | `deck-style` | Make a colourway or a template, and check contrast |
 | `deck-publish` | Export, inline, refresh the QR, and publish after you say yes |

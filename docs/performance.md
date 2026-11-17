@@ -36,7 +36,7 @@ These are desktop Chromium numbers, and CPU time is not watts. A phone's cost di
 - **`var()` inside keyframes.** Chrome runs a `transform` animation on the main thread when its keyframes read a custom property. Keep keyframe values literal and put per-element differences on a property the animation doesn't touch, such as `rotate`.
 - **Long idle.** After 90 seconds without input the core pauses every looping animation on the active slide, and SMIL in its SVGs, until the next key, tap or mouse move. Set `"idle"` in the config block to change the seconds, or `0` to turn it off. Script-driven loops should check `document.documentElement.classList.contains("is-resting")`.
 - **`backdrop-filter` over moving content.** The blur is recomputed every time anything behind it changes. Keep blurred panels over static backgrounds.
-- **Big media on load.** `preload="auto"` on several videos downloads them all at once on a phone's connection. Keep it for the clip you play first, and give every video a `poster`.
+- **Big media on load.** `preload="auto"` on several videos downloads them all at once on a phone's connection. Video patterns default to `preload="none"` with a local `poster`; keep an eager exception only for an imminent clip when its load cost is justified. A successful metadata QA probe is not a measurement of cold-start loading.
 
 ## Phones and zoom
 

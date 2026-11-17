@@ -381,9 +381,10 @@
     fullscreen: toggleFullscreen
   };
 
-  function isOwnedByControl(target) {
+  function isOwnedByControl(target, touch = false) {
+    const media = touch ? "video[controls], audio[controls], .player" : "video, audio";
     return target instanceof Element &&
-      target.closest('input, textarea, select, video, audio, iframe, [contenteditable]:not([contenteditable="false"])');
+      target.closest(`input, textarea, select, iframe, [role="slider"], [role="spinbutton"], [role="textbox"], [data-deck-interactive], [contenteditable]:not([contenteditable="false"]), ${media}`);
   }
 
   function slideFromHash() {
@@ -438,11 +439,11 @@
     const zoomed = () => hostZoomed() ?? (window.visualViewport?.scale ?? 1) > 1.01;
     document.addEventListener("touchstart", e => {
       const t = e.target;
-      if (e.touches.length !== 1 || zoomed() || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
+      if (e.defaultPrevented || e.touches.length !== 1 || zoomed() || isOwnedByControl(t, true) || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
       touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }, { passive: true });
     document.addEventListener("touchend", e => {
-      if (!touch || e.touches.length || zoomed()) { touch = null; return; }
+      if (!touch || e.defaultPrevented || e.touches.length || !e.changedTouches.length || zoomed()) { touch = null; return; }
       const dx = e.changedTouches[0].clientX - touch.x;
       const dy = e.changedTouches[0].clientY - touch.y;
       touch = null;
@@ -561,7 +562,7 @@
 
   function use(plugin) {
     plugins.push(plugin);
-    if (!deck.started) return;
+    if (!deck.started || hosting) return;
     deck.all.forEach(slide => {
       try { plugin.init?.(slide, api); } catch (e) { console.error(e); }
     });
