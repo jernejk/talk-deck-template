@@ -8,7 +8,7 @@ import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
 import { selectSlides, slideSections } from "./qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock } from "./qa-lock.mjs";
-import { artifact, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
+import { artifact, assertDeckInput, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
 import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -147,7 +147,7 @@ async function decks() {
   } else found.push(join(ROOT, "site/index.html"));
   const out = [];
   for (const index of found) {
-    if (index !== serveRoot && !index.startsWith(serveRoot + sep)) throw new Error(`${index} is outside ${serveRoot}.`);
+    await assertDeckInput(ROOT, repoMode, index);
     const html = await readFile(index, "utf8");
     const own = html.match(/templates\/([\w-]+)\/theme\.css" id="theme"/)?.[1];
     const isCatalog = basename(dirname(index)) === "catalog";

@@ -162,6 +162,13 @@ test("real QA receipts distinguish full/scoped/fast, stale and tampered evidence
   assert.deepEqual(full.json.screenshotCounts, { slides: 8, sheets: 2, total: 10 });
   let s = await status(root, "full");
   assert.equal(s.json.currentFull, true, JSON.stringify(s.json)); assert.equal(s.json.state, "current-full");
+  const pointer = join(root, "qa/full/latest.json");
+  const correctPointer = await readFile(pointer);
+  await writeFile(pointer, JSON.stringify({ ...JSON.parse(correctPointer), schema: "wrong" }));
+  s = await status(root, "full");
+  assert.equal(s.json.latest.valid, false);
+  assert.equal(s.json.full.valid, true);
+  await writeFile(pointer, correctPointer);
   const receipt = JSON.parse(await readFile(full.json.receipt, "utf8"));
   assert.deepEqual(receipt.tasks.filter(t => t.kind === "render").map(t => t.checkedIds), Array(2).fill(["intro", "embed", "media", "close"]));
   assert(receipt.tasks.filter(t => t.kind.startsWith("features-")).every(t => t.completed), JSON.stringify(receipt.problems));
@@ -318,4 +325,116 @@ test("full keyboard QA traverses a stepped nested embed and rejects its broken r
   await writeFile(join(root, "site/grandchild.html"), '<!doctype html><title>Broken revealed child</title><img src="missing-grandchild.png" alt="Broken">');
   const broken = await qa(root, "stepped-broken", [], { code: 1 });
   assert.ok(broken.json.problems.some(p => JSON.stringify(p).includes("404")));
+});
+
+async function authoringFixture(t) {
+  const dir = await mkdtemp(join(artifacts, "authoring-contract-"));
+  if (!process.env.QA_TEST_ARTIFACTS) t.after(() => rm(dir, { recursive: true, force: true }));
+  return dir;
+}
+
+async function author(tool, dir, ...args) {
+  const { spawnSync } = await import("node:child_process");
+  const r = spawnSync(process.execPath, [join(ROOT, "tools", tool + ".mjs"), dir, ...args], { encoding: "utf8" });
+  assert.ifError(r.error);
+  return r;
+}
+
+test("outline preserves the deck boundary and config, and rejects ambiguous markup before writing", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), outline = join(dir, "outline.json");
+  await writeFile(outline, JSON.stringify({ agenda: true, slides: [{ pattern: "statement", section: "Q&A", title: "Questions" }] }));
+  const head = '<head><title>Retain</title><script>const fake = "<main id=deck></main>"</script><script id="deck-config" type="application/json">{"brand":"Keep","agenda":[{"section":"Q&A","title":"Your questions","note":"Keep"}]}</script></head>';
+  const end = "</MAIN><main id=other>Keep this main</main><footer>Keep</footer>";
+  for (const opener of ['<MAIN class="x > y" id="deck">', "<main id='deck'>"]) {
+    await writeFile(index, "<!doctype html>" + head + "<!-- <main id=deck></main> -->" + opener + "Old" + end);
+    const r = await author("outline", dir, outline, "--force");
+    assert.equal(r.status, 0, r.stderr);
+    const html = await readFile(index, "utf8");
+    assert.ok(html.includes(opener) && html.endsWith(end));
+    assert.ok(html.includes('<title>Retain</title><script>const fake = "<main id=deck></main>"'));
+    assert.match(html, /data-section="Q&amp;A"/);
+    const config = JSON.parse(html.match(/<script id="deck-config"[^>]*>([\s\S]*?)<\/script>/)[1]);
+    assert.equal(config.brand, "Keep");
+    assert.deepEqual(config.agenda, [{ section: "Q&A", title: "Your questions", note: "Keep", time: "0:00" }]);
+  }
+  for (const main of ["<main>Other</main>", "<main id=deck>", "<main id=deck></main><main id='deck'></main>", "<main id=deck></main></main>"]) {
+    const html = head + main;
+    await writeFile(index, html);
+    const r = await author("outline", dir, outline, "--force");
+    assert.equal(r.status, 1, r.stdout);
+    assert.equal(await readFile(index, "utf8"), html);
+  }
+});
+
+test("add and route share nested boundaries and preserve repeated cues, use cases and pipes", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), presenter = join(dir, "PRESENTER.md");
+  const section = (id, title, body = "", attrs = "") => '<section class=slide id="' + id + '" data-title="' + title + '" ' + attrs + '>' + body + '</section>';
+  const notes = clock => '<aside class="notes"><b>' + clock + '.</b></aside>';
+  const one = section("one", "Demo", '<section>Nested</section><!-- </section> -->' + notes("0:00–1:00"));
+  const two = section("two", "Demo", notes("1:00–2:00"));
+  const pipe = section("pipe", "A | B");
+  const extra1 = section("extra-one", "Extra: More | detail", "", "data-hidden");
+  const extra2 = section("extra-two", "Extra: More | detail", "", "data-hidden");
+  const writeDeck = (...slides) => writeFile(index, '<main id="deck">' + slides.join("\n") + '</main>');
+  const original = '| # | Slide | Clock | Live or screenshot | Cue |\n|---|---|---|---|---|\n' +
+    '| 1 | Demo | 0:00–1:00 | Illustration | FIRST \\| both |\n| 2 | Demo | 1:00–2:00 | Slide | SECOND |\n| 3 | A \\| B |  | Slide | THIRD\n\n' +
+    '| Extra | Use when |\n|---|---|\n| More \\| detail | Extra FIRST |\n| More \\| detail | Extra SECOND |\n';
+  await writeFile(presenter, original);
+  await writeDeck(two, one, pipe, extra1, extra2);
+  let r = await author("route", dir);
+  assert.match(r.stderr, /ambiguous legacy/);
+  assert.equal(await readFile(presenter, "utf8"), original);
+
+  await writeDeck(one, two, pipe, extra1, extra2);
+  r = await author("route", dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal((await author("route", dir, "--check")).status, 0);
+  await writeDeck(two, one, pipe, extra2, extra1);
+  r = await author("route", dir);
+  assert.equal(r.status, 0, r.stderr);
+  const md = await readFile(presenter, "utf8");
+  assert.match(md, /\| 1 \| Demo .* \| 1:00–2:00 \| Slide \| SECOND \|/);
+  assert.match(md, /\| 2 \| Demo .* \| 0:00–1:00 \| Illustration \| FIRST \\\| both \|/);
+  assert.match(md, /\| A \\\| B \|  \| Slide \| THIRD \|/);
+  assert.ok(md.indexOf("Extra SECOND") < md.indexOf("Extra FIRST"));
+  r = await author("add", dir, "statement", "--after", "one");
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(slideSections(await readFile(index, "utf8")).map(s => s.id), ["two", "one", "statement", "pipe", "extra-two", "extra-one"]);
+});
+
+test("inline resolves static resources per iframe document and fails before overwriting output on cycles", async t => {
+  const dir = await authoringFixture(t), out = join(dir, "standalone.html");
+  await mkdir(join(dir, "demo/nested"), { recursive: true });
+  await writeFile(join(dir, "index.html"), "<iframe data-src='demo/child.html' title='Child'></iframe>");
+  await writeFile(join(dir, "demo/child.html"), "<script src='run.js'></script><link rel=stylesheet href=look.css><iframe src=nested/grandchild.html></iframe>");
+  await writeFile(join(dir, "demo/run.js"), 'document.title = "child";');
+  await writeFile(join(dir, "demo/look.css"), "body { background: url(nested/icon.svg); }");
+  await writeFile(join(dir, "demo/nested/icon.svg"), '<svg xmlns="http://www.w3.org/2000/svg" />');
+  await writeFile(join(dir, "demo/nested/grandchild.html"), "<img src=icon.svg alt=Icon>");
+  let r = await author("inline", dir);
+  assert.equal(r.status, 0, r.stderr);
+  const exported = await readFile(out, "utf8");
+  const unstuff = (text, type) => Buffer.from(text.match(new RegExp("data:" + type + "[^,]*,([A-Za-z0-9+/=]+)"))[1], "base64").toString();
+  const child = unstuff(exported, "text/html");
+  assert.equal(unstuff(child, "text/javascript"), 'document.title = "child";');
+  assert.match(unstuff(child, "text/css"), /data:image\/svg\+xml;base64/);
+  assert.match(unstuff(child, "text/html"), /data:image\/svg\+xml;base64/);
+  for (const [body, diagnostic] of [["<iframe src=../child.html></iframe>", /Circular iframe/], ["<img srcset='icon.svg 1x'>", /grandchild.html.*unsupported/]]) {
+    await writeFile(join(dir, "demo/nested/grandchild.html"), body);
+    r = await author("inline", dir);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, diagnostic);
+    assert.equal(await readFile(out, "utf8"), exported);
+  }
+});
+
+test("QA rejects an explicit repository deck outside the fingerprinted examples", async t => {
+  const root = await fixture(t);
+  await mkdir(join(root, "examples"));
+  await mkdir(join(root, "core"));
+  await writeFile(join(root, "core/deck.js"), "");
+  const output = join(root, "outside");
+  const r = await run(root, "qa", ["site", "--out", output], { code: 1 });
+  assert.match(r.stderr, /inside the fingerprinted examples/);
+  await assert.rejects(readFile(join(output, "latest.json")), { code: "ENOENT" });
 });

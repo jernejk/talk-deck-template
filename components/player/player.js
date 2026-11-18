@@ -38,7 +38,7 @@ function buildVideo(fig, slide) {
 
   let started = false;
   let seekOnMetadata = false;
-  let scrubbing = false;
+  let scrubPointer = null;
   let raf = 0;
 
   function paint() {
@@ -52,7 +52,7 @@ function buildVideo(fig, slide) {
     toggle.ariaLabel = v.paused ? "Play" : "Pause";
     mute.ariaPressed = String(v.muted);
     time.textContent = `${fmt(done)} / ${fmt(total, Math.round)}`;
-    if (scrubbing) return;
+    if (scrubPointer !== null) return;
     seek.max = String(total);
     seek.value = String(done);
     seek.style.setProperty("--p", total ? `${done / total * 100}%` : "0%");
@@ -80,10 +80,24 @@ function buildVideo(fig, slide) {
     v.play().catch(swallow);
   }
 
+  function clearScrub() {
+    scrubPointer = null;
+    removeEventListener("pointerup", finishScrub, true);
+    removeEventListener("pointercancel", finishScrub, true);
+  }
+
+  function finishScrub(event) {
+    if (event.pointerId !== scrubPointer) return;
+    clearScrub();
+    paint();
+    if (event.type === "pointerup" && slide.classList.contains("is-active")) slide.focus({ preventScroll: true });
+  }
+
   const api = {
     play,
-    pause: () => v.pause(),
+    pause() { clearScrub(); v.pause(); paint(); },
     reset() {
+      clearScrub();
       v.pause();
       started = false;
       seekOnMetadata = v.readyState < 1;
@@ -106,9 +120,11 @@ function buildVideo(fig, slide) {
   toggle.addEventListener("click", () => v.paused ? play() : v.pause());
   mute.addEventListener("click", () => { v.muted = !v.muted; });
   seek.addEventListener("input", () => { v.currentTime = start + Number(seek.value); paint(); });
-  seek.addEventListener("pointerdown", () => {
-    scrubbing = true;
-    addEventListener("pointerup", () => { scrubbing = false; paint(); slide.focus({ preventScroll: true }); }, { once: true });
+  seek.addEventListener("pointerdown", event => {
+    if (scrubPointer !== null || event.button !== 0) return;
+    scrubPointer = event.pointerId;
+    addEventListener("pointerup", finishScrub, true);
+    addEventListener("pointercancel", finishScrub, true);
   });
   paint();
 }

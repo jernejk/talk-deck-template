@@ -468,6 +468,7 @@
     resting = true;
     document.documentElement.classList.add("is-resting");
     current()?.querySelectorAll("svg").forEach(svg => { if (svg.animationsPaused && !svg.animationsPaused()) { svg.pauseAnimations(); restPaused.add(svg); } });
+    if (deck.active) emit("rest", deck.active);
   }
   function wake() {
     lastInput = Date.now();
@@ -476,6 +477,7 @@
     document.documentElement.classList.remove("is-resting");
     restPaused.forEach(svg => svg.unpauseAnimations());
     restPaused.clear();
+    if (deck.active) emit("wake", deck.active);
   }
 
   function touchHint() {
@@ -554,9 +556,9 @@
     deck.all.forEach(rise);
     wire();
     toggleNotes(false);
-    refreshVisible(null, { updateHash: false });
     const entry = slideFromHash();
-    if (entry) goTo(entry, { updateHash: false });
+    deck.showExtras = entry?.hasAttribute("data-hidden") ?? false;
+    refreshVisible(entry, { updateHash: false });
     touchHint();
   }
 

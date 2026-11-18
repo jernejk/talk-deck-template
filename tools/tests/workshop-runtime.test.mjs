@@ -19,15 +19,25 @@ const fixture = html(slide("intro", controls) + slide("clips", `<div data-step>$
 let browser, safari, server, base, lease;
 const sockets = new Set();
 const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".mp4": "video/mp4", ".woff2": "font/woff2" };
-let many, youtube;
+let many, youtube, lifecycle;
 
 test.before(async () => {
   lease = await acquireResourceLock({ kind: process.env.WORKSHOP_TEST_EXCLUSIVE ? "perf" : "qa", slots: 2 });
   const figures = await Promise.all(["video", "player"].map(async name => (await readFile(join(ROOT, `slides/${name}.html`), "utf8")).match(/<figure[\s\S]*?<\/figure>/)[0].replaceAll('="assets/', '="/slides/assets/')));
   youtube = html(slide("youtube", (await readFile(join(ROOT, "slides/youtube.html"), "utf8")).match(/<figure[\s\S]*?<\/figure>/)[0].replaceAll('="assets/', '="/slides/assets/')) + slide("close", ""));
   many = html(slide("intro", "") + Array.from({ length: 12 }, (_, i) => slide(`v${i}`, figures[i % 2].replace("demo.mp4", `demo.mp4?clip=${i}`))).join("") + Array.from({ length: 12 }, (_, i) => slide(`e${i}`, embed(`/child.html?child=${i}`).replace(" data-step", ""))).join("") + Array.from({ length: 36 }, (_, i) => slide(`s${i}`, "", i === 35 ? "data-hidden" : "")).join("") + slide("close", ""));
+  const fallback = embed("/child.html").replace('<iframe', '<img class="embed-shot" src="/slides/assets/sample/demo-poster.png" alt="Local fallback"><iframe');
+  lifecycle = html(
+    slide("timer", '<div class="timer" data-time="0:05" data-autostart></div>') +
+    slide("stepped", '<div data-step>' + fallback + '</div>') +
+    slide("loading", embed("/slow-demo.html")) +
+    slide("scrub", figures[1]) +
+    slide("travel", '<svg viewBox="0 0 100 10"><g class="mx-travel" style="--t:4s"><path d="M0 5H100"/><circle r="2"/></g></svg>') +
+    slide("extra", "", "data-hidden")
+  ).replace('"sections":{"Test":1}', '"sections":{"Test":1},"idle":1');
   server = createServer(async (req, res) => {
     const path = decodeURIComponent(new URL(req.url, "http://fixture.test").pathname);
+    if (path === "/lifecycle.html") { res.setHeader("Content-Type", "text/html"); res.end(lifecycle); return; }
     if (path === "/fixture.html" || path === "/many.html" || path === "/youtube.html" || path === "/child.html") { res.setHeader("Content-Type", "text/html"); res.end(path === "/fixture.html" ? fixture : path === "/many.html" ? many : path === "/youtube.html" ? youtube : '<!doctype html><title>Child</title><p>Ready.</p>'); return; }
     const file = resolve(ROOT, "." + path);
     if (!file.startsWith(ROOT + sep)) { res.writeHead(403).end(); return; }
@@ -196,12 +206,12 @@ test("phone overlays, expanded demos and expired countdowns stay usable through 
       await p.locator('[data-action="overview"]').click();
       assert.equal(await p.locator("#overview").evaluate(el => el.contains(document.activeElement)), true);
       await p.keyboard.press("Escape");
-      assert.equal(await p.evaluate(() => document.activeElement.dataset.action), "overview");
+      await p.waitForFunction(() => document.activeElement.dataset.action === "overview");
       await go(p, "image"); await p.locator("#image .image-zoom").click();
       await p.locator('[data-action="next"]').evaluate(el => el.focus());
       assert.equal(await p.locator("#image-viewer").evaluate(el => el.contains(document.activeElement)), true);
       await p.keyboard.press("Escape");
-      assert.equal(await p.evaluate(() => document.activeElement.classList.contains("image-zoom")), true);
+      await p.waitForFunction(() => document.activeElement.classList.contains("image-zoom"));
     }
   }
 });
@@ -264,4 +274,121 @@ test("a refused autoplay leaves native play controls available", async t => {
   await p.evaluate(() => Deck.next());
   await p.waitForFunction(() => document.querySelector("#clips video").controls, null, { timeout: 1000 });
   assert.equal(await p.locator("#clips video").first().evaluate(v => v.muted && v.paused), true);
+});
+
+test("deep links enter the requested main or extra slide before an autostart timer", async t => {
+  for (const [hash, id] of [["#stepped", "stepped"], ["#6", "extra"], ["#extra", "extra"]]) {
+    const p = await pageFor(t);
+    await p.goto(base + "/lifecycle.html" + hash);
+    assert.equal(await p.evaluate(() => Deck.current().id), id);
+    assert.equal(await p.evaluate(() => location.hash), hash);
+    assert.match(await p.locator("#timer .timer button").first().textContent(), /Start/);
+    await go(p, "timer");
+    assert.match(await p.locator("#timer .timer button").first().textContent(), /Pause/);
+    await p.close();
+  }
+});
+
+test("global Live tracks nested reveals and pending iframe unload survives slide leave", async t => {
+  for (const [engine, viewport, theme] of [
+    [browser, { width: 1920, height: 1080 }, "community"],
+    [safari, { width: 390, height: 844 }, "paper"]
+  ]) {
+    const p = await pageFor(t, engine, { viewport, hasTouch: viewport.width < 400 });
+    await p.route("**/slow-demo.html", () => {}); // Hold navigation beyond both unload calls.
+    await p.goto(base + "/lifecycle.html?theme=" + theme + "#stepped");
+    const live = p.locator(".deck-nav button").filter({ hasText: /^Live/ });
+    const fallbackFrame = p.locator("#stepped iframe");
+    assert.equal(await live.isHidden(), true);
+    await p.keyboard.press("l");
+    assert.equal(await fallbackFrame.getAttribute("src"), null);
+    await p.evaluate(() => Deck.next());
+    assert.equal(await live.isHidden(), true);
+    await p.evaluate(() => Deck.next());
+    assert.equal(await live.isVisible(), true);
+    await p.keyboard.press("l");
+    assert.equal(await live.getAttribute("aria-pressed"), "true");
+    await p.evaluate(() => Deck.prev());
+    assert.equal(await live.isHidden(), true);
+    assert.equal(await live.getAttribute("aria-pressed"), "false");
+    await p.evaluate(() => Deck.next());
+    await live.click();
+    assert.equal(await live.getAttribute("aria-pressed"), "true");
+    await go(p, "loading");
+    await p.evaluate(() => { Deck.next(); Deck.prev(); Deck.next(); Deck.prev(); Deck.goTo(document.querySelector("#scrub")); });
+    const frame = p.locator("#loading iframe");
+    assert.equal(await frame.getAttribute("data-state"), "unload");
+    await p.waitForFunction(() => document.querySelector("#loading iframe").getAttribute("src") === "about:blank");
+  }
+});
+
+test("player cancellation repaints progress, ignores other pointers and keeps focus on the active slide", async t => {
+  for (const engine of [browser, safari]) {
+    const p = await pageFor(t, engine);
+    await p.goto(base + "/lifecycle.html#scrub");
+    const result = await p.evaluate(async () => {
+      const slide = Deck.current(), seek = slide.querySelector(".player-seek"), video = slide.querySelector("video");
+      const event = (target, type, pointerId) => target.dispatchEvent(new PointerEvent(type, { pointerId, bubbles: true, button: 0 }));
+      video.preload = "auto";
+      if (video.readyState === 0) await new Promise(resolve => video.addEventListener("loadedmetadata", resolve, { once: true }));
+      seek.focus();
+      event(seek, "pointerdown", 11);
+      event(window, "pointerup", 22);
+      video.currentTime = 2;
+      video.dispatchEvent(new Event("seeked"));
+      const during = seek.value;
+      event(window, "pointercancel", 11);
+      const cancelled = [seek.value, seek.getAttribute("aria-valuetext"), parseFloat(seek.style.getPropertyValue("--p")), document.activeElement === seek];
+      event(seek, "pointerdown", 33);
+      Deck.goTo(document.querySelector("#stepped"));
+      event(window, "pointerup", 33);
+      return { during, cancelled, inactiveFocused: document.activeElement === slide };
+    });
+    assert.equal(result.during, "0");
+    const [value, a11y, progress, seekFocused] = result.cancelled;
+    assert.equal(value, "1");
+    assert.equal(a11y, "0:01 / 0:03");
+    assert.ok(progress > 33 && progress < 34);
+    assert.equal(seekFocused, true);
+    assert.equal(result.inactiveFocused, false);
+  }
+});
+
+test("travelling SVG dots suspend at idle, wake at the same phase, and park on reduced motion", async t => {
+  const p = await pageFor(t, browser, { reducedMotion: "no-preference" });
+  await p.clock.install();
+  await p.goto(base + "/lifecycle.html#travel");
+  const dot = p.locator(".mx-travel circle");
+  await p.clock.runFor(430);
+  const moving = await dot.getAttribute("transform");
+  assert.notEqual(moving, "translate(0.0 5.0)");
+  await p.clock.fastForward(5000);
+  assert.ok(await p.locator("html").evaluate(el => el.classList.contains("is-resting")));
+  const rested = await dot.getAttribute("transform");
+  await p.clock.runFor(250);
+  assert.equal(await dot.getAttribute("transform"), rested);
+  await p.evaluate(() => document.dispatchEvent(new Event("pointermove")));
+  await p.clock.runFor(16);
+  assert.equal(await dot.getAttribute("transform"), rested);
+  await p.clock.runFor(150);
+  assert.notEqual(await dot.getAttribute("transform"), rested);
+  async function changeMotion(reducedMotion) {
+    await p.evaluate(() => {
+      window.motionChanged = new Promise(resolve => {
+        matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => resolve(true), { once: true });
+      });
+    });
+    await p.emulateMedia({ reducedMotion });
+    await p.evaluate(() => window.motionChanged);
+  }
+  await changeMotion("reduce");
+  await p.clock.runFor(100);
+  assert.equal(await dot.getAttribute("transform"), "translate(50.0 5.0)");
+  await changeMotion("no-preference");
+  await p.clock.runFor(150);
+  assert.notEqual(await dot.getAttribute("transform"), "translate(50.0 5.0)");
+  await go(p, "scrub");
+  const left = await dot.getAttribute("transform");
+  await p.clock.runFor(150);
+  assert.equal(await dot.getAttribute("transform"), left);
 });

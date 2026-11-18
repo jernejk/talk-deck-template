@@ -1,3 +1,4 @@
+import { attributes, slideSections as scanSlides } from "./qa-scope.mjs";
 import { access, cp, mkdir, readdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -41,18 +42,7 @@ export async function patterns() {
   return Promise.all(index.map(async p => ({ ...p, html: (await readFile(join(REPO, "slides", `${p.name}.html`), "utf8")).trim() })));
 }
 
-const attr = (tag, name) => tag.match(new RegExp(`\\s${name}\\s*=\\s*(["'])(.*?)\\1`, "i"))?.[2];
-
-export function slideSections(html) {
-  const out = [];
-  for (const m of html.matchAll(/<section\b[^>]*>/gi)) {
-    const tag = m[0];
-    if (!(attr(tag, "class") || "").split(/\s+/).includes("slide")) continue;
-    const close = html.indexOf("</section>", m.index);
-    out.push({ start: m.index, end: close < 0 ? html.length : close + "</section>".length, tag, id: attr(tag, "id") || "", hidden: /\sdata-hidden\b/i.test(tag) });
-  }
-  return out;
-}
+export const slideSections = html => scanSlides(html, { strict: false });
 
 export function uniqueId(id, taken) {
   let next = id;
@@ -147,15 +137,32 @@ export async function deckIndex(path) {
   fail(`No deck at ${path}: expected index.html or site/index.html.`);
 }
 
+export function routeRows(slides) {
+  const main = [], extras = [];
+  for (const html of slides) {
+    const slide = slideSections(html)[0];
+    if (!slide) continue;
+    const attrs = attributes(slide.tag);
+    const title = attrs.get("data-title") ?? "";
+    if (slide.hidden) {
+      extras.push({ id: slide.id, cells: [title.replace(/^Extra: /, ""), ""] });
+    } else {
+      const clock = html.match(/<b>(\d+:\d\d–\d+:\d\d)\.<\/b>/)?.[1] ?? "";
+      const live = attrs.get("data-live");
+      main.push({ id: slide.id, cells: [main.length + 1, title, clock, live ? '**Live:** ' + live : "Slide", ""] });
+    }
+  }
+  return { main, extras };
+}
+
+// Preserve backslashes as written except immediately before a table pipe.
+export function markdownRow(cells) {
+  return "| " + cells.map(cell => String(cell).replace(/(\\*)\|/g, (_, slashes) => slashes + slashes + "\\|")).join(" | ") + " |";
+}
+
 export function routeTable(slides) {
-  const rows = slides.filter(s => !/^<section[^>]*\bdata-hidden\b/.test(s)).map((s, i) => {
-    const title = s.match(/data-title="([^"]*)"/)?.[1] ?? "";
-    const clock = s.match(/<b>(\d+:\d\d–\d+:\d\d)\.<\/b>/)?.[1] ?? "";
-    const live = s.match(/data-live="([^"]*)"/)?.[1];
-    return `| ${i + 1} | ${title} | ${clock} | ${live ? `**Live:** ${live}` : "Slide"} |  |`;
-  });
-  const extras = slides.filter(s => /^<section[^>]*\bdata-hidden\b/.test(s)).map(s => `| ${s.match(/data-title="([^"]*)"/)?.[1].replace(/^Extra: /, "") ?? ""} |  |`);
-  return { route: rows.join("\n"), extras: extras.join("\n"), main: rows.length, extraCount: extras.length };
+  const { main, extras } = routeRows(slides);
+  return { route: main.map(r => markdownRow(r.cells)).join("\n"), extras: extras.map(r => markdownRow(r.cells)).join("\n"), main: main.length, extraCount: extras.length };
 }
 
 export async function copyAssets(html, deckDir, { overwrite = false } = {}) {

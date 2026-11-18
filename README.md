@@ -109,6 +109,10 @@ Outside this repo, `new` makes a self-contained folder: `site/` is the deck you 
 | Lint a deck's content | `npm run lint -- ~/talks/my-talk` (no screenshots, about a second) |
 | Publish | `npx surge ~/talks/my-talk/site my-talk.surge.sh` |
 
+Single-file export packages static local styles, classic scripts, media and iframe documents. Each iframe resolves its own relative resources. Build modules and runtime-loaded dependencies into the demo before export. The exporter rejects unsupported static markup such as `srcset`, `srcdoc`, local navigation to another page and recursive iframes.
+
+Route refresh records slide IDs for repeated titles in Markdown comments. For a legacy table with repeated titles, check that the rows still follow the deck order before the first refresh. Escape pipes inside cells as `\|`.
+
 ### Patterns for each part of a talk
 
 | Part | Patterns |
@@ -208,6 +212,8 @@ Each deck × template × size runs as a separate job, up to four at a time; `--j
 ### Evidence and bounded edits
 
 Read [change tiers](skills/deck-check/tiers.md) before choosing iteration checks. Plain prose needs no browser; generated guidance needs a scratch-copy check. Deferred final gates remain in the pending record.
+
+Explicit QA targets must live in the fingerprinted `examples/` tree in this repository or in `site/` in a standalone deck.
 
 Each QA result includes `receipt`, `artifactRoot`, checked slide IDs, task timings and screenshot counts. Read only the artifacts named in that receipt. `npm run qa -- --status --out <same-output-root>` verifies current inputs, tools, browser configuration and artifact hashes without launching QA; scoped or fast evidence cannot become full evidence. Unknown slide IDs fail. WebKit, forced-resolution, touch, nested embeds, posters and lifecycle contracts run once for relevant feature slides. Physical-phone behavior remains unverified. In macOS WebKit mobile emulation, three anonymous native video-control icon failures also reproduce on a bare video page; QA retains these exact diagnostics as `webkit-native-controls` warnings. Application-origin console errors remain failures, and media/poster checks still run.
 
