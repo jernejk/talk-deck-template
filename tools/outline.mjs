@@ -50,6 +50,7 @@ let html = await readFile(index, "utf8");
 let openMain, boundary;
 const configs = [], titles = [];
 for (const tag of htmlTags(html)) {
+  if (tag.namespace !== "html") continue;
   if (tag.name === "main") {
     if (!tag.closing) {
       if (openMain) fail(index + " has nested <main> elements.");

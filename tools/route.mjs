@@ -34,7 +34,7 @@ function tableRow(line, width, titleCol) {
     }
   }
   if (row.endsWith("|") && cells.at(-1) === "") cells.pop();
-  if (cells.length !== width) fail(file + ": expected " + width + " columns. Escape literal pipes as \\| before refreshing: " + line);
+  if (cells.length !== width) fail(file + ": expected " + width + " columns, found " + cells.length + ". Use the standard columns and escape any literal pipes as \\|: " + line);
   const mark = marker.exec(cells[titleCol]);
   if (mark) cells[titleCol] = cells[titleCol].slice(0, mark.index);
   return { id: mark ? decodeURIComponent(mark[1]) : "", cells: cells.map(c => c.trim()) };
@@ -53,6 +53,7 @@ function table(md, head, width, titleCol) {
 const slides = slideSections(html).map(s => html.slice(s.start, s.end));
 const fresh = routeRows(slides);
 let md = before;
+const migrations = [];
 
 function match(old, rows, col) {
   const oldTitles = old.map(r => r.cells[col]);
@@ -75,10 +76,23 @@ function match(old, rows, col) {
     if (row) used.add(row);
     return row;
   });
+  const unmatched = title => titles.flatMap((t, i) => t === title && !matches[i] ? [i] : []);
+  const orphans = old.filter(o => o.id && !used.has(o));
+  for (const title of new Set(orphans.map(o => o.cells[col]))) {
+    const prior = orphans.filter(o => o.cells[col] === title);
+    const slots = unmatched(title);
+    const nextId = rows[slots[0]]?.id;
+    const competingLegacy = old.some(o => !o.id && o.cells[col] === title);
+    if (prior.length !== 1 || slots.length !== 1 || !nextId || rows.filter(r => r.id === nextId).length !== 1 || competingLegacy) {
+      fail(file + ': ambiguous route ID for "' + title + '". Update the affected ID markers or remove retired rows before refreshing.');
+    }
+    matches[slots[0]] = prior[0];
+    used.add(prior[0]);
+  }
   for (const title of new Set(titles)) {
     const legacy = old.filter(o => !o.id && o.cells[col] === title);
     if (!legacy.length) continue;
-    const slots = titles.flatMap((t, i) => t === title && !matches[i] ? [i] : []);
+    const slots = unmatched(title);
     if (!slots.length) continue;
     if (legacy.length > 1 || slots.length > 1) {
       // An unchanged legacy table only supplies occurrence order. Detect visible
@@ -91,7 +105,15 @@ function match(old, rows, col) {
         fail(file + ': ambiguous legacy rows for "' + title + '". Align the existing rows with the slides before refreshing.');
       }
     }
-    slots.forEach((i, n) => { matches[i] = legacy[n]; used.add(legacy[n]); });
+    slots.forEach((i, n) => {
+      matches[i] = legacy[n];
+      used.add(legacy[n]);
+      if (titles.filter(t => t === title).length > 1 && rows[i].id) {
+        const occurrence = oldTitles.slice(0, old.indexOf(legacy[n]) + 1).filter(t => t === title).length;
+        const table = col === 1 ? "route" : "extra";
+        migrations.push('Legacy ' + table + ' binding by order: ' + JSON.stringify(title) + ' occurrence ' + occurrence + ' → #' + rows[i].id);
+      }
+    });
   }
   // Retain the positional fallback for a renamed legacy slide.
   return rows.map((_, i) => matches[i] ?? (old[i] && !used.has(old[i]) && !old[i].id && !titles.includes(old[i].cells[col]) ? old[i] : null));
@@ -126,4 +148,8 @@ md = md.replace(/^\d+ main slides plus \d+ extras?\./m, fresh.main.length + " ma
 
 if (md === before) console.log(`${file} is up to date.`);
 else if (o.check) fail(`${file} is stale: run npm run route${positionals.length ? ` -- ${positionals[0]}` : ""}`);
-else { await writeFile(file, md); console.log(`Updated ${file}.`); }
+else {
+  migrations.forEach(message => console.error(message));
+  await writeFile(file, md);
+  console.log(`Updated ${file}.`);
+}

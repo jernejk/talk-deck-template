@@ -24,7 +24,27 @@ async function media(url) {
   return data(type, await readFile(file)) + url.hash;
 }
 
+// A quoted image-set option is itself a URL. Quotes inside url() and type()
+// belong to those functions and keep their existing handling.
+function stringImageSet(text) {
+  const sets = /\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|((?:-webkit-)?\bimage-set\s*\()/gi;
+  const tokens = /\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'|[()]/g;
+  for (const set of text.matchAll(sets)) {
+    if (!set[1]) continue;
+    tokens.lastIndex = set.index + set[0].length;
+    let depth = 1;
+    for (let token; depth && (token = tokens.exec(text));) {
+      const value = token[0];
+      if (depth === 1 && /^["']/.test(value)) return true;
+      if (value === "(") depth++;
+      if (value === ")") depth--;
+    }
+  }
+  return false;
+}
+
 async function cssText(text, file, ancestors) {
+  if (stringImageSet(text)) throw new Error(file + ": unsupported string-form image-set(); use url() for image options.");
   const imports = /@import\s+(?:url\(\s*(?:"([^"]*)"|'([^']*)'|([^)"'\s]+))\s*\)|"([^"]*)"|'([^']*)')([^;]*);/gi;
   const urls = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^)"'\s]+))\s*\)/gi;
   let result = "", at = 0;
@@ -65,7 +85,8 @@ async function inlineDocument(file, ancestors = new Set()) {
   const chain = new Set([...ancestors, actual]);
   const html = await readFile(file, "utf8");
   const edits = [];
-  for (const token of htmlTags(html)) {
+  const tags = [...htmlTags(html)];
+  for (const [i, token] of tags.entries()) {
     if (token.closing) continue;
     const { name, tag } = token;
     const attrs = attributes(tag);
@@ -76,18 +97,21 @@ async function inlineDocument(file, ancestors = new Set()) {
     if (name === "script" && attrs.get("type")?.toLowerCase() === "module") {
       throw new Error(file + ": bundle module scripts into classic scripts before inlining.");
     }
-    if (name === "style") {
-      const text = html.slice(token.end, token.contentEnd);
+    if (name === "style" && !(token.namespace !== "html" && /\/>$/.test(tag))) {
+      const end = token.contentEnd ?? tags.slice(i + 1).find(t => t.closing && t.name === "style" && t.namespace === token.namespace)?.start;
+      if (end === undefined) throw new Error(file + ": unclosed foreign <style>.");
+      const text = html.slice(token.end, end);
       const rewritten = await cssText(text, file, new Set());
-      if (text !== rewritten) edits.push([token.end, token.contentEnd, rewritten]);
+      if (text !== rewritten) edits.push([token.end, end, rewritten]);
     }
     const attrsToEdit = [];
     for (const attr of attributeTokens(tag)) {
       const ref = attr.value.trim(), key = attr.name;
       let replacement;
-      if (key === "style" && /url\(/i.test(ref)) {
-        const rewritten = await cssText(ref, file, new Set());
-        if (rewritten !== ref) replacement = rewritten;
+      if (key === "style" && /(?:url|image-set)\s*\(/i.test(ref)) {
+        const css = ref.replace(/&quot;|&#0*34;|&#x0*22;/gi, '"').replace(/&apos;|&#0*39;|&#x0*27;/gi, "'");
+        const rewritten = await cssText(css, file, new Set());
+        if (rewritten !== css) replacement = rewritten;
       } else if (key === "src" && name === "script" && local(ref)) {
         replacement = data("text/javascript;charset=utf-8", await readFile(urlFrom(ref, file)));
       } else if (key === "href" && name === "link" && local(ref) && attrs.get("rel")?.toLowerCase() === "stylesheet") {

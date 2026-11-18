@@ -402,6 +402,69 @@ test("add and route share nested boundaries and preserve repeated cues, use case
   assert.deepEqual(slideSections(await readFile(index, "utf8")).map(s => s.id), ["two", "one", "statement", "pipe", "extra-two", "extra-one"]);
 });
 
+test("route rebinds one marked main and extra rename and rejects ambiguous edits without writes", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), presenter = join(dir, "PRESENTER.md");
+  async function writeDeck(mainIds, extraIds) {
+    const main = mainIds.map(id => '<section class="slide" id="' + id + '" data-title="Demo"></section>');
+    const extras = extraIds.map(id => '<section class="slide" id="' + id + '" data-title="Extra: Why" data-hidden></section>');
+    await writeFile(index, "<main>" + [...main, ...extras].join("") + "</main>");
+  }
+  const initial = '| # | Slide | Clock | Live or screenshot | Cue |\n|---|---|---|---|---|\n' +
+    '| 1 | Demo |  | Slide | Cue one |\n| 2 | Demo |  | Screenshot | Cue two |\n\n' +
+    '| Extra | Use when |\n|---|---|\n| Why | Extra one |\n| Why | Extra two |\n';
+  await writeDeck(["one", "two"], ["first", "second"]);
+  await writeFile(presenter, initial);
+  let r = await author("route", dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /Legacy route binding by order: "Demo" occurrence 1 → #one/);
+  assert.match(r.stderr, /Legacy route binding by order: "Demo" occurrence 2 → #two/);
+  assert.match(r.stderr, /Legacy extra binding by order: "Why" occurrence 1 → #first/);
+  assert.match(r.stderr, /Legacy extra binding by order: "Why" occurrence 2 → #second/);
+
+  await writeDeck(["one", "renamed"], ["first", "newextra"]);
+  r = await author("route", dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(r.stderr, "");
+  const rebound = await readFile(presenter, "utf8");
+  assert.match(rebound, /deck-slide:renamed --> \|  \| Screenshot \| Cue two/);
+  assert.match(rebound, /deck-slide:newextra --> \| Extra two/);
+  assert.match(rebound, /deck-slide:one --> .*Cue one/);
+  assert.match(rebound, /deck-slide:first --> \| Extra one/);
+  assert.equal((await author("route", dir, "--check")).status, 0);
+
+  for (const [main, extras, title] of [
+    [["three", "four"], ["first", "newextra"], "Demo"],
+    [["one", "renamed"], ["third", "fourth"], "Why"],
+    [["one"], ["first", "newextra"], "Demo"]
+  ]) {
+    await writeDeck(main, extras);
+    r = await author("route", dir);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, new RegExp('ambiguous route ID for "' + title + '"'));
+    assert.equal(await readFile(presenter, "utf8"), rebound);
+  }
+});
+
+test("strict scan and add preserve boundaries around SVG and MathML titles", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html");
+  const a = '<section class="slide" id="a"><svg><title/></svg>' +
+    '<math><annotation><title/></annotation><mtext><textarea><section class="slide" id="fake"></section></textarea></mtext></math></section>';
+  const b = '<section class="slide" id="b"></section>';
+  const c = '<section class="slide" id="c"><svg><title>Chart</title><desc><![CDATA[<section id="fake">]]></desc></svg></section>';
+  for (const [markup, ids] of [[a + b, ["a", "b"]], [a + b + c, ["a", "b", "c"]], [c + b, ["c", "b"]]]) {
+    const html = '<html><head><title><section class="slide" id="fake"></title></head><body><main id="deck">' + markup + '</main></body></html>';
+    assert.deepEqual(slideSections(html).map(s => s.id), ids);
+    await writeFile(index, html);
+    const result = await author("add", dir, "statement", "--after", ids[0]);
+    assert.equal(result.status, 0, result.stderr);
+    const output = await readFile(index, "utf8");
+    assert.deepEqual(slideSections(output).map(s => s.id), [ids[0], "statement", ...ids.slice(1)]);
+    assert.ok(output.indexOf('id="statement"') < output.indexOf("</main>"));
+  }
+  assert.throws(() => slideSections(a + '<script>unclosed'), /Unclosed <script>/);
+  assert.throws(() => slideSections(a + a), /unique id/);
+});
+
 test("inline resolves static resources per iframe document and fails before overwriting output on cycles", async t => {
   const dir = await authoringFixture(t), out = join(dir, "standalone.html");
   await mkdir(join(dir, "demo/nested"), { recursive: true });
@@ -428,6 +491,27 @@ test("inline resolves static resources per iframe document and fails before over
   }
 });
 
+test("inline rejects string image-set options before replacing an export", async t => {
+  const dir = await authoringFixture(t), out = join(dir, "standalone.html");
+  await writeFile(join(dir, "index.html"), '<iframe src="child.html"></iframe>');
+  await writeFile(join(dir, "child.html"), '<link rel="stylesheet" href="demo.css"><p>Demo</p>');
+  await writeFile(join(dir, "icon.svg"), '<svg xmlns="http://www.w3.org/2000/svg"><title/></svg>');
+  await writeFile(join(dir, "demo.css"), '/* image-set("ignored.png") */ p { background: image-set(url("icon.svg") type("image/svg+xml") 1x); }');
+  let r = await author("inline", dir);
+  assert.equal(r.status, 0, r.stderr);
+  const before = await readFile(out, "utf8");
+  await writeFile(join(dir, "demo.css"), 'p { background: image-set(url("icon.svg") 1x, /* retina */ "icon.svg" 2x); }');
+  r = await author("inline", dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /demo.css.*unsupported string-form image-set/);
+  assert.equal(await readFile(out, "utf8"), before);
+  await writeFile(join(dir, "child.html"), '<p style="background: -webkit-image-set(&quot;icon.svg&quot; 1x)">Demo</p>');
+  r = await author("inline", dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /child.html.*unsupported string-form image-set/);
+  assert.equal(await readFile(out, "utf8"), before);
+});
+
 test("QA rejects an explicit repository deck outside the fingerprinted examples", async t => {
   const root = await fixture(t);
   await mkdir(join(root, "examples"));
@@ -437,4 +521,34 @@ test("QA rejects an explicit repository deck outside the fingerprinted examples"
   const r = await run(root, "qa", ["site", "--out", output], { code: 1 });
   assert.match(r.stderr, /inside the fingerprinted examples/);
   await assert.rejects(readFile(join(output, "latest.json")), { code: "ENOENT" });
+});
+
+test("QA refuses uncovered resources through HTTP and reports file requests, including symlink aliases", { timeout: 90000 }, async t => {
+  const root = await fixture(t);
+  await mkdir(join(root, "examples"));
+  const deck = join(root, "examples/workshop");
+  await rename(join(root, "site"), deck);
+  await mkdir(join(root, "core"));
+  await writeFile(join(root, "core/deck.js"), "");
+  await mkdir(join(root, "docs"));
+  const resource = join(root, "docs/x.png");
+  await cp(join(deck, "poster.png"), resource);
+  await symlink(resource, join(deck, "alias.png"));
+  await symlink(join(deck, "poster.png"), join(deck, "covered-alias.png"));
+  const index = join(deck, "index.html");
+  const fixtureHtml = await readFile(index, "utf8");
+  await writeFile(index, fixtureHtml.replace("</h2>", '</h2><img src="../../docs/x.png" width="5" height="5" alt="Outside"><img src="alias.png" width="5" height="5" alt="Outside alias"><img src="covered-alias.png" width="5" height="5" alt="Covered alias">'));
+  const result = await qa(root, "outside-resources", [deck], { code: 1 });
+  assert.equal(result.json.scope, "full");
+  for (const where of ["QA HTTP server", "workshop file://"]) {
+    const denied = result.json.problems.filter(p => p.where === where && p.check === "resource-input-scope").flatMap(p => p.errors);
+    assert.ok(denied.some(message => message.endsWith("/docs/x.png")), JSON.stringify(result.json.problems));
+    assert.ok(denied.some(message => message.endsWith("/workshop/alias.png")), JSON.stringify(result.json.problems));
+    assert.ok(denied.every(message => !message.endsWith("/covered-alias.png")), JSON.stringify(denied));
+  }
+  const report = await qa(root, "outside-resources", [deck, "--status"], { code: 1 });
+  assert.equal(report.json.currentFull, false);
+  await writeFile(resource, "changed outside resource");
+  const changed = await qa(root, "outside-resources", [deck, "--status"], { code: 1 });
+  assert.equal(changed.json.currentFull, false);
 });

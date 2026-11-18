@@ -191,6 +191,11 @@ const run = await createRun(out);
 const config = { sizes: sizeList, motion: opt.motion, titles: opt.titles, jobs, fast: opt.fast, theme: opt.theme ?? null, selectors: picks ?? null, changed, since: opt.since ?? null, targets: positionals.map(p => resolve(p)), lintBaseline: opt["lint-baseline"] ? resolve(opt["lint-baseline"]) : null, lintChecks: opt["lint-checks"]?.split(",") ?? null };
 if (config.lintBaseline) plan.tools.push(config.lintBaseline);
 const before = await fingerprint(plan, config);
+const inputFiles = new Set(before.inputs.files.filter(file => file.sha256).map(file => file.path));
+const uncovered = new Set();
+function coveredFile(path, actual) {
+  return inputFiles.has(path) && inputFiles.has(actual);
+}
 const limitations = [opt.fast && "--fast", picks && "--slides", changed && "--changed/--since", opt.theme && "--theme", !["1920x1080", "1280x720"].every(size => sizeList.includes(size)) && "custom sizes omit a default size"].filter(Boolean);
 const receiptScope = { kind: opt.fast ? "fast" : limitations.length ? "scoped" : "full", limitations, universe: repoMode && !positionals.length ? "engine" : "decks", decks: deckList.map(({ index, name, themes, allIds, selectedIds }) => ({ index, name, themes, allIds, selectedIds })) };
 const pending = [];
@@ -200,6 +205,7 @@ if (repoMode && !positionals.length) {
 }
 if (scope?.size === 0) note("nothing changed outside the docs; this records an empty scoped run, never full evidence.");
 
+const artifactRoot = await realpath(run.artifactRoot);
 server = createServer(async (req, res) => {
   let path, root = serveRoot;
   try {
@@ -213,7 +219,15 @@ server = createServer(async (req, res) => {
   }
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
   try {
-    const body = await readFile(path);
+    const actual = await realpath(path);
+    if (root === serveRoot) {
+      if (!coveredFile(path, actual)) {
+        uncovered.add(path);
+        res.writeHead(403).end("QA resource is outside the fingerprinted inputs");
+        return;
+      }
+    } else if (!actual.startsWith(artifactRoot + sep)) { res.writeHead(403).end(); return; }
+    const body = await readFile(actual);
     const headers = { "content-type": TYPES[extname(path)] || "application/octet-stream", "accept-ranges": "bytes" };
     if (req.headers.range) {
       const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
@@ -344,10 +358,25 @@ async function offline(deck) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   page.setDefaultNavigationTimeout(15000);
   const flush = watch(page, `${deck.name} file://`, found.problems, found.warnings ??= []);
+  const requests = new Set();
+  page.on("request", request => {
+    if (request.url().startsWith("file:")) requests.add(request.url());
+  });
   try {
   await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
   await page.waitForTimeout(300);
-  } finally { await flush(); await page.close(); }
+  } finally {
+    await flush();
+    await page.close();
+    for (const url of requests) {
+      let path;
+      try { path = fileURLToPath(url); } catch { path = url; }
+      const actual = await realpath(path).catch(() => null);
+      if (!coveredFile(path, actual)) found.problems.push({
+        where: deck.name + " file://", check: "resource-input-scope", errors: ["QA resource is outside the fingerprinted inputs: " + path]
+      });
+    }
+  }
   return found;
 }
 
@@ -483,6 +512,10 @@ if (config.lintBaseline) {
     for (const w of added) problems.push({ where: `${basename(dirname(w.index))} #${w.slide}`, check: "new-lint-warning", lintCheck: w.check, message: w.message });
   } catch (e) { problems.push({ where: "lint baseline", errors: [e.message] }); }
 }
+if (uncovered.size) problems.push({
+  where: "QA HTTP server", check: "resource-input-scope",
+  errors: [...uncovered].sort().map(path => "QA resource is outside the fingerprinted inputs: " + path)
+});
 const after = await fingerprint(plan, config);
 if (before.digest !== after.digest) { problems.push({ where: "fingerprint", errors: ["Inputs/tools/browser changed during QA. This run cannot be current evidence."] }); pending.push("rerun after inputs stop changing"); }
 const artifacts = results.flatMap(r => r.artifacts || []);

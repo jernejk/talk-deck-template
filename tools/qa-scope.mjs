@@ -33,20 +33,48 @@ export function attributes(tag) {
 
 // Retain offsets in the original HTML and skip tag-looking text in raw-text elements.
 export function* htmlTags(html, { strict = true } = {}) {
-  const tags = /<!--[\s\S]*?(?:-->|$)|<(?:[^<>"']|"[^"]*"|'[^']*')*>/g;
+  const tags = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[|<(?:[^<>"']|"[^"]*"|'[^']*')*>/g;
+  const foreign = [];
   for (let match; (match = tags.exec(html));) {
     const tag = match[0];
+    const parent = foreign.at(-1);
+    if (tag === "<![CDATA[" && parent && parent.namespace !== "html") {
+      const end = html.indexOf("]]>", tags.lastIndex);
+      tags.lastIndex = end === -1 ? html.length : end + 3;
+      continue;
+    }
     const element = /^<\s*(\/\s*)?([a-z][\w:-]*)(?=[\s/>])/i.exec(tag);
     if (!element) continue;
     const [, closing, rawName] = element, name = rawName.toLowerCase();
-    const token = { name, closing: !!closing, tag, start: match.index, end: tags.lastIndex };
-    if (!closing && /^(script|style|title|textarea)$/.test(name)) {
+    const outer = parent?.namespace ?? "html";
+    let namespace = outer;
+    if (closing) {
+      const at = foreign.findLastIndex(node => node.name === name);
+      if (at >= 0) namespace = foreign.splice(at)[0].namespace;
+    } else {
+      // SVG and MathML integration points can contain HTML or a nested foreign subtree.
+      if (parent?.htmlChildren || parent?.mathText && !/^(mglyph|malignmark)$/.test(name)) namespace = "html";
+      if (namespace === "html" && /^(svg|math)$/.test(name)) namespace = name;
+      if (parent?.name === "annotation-xml" && outer === "math" && name === "svg") namespace = "svg";
+    }
+    const token = { name, namespace, closing: !!closing, tag, start: match.index, end: tags.lastIndex };
+    if (!closing && namespace === "html" && /^(script|style|title|textarea)$/.test(name)) {
       const end = new RegExp('<\\/\\s*' + name + '\\s*>', "ig");
       end.lastIndex = tags.lastIndex;
       const close = end.exec(html);
       if (!close && strict) throw new Error('Unclosed <' + name + '>.');
       token.contentEnd = close?.index ?? html.length;
       tags.lastIndex = close ? end.lastIndex : html.length;
+    } else if (!closing && (parent || namespace !== "html")) {
+      const empty = namespace === "html"
+        ? /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(name)
+        : /\/>$/.test(tag);
+      if (!empty) {
+        const htmlChildren = namespace === "svg" && /^(title|desc|foreignobject)$/.test(name) ||
+          namespace === "math" && name === "annotation-xml" && /^(text\/html|application\/xhtml\+xml)$/i.test(attributes(tag).get("encoding") ?? "");
+        const mathText = namespace === "math" && /^(mi|mo|mn|ms|mtext)$/.test(name);
+        foreign.push({ name, namespace, htmlChildren, mathText });
+      }
     }
     yield token;
   }
