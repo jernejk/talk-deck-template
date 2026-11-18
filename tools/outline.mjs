@@ -47,10 +47,11 @@ const index = await deckIndex(deckPath);
 let html = await readFile(index, "utf8");
 // Identify the owned region before planning any writes. A second deck or an
 // unmatched main makes the replacement unsafe.
-let openMain, boundary;
+let openMain, boundary, headEnd, openDeckStart;
 const configs = [], titles = [];
 for (const tag of htmlTags(html)) {
-  if (tag.namespace !== "html") continue;
+  if (tag.namespace !== "html" || tag.inert) continue;
+  if (tag.closing && tag.name === "head" && !openMain && !boundary) headEnd = tag.start;
   if (tag.name === "main") {
     if (!tag.closing) {
       if (openMain) fail(index + " has nested <main> elements.");
@@ -59,6 +60,7 @@ for (const tag of htmlTags(html)) {
       if (!openMain) fail(index + " has an unmatched </main>.");
       if (attributes(openMain.tag).get("id") === "deck") {
         if (boundary) fail(index + ' has more than one <main id="deck">.');
+        openDeckStart = openMain.start;
         boundary = { start: openMain.end, end: tag.start };
       }
       openMain = null;
@@ -156,7 +158,12 @@ const { start, end } = boundary;
 const replacement = "\n\n" + body.join("\n\n") + "\n" +
   (extras.length ? "\n<!-- Presenter extras -->\n\n" + extras.join("\n\n") + "\n" : "");
 const edits = [{ start, end, text: replacement }];
-if (configTag) edits.push({ start: configTag.end, end: configTag.contentEnd, text: "\n" + JSON.stringify(config, null, 2).replace(/</g, "\\u003c") + "\n" });
+const configBody = "\n" + JSON.stringify(config, null, 2).replace(/</g, "\\u003c") + "\n";
+if (configTag) edits.push({ start: configTag.end, end: configTag.contentEnd, text: configBody });
+else {
+  const at = headEnd ?? openDeckStart;
+  edits.push({ start: at, end: at, text: '<script type="application/json" id="deck-config">' + configBody + "</script>\n" });
+}
 const title = titles.find(t => t.end <= start);
 if (outline.title && title) edits.push({ start: title.end, end: title.contentEnd, text: esc(config.title) });
 for (const edit of edits.sort((a, b) => b.start - a.start)) {

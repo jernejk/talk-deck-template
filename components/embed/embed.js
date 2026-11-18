@@ -1,7 +1,10 @@
 let liveControl = null;
 
 const revealed = fig => !fig.closest("[data-step]:not(.is-shown)");
-const fallbackIn = slide => [...(slide?.querySelectorAll(".embed") || [])].find(fig => fig.embedFallback && revealed(fig));
+function fallbackIn(slide) {
+  const ready = [...(slide?.querySelectorAll(".embed") || [])].filter(fig => fig.embedFallback && revealed(fig));
+  return ready.find(fig => fig.classList.contains("is-live")) ?? ready[0];
+}
 
 function refreshLiveControl(slide) {
   if (!liveControl) return;
@@ -143,7 +146,8 @@ function sync(fig) {
     toggle.classList.toggle("embed-go", !live);
     toggle.setAttribute("aria-pressed", String(live));
     reload.hidden = !live;
-    if (liveControl && fig === fallbackIn(fig.closest(".slide"))) liveControl.setAttribute("aria-pressed", String(live));
+    const slide = fig.closest(".slide");
+    if (slide.classList.contains("is-active")) refreshLiveControl(slide);
   } else {
     toggle.firstChild.textContent = fig.embedOpen ? "Shrink" : "Expand";
     toggle.setAttribute("aria-pressed", String(Boolean(fig.embedOpen)));

@@ -143,21 +143,22 @@ export function routeRows(slides) {
     const slide = slideSections(html)[0];
     if (!slide) continue;
     const attrs = attributes(slide.tag);
-    const title = attrs.get("data-title") ?? "";
+    const title = routeCell(attrs.get("data-title") ?? "");
     if (slide.hidden) {
       extras.push({ id: slide.id, cells: [title.replace(/^Extra: /, ""), ""] });
     } else {
       const clock = html.match(/<b>(\d+:\d\d–\d+:\d\d)\.<\/b>/)?.[1] ?? "";
-      const live = attrs.get("data-live");
+      const live = routeCell(attrs.get("data-live") ?? "");
       main.push({ id: slide.id, cells: [main.length + 1, title, clock, live ? '**Live:** ' + live : "Slide", ""] });
     }
   }
   return { main, extras };
 }
 
-// Preserve backslashes as written except immediately before a table pipe.
+const routeCell = value => String(value).replace(/\s*[\r\n]+\s*/g, " ").trim();
+
 export function markdownRow(cells) {
-  return "| " + cells.map(cell => String(cell).replace(/(\\*)\|/g, (_, slashes) => slashes + slashes + "\\|")).join(" | ") + " |";
+  return "| " + cells.map(cell => routeCell(cell).replace(/\|/g, "\\|")).join(" | ") + " |";
 }
 
 export function routeTable(slides) {

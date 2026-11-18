@@ -47,7 +47,7 @@ export async function snapshot(paths) {
       }
     } else if (info.isFile()) {
       const bytes = await readFile(path);
-      files.push({ path: label, bytes: bytes.length, sha256: hash(bytes) });
+      files.push({ path: label, ...(path !== label ? { target: path } : {}), bytes: bytes.length, sha256: hash(bytes) });
     }
   }
   for (const path of [...new Set(paths.map(p => resolve(p)))].sort()) await walk(path, path);
@@ -55,9 +55,10 @@ export async function snapshot(paths) {
 }
 
 export async function assertDeckInput(root, repoMode, index) {
-  const dir = join(root, repoMode ? "examples" : "site");
+  const folder = repoMode ? "examples" : "site";
+  const dir = join(root, folder), physicalDir = join(await canonicalPath(root), folder);
   const actual = await canonicalPath(index);
-  if (!within(dir, index) || index === dir || !within(dir, actual) || actual === dir) {
+  if (!within(dir, index) || index === dir || !within(physicalDir, actual) || actual === physicalDir) {
     throw new Error('QA deck must be inside the fingerprinted ' + (repoMode ? "examples/" : "site/") + ' directory: ' + index);
   }
 }

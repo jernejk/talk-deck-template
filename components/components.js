@@ -194,7 +194,10 @@ Deck.use({
 let liveControl = null;
 
 const revealed = fig => !fig.closest("[data-step]:not(.is-shown)");
-const fallbackIn = slide => [...(slide?.querySelectorAll(".embed") || [])].find(fig => fig.embedFallback && revealed(fig));
+function fallbackIn(slide) {
+  const ready = [...(slide?.querySelectorAll(".embed") || [])].filter(fig => fig.embedFallback && revealed(fig));
+  return ready.find(fig => fig.classList.contains("is-live")) ?? ready[0];
+}
 
 function refreshLiveControl(slide) {
   if (!liveControl) return;
@@ -336,7 +339,8 @@ function sync(fig) {
     toggle.classList.toggle("embed-go", !live);
     toggle.setAttribute("aria-pressed", String(live));
     reload.hidden = !live;
-    if (liveControl && fig === fallbackIn(fig.closest(".slide"))) liveControl.setAttribute("aria-pressed", String(live));
+    const slide = fig.closest(".slide");
+    if (slide.classList.contains("is-active")) refreshLiveControl(slide);
   } else {
     toggle.firstChild.textContent = fig.embedOpen ? "Shrink" : "Expand";
     toggle.setAttribute("aria-pressed", String(Boolean(fig.embedOpen)));
@@ -555,7 +559,10 @@ Deck.use({
       dots.forEach((dot, i) => { if (!dot.style.getPropertyValue("--i")) dot.style.setProperty("--i", i); });
     });
   },
-  enter(slide) {
+  enter(slide, deck) {
+    if (slide !== deck.current()) return;
+    travel?.dispose();
+    travel = undefined;
     const plan = [...slide.querySelectorAll(".mx-travel")].map(g => {
       const path = g.querySelector(":scope > path");
       const dots = dotsOf(g);
@@ -590,13 +597,14 @@ Deck.use({
       else { paint(false); resume(); }
     }
     media.addEventListener("change", changeMotion);
-    travel = { pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
+    travel = { slide, pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
     changeMotion();
   },
-  rest() { travel?.pause(); },
-  wake() { travel?.resume(); },
-  leave() {
-    travel?.dispose();
+  rest(slide) { if (travel?.slide === slide) travel.pause(); },
+  wake(slide) { if (travel?.slide === slide) travel.resume(); },
+  leave(slide) {
+    if (travel?.slide !== slide) return;
+    travel.dispose();
     travel = undefined;
   }
 });

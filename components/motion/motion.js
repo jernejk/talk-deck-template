@@ -11,7 +11,10 @@ Deck.use({
       dots.forEach((dot, i) => { if (!dot.style.getPropertyValue("--i")) dot.style.setProperty("--i", i); });
     });
   },
-  enter(slide) {
+  enter(slide, deck) {
+    if (slide !== deck.current()) return;
+    travel?.dispose();
+    travel = undefined;
     const plan = [...slide.querySelectorAll(".mx-travel")].map(g => {
       const path = g.querySelector(":scope > path");
       const dots = dotsOf(g);
@@ -46,13 +49,14 @@ Deck.use({
       else { paint(false); resume(); }
     }
     media.addEventListener("change", changeMotion);
-    travel = { pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
+    travel = { slide, pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
     changeMotion();
   },
-  rest() { travel?.pause(); },
-  wake() { travel?.resume(); },
-  leave() {
-    travel?.dispose();
+  rest(slide) { if (travel?.slide === slide) travel.pause(); },
+  wake(slide) { if (travel?.slide === slide) travel.resume(); },
+  leave(slide) {
+    if (travel?.slide !== slide) return;
+    travel.dispose();
     travel = undefined;
   }
 });

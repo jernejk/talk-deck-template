@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cp, mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, realpath, rename, rm, symlink, writeFile } from "node:fs/promises";
 import { join, resolve, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -8,7 +8,7 @@ import { spawn } from "node:child_process";
 import { selectSlides, slideSections, outsideSlides, insertFragment } from "../qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock } from "../qa-lock.mjs";
 import { nativeWebkitControlDiagnostic } from "../qa-features.mjs";
-import { assertOutputBoundary } from "../qa-receipt.mjs";
+import { assertDeckInput, assertOutputBoundary, snapshot } from "../qa-receipt.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const tools = ["qa.mjs", "lint.mjs", "qa-scope.mjs", "qa-receipt.mjs", "qa-features.mjs", "qa-lock.mjs", "accept.mjs", "qr.swift"];
@@ -396,7 +396,7 @@ test("add and route share nested boundaries and preserve repeated cues, use case
   assert.match(md, /\| 1 \| Demo .* \| 1:00–2:00 \| Slide \| SECOND \|/);
   assert.match(md, /\| 2 \| Demo .* \| 0:00–1:00 \| Illustration \| FIRST \\\| both \|/);
   assert.match(md, /\| A \\\| B \|  \| Slide \| THIRD \|/);
-  assert.ok(md.indexOf("Extra SECOND") < md.indexOf("Extra FIRST"));
+  assert.match(md, /Extra SECOND[^\n]*\n[^\n]*Extra FIRST/);
   r = await author("add", dir, "statement", "--after", "one");
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(slideSections(await readFile(index, "utf8")).map(s => s.id), ["two", "one", "statement", "pipe", "extra-two", "extra-one"]);
@@ -537,12 +537,12 @@ test("QA refuses uncovered resources through HTTP and reports file requests, inc
   await symlink(join(deck, "poster.png"), join(deck, "covered-alias.png"));
   const index = join(deck, "index.html");
   const fixtureHtml = await readFile(index, "utf8");
-  await writeFile(index, fixtureHtml.replace("</h2>", '</h2><img src="../../docs/x.png" width="5" height="5" alt="Outside"><img src="alias.png" width="5" height="5" alt="Outside alias"><img src="covered-alias.png" width="5" height="5" alt="Covered alias">'));
+  await writeFile(index, fixtureHtml.replace("</h2>", '</h2><img src="../../docs/x.png" width="5" height="5" alt="Outside"><img src="../../docs/absent.png" width="5" height="5" alt="Absent"><img src="alias.png" width="5" height="5" alt="Outside alias"><img src="covered-alias.png" width="5" height="5" alt="Covered alias">'));
   const result = await qa(root, "outside-resources", [deck], { code: 1 });
   assert.equal(result.json.scope, "full");
   for (const where of ["QA HTTP server", "workshop file://"]) {
     const denied = result.json.problems.filter(p => p.where === where && p.check === "resource-input-scope").flatMap(p => p.errors);
-    assert.ok(denied.some(message => message.endsWith("/docs/x.png")), JSON.stringify(result.json.problems));
+    assert.ok(denied.some(message => message.endsWith("/docs/x.png")) && denied.some(message => message.endsWith("/docs/absent.png")), JSON.stringify(result.json.problems));
     assert.ok(denied.some(message => message.endsWith("/workshop/alias.png")), JSON.stringify(result.json.problems));
     assert.ok(denied.every(message => !message.endsWith("/covered-alias.png")), JSON.stringify(denied));
   }
@@ -551,4 +551,151 @@ test("QA refuses uncovered resources through HTTP and reports file requests, inc
   await writeFile(resource, "changed outside resource");
   const changed = await qa(root, "outside-resources", [deck, "--status"], { code: 1 });
   assert.equal(changed.json.currentFull, false);
+});
+
+test("inline rewrites only real CSS resource tokens across styles, imports, frames and attributes", async t => {
+  const dir = await authoringFixture(t), out = join(dir, "standalone.html");
+  await mkdir(join(dir, "demo"));
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>';
+  const encoded = 'data:image/svg+xml;base64,' + Buffer.from(svg).toString("base64");
+  const fake = String.raw`/* @import "retired.css"; url(removed.png) */
+p::after { content: "escaped \"quote\" url(nope.png)"; --custom:curl(missing.png); }
+p { --remote: url("data:image/svg+xml,<svg>( )</svg>"); }
+`;
+  const css = fake + String.raw`p { background: URL(  'art).svg' /* retained */); mask: url(art\).svg); }`;
+  const styled = '<p style = " background:url(&quot;art).svg&quot;); --label:&quot;url(nope.png) R&amp;D&quot;; /* url(missing.png) */ ">';
+  const linked = '@import /* kept */ "inner.css";\n' + fake;
+  const inner = fake + 'p { background:url("a&amp;b.svg"); }';
+  await writeFile(join(dir, "index.html"), '<style>' + css + '</style>' + styled +
+    '<link rel=" stylesheet " href="linked&#46;css"><iframe src="demo/child.html"></iframe><img src="art&#41;&#46;svg">');
+  await writeFile(join(dir, "art).svg"), svg);
+  await writeFile(join(dir, "a&amp;b.svg"), svg);
+  await writeFile(join(dir, "a&b.svg"), "different bytes");
+  await writeFile(join(dir, "linked.css"), linked);
+  await writeFile(join(dir, "inner.css"), inner);
+  await writeFile(join(dir, "demo/child.html"), '<style>' + fake + 'p { background: url(child.svg); }</style>');
+  const childSvg = svg.replace('width="10"', 'width="19"');
+  await writeFile(join(dir, "demo/child.svg"), childSvg);
+  let r = await author("inline", dir);
+  assert.equal(r.status, 0, r.stderr);
+  const exported = await readFile(out, "utf8");
+  const unstitch = (text, mime) => Buffer.from(text.match(new RegExp("data:" + mime + "[^,]*,([A-Za-z0-9+/=]+)"))[1], "base64").toString();
+  assert.ok(exported.includes('<style>' + fake + 'p { background: URL(  "' + encoded +
+    '" /* retained */); mask: url("' + encoded + '"); }</style>'));
+  assert.ok(exported.includes(styled.replace('art).svg', encoded)));
+  assert.ok(exported.includes('<img src="' + encoded + '">'));
+  const encodedLinked = unstitch(exported, "text/css");
+  assert.ok(encodedLinked.startsWith('@import /* kept */ "data:text/css;') && encodedLinked.endsWith(fake));
+  assert.equal(unstitch(encodedLinked, "text/css"), inner.replace("a&amp;b.svg", encoded));
+  assert.equal(unstitch(exported, "text/html"), '<style>' + fake + 'p { background: url("data:image/svg+xml;base64,' +
+    Buffer.from(childSvg).toString("base64") + '"); }</style>');
+  await writeFile(join(dir, "inner.css"), fake + 'p { background:url(genuinely-missing.svg); }');
+  r = await author("inline", dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /genuinely-missing\.svg/);
+  assert.equal(await readFile(out, "utf8"), exported);
+  await writeFile(join(dir, "inner.css"), fake);
+  await writeFile(join(dir, "linked.css"), fake + '@import "genuinely-missing.css";');
+  r = await author("inline", dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /genuinely-missing\.css/);
+  assert.equal(await readFile(out, "utf8"), exported);
+});
+
+test("inline keeps import order and raw-text boundaries, rejects local refresh and stylesheet integrity", async t => {
+  const dir = await authoringFixture(t), out = join(dir, "standalone.html");
+  const page = join(dir, "index.html"), blue = 'data:text/css,p%7Bcolor:blue%7D';
+  const base = 'p{color:red} p::after{content:"</style>"}';
+  await writeFile(join(dir, "base.css"), base);
+  await writeFile(page, '<meta http-equiv="refresh" content="120"><style>@import "base.css";@import "' + blue + '";</style><p>Test</p>');
+  let r = await author("inline", dir);
+  assert.equal(r.status, 0, r.stderr);
+  const before = await readFile(out, "utf8");
+  assert.equal(before, '<meta http-equiv="refresh" content="120"><style>@import "data:text/css;charset=utf-8;base64,' +
+    Buffer.from(base).toString("base64") + '";@import "' + blue + '";</style><p>Test</p>');
+  for (const [markup, error] of [
+    ['<meta http-equiv="Refr&#101;sh" content="0; URL=&#39;next.html&#39;">', /local page/],
+    ['<link rel=stylesheet href=base.css integrity="sha256-digest">', /integrity.*stylesheet/],
+    ['<script type="mod&#117;le" src="a.js"></script>', /module scripts/]
+  ]) {
+    await writeFile(page, markup);
+    r = await author("inline", dir);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, error);
+    assert.equal(await readFile(out, "utf8"), before);
+  }
+});
+
+test("route protects moved marked IDs and conflicting clocks, then round-trips GFM and multiline titles", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), presenter = join(dir, "PRESENTER.md");
+  const slide = (id, title, clock, attrs = "") => '<section class="slide" id="' + id + '" data-title="' + title + '" ' + attrs +
+    '><aside class="notes"><b>' + clock + '.</b></aside></section>';
+  const header = "| # | Slide | Clock | Live or screenshot | Cue |\n|---|---|---|---|---|\n";
+  const markedA = "| 1 | Demo <!-- deck-slide:a --> | 0:00–1:00 | Slide | FIRST |\n";
+  const a = slide("a", "Demo", "0:00–1:00"), b = slide("b", "Demo", "1:00–2:00"), c = slide("c", "Demo", "2:00–3:00");
+  for (const [body, table, error] of [
+    [a.replace("class=", "data-hidden class=") + b + c, markedA + "| 2 | Demo <!-- deck-slide:b --> | 1:00–2:00 | Slide | SECOND |\n", /#a moved/],
+    [a + b.replace('title="Demo"', 'title="Logs"') + c, markedA + "| 2 | Demo | 1:00–2:00 | Slide | SECOND |\n", /conflicting clock/],
+    [a + b.replace('id="b"', 'id="a"'), "| 1 | Demo | 0:00–1:00 | Slide | FIRST |\n| 2 | Demo | 1:00–2:00 | Slide | SECOND |\n", /duplicate slide IDs/]
+  ]) {
+    await writeFile(index, body);
+    await writeFile(presenter, header + table);
+    const r = await author("route", dir);
+    assert.equal(r.status, 1);
+    assert.match(r.stderr, error);
+    assert.equal(await readFile(presenter, "utf8"), header + table);
+  }
+  const backtick = String.fromCharCode(96);
+  const codeCue = "Use " + backtick + "grep 'a\\\\|b'" + backtick + " and A \\| B";
+  await writeFile(index, a.replace('title="Demo"', "title='Two\n  lines'") + b);
+  await writeFile(presenter, header + "| 1 | Two lines | 0:00–1:00 | Slide | " + codeCue + " |\n| 2 | Demo | 1:00–2:00 | Slide |\n");
+  const r = await author("route", dir);
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok((await readFile(presenter, "utf8")).includes("| Two lines | 0:00–1:00 | Slide | " + codeCue + " |"));
+  assert.equal((await author("route", dir, "--check")).status, 0);
+});
+
+test("outline ignores inert deck markup and script lookalikes and persists absent config", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), outline = join(dir, "outline.json");
+  const template = '<template><main id="deck"><section class="slide" id="preview"></section></main><script id="deck-config">{}</script></template>';
+  const script = '<script>const sample = "< /script><main id=deck></main>".replace("< ", "<"); const raw = "< /script>"; const fake="<'+
+    '/ script><main id=deck></main>";</script >';
+  await writeFile(index, '<head><title>Deck</title>' + script + '</head><body>' + template + '<main id="deck"></main></body>');
+  await writeFile(outline, JSON.stringify({ duration: "2:00", agenda: true, slides: [{ pattern: "statement", title: "Questions", section: "Q&A" }] }));
+  const r = await author("outline", dir, outline, "--force");
+  assert.equal(r.status, 0, r.stderr);
+  const html = await readFile(index, "utf8");
+  assert.ok(html.includes(template) && html.includes(script));
+  assert.match(html, /"duration": "2:00"/);
+  assert.match(html, /"section": "Q&A"/);
+  assert.deepEqual(slideSections(html).map(s => s.id), ["statement"]);
+  assert.deepEqual(slideSections('<section class="slide" id="real"><math><annotation-xml encoding="application/xml"><section class="slide" id="foreign"></section></annotation-xml></math></section>').map(s => s.id), ["real"]);
+});
+
+test("QA pins alias requests to the snapshot target and accepts canonical checkout aliases", { timeout: 60000 }, async t => {
+  const root = await fixture(t), site = join(root, "site");
+  const alias = join(site, "retarget.png"), first = join(site, "poster.png"), second = join(site, "second.png");
+  await cp(first, second);
+  await symlink(first, alias);
+  const firstSnapshot = await snapshot([site]);
+  const originalTarget = await realpath(first);
+  assert.equal(firstSnapshot.files.find(f => f.path === alias)?.target, originalTarget);
+  const qaTool = join(root, "tools/qa.mjs");
+  // Simulate a covered-to-covered alias change strictly during each HTTP request.
+  const source = await readFile(qaTool, "utf8");
+  await writeFile(qaTool, 'import { unlinkSync, symlinkSync } from "node:fs";\n' + source.replace(
+    'server = createServer(async (req, res) => {',
+    'server = createServer(async (req, res) => {\n' +
+    'if (req.url === "/retarget.png") { const alias = ' + JSON.stringify(alias) + '; unlinkSync(alias); symlinkSync(' +
+    JSON.stringify(second) + ', alias); res.once("finish", () => { unlinkSync(alias); symlinkSync(' + JSON.stringify(first) + ', alias); }); }\n'
+  ));
+  const index = join(site, "index.html");
+  await writeFile(index, (await readFile(index, "utf8")).replace("</h2>", '</h2><img src="retarget.png" alt="Alias">'));
+  const captured = await qa(root, "retarget", ["--slides", "intro", "--fast"], { code: 1 });
+  assert.ok(captured.json.problems.some(p => p.check === "resource-input-scope" && p.errors.some(e => e.endsWith("retarget.png"))), JSON.stringify(captured.json.problems));
+  assert.equal((await snapshot([site])).files.find(f => f.path === alias)?.target, originalTarget);
+  assert.ok(!captured.json.problems.some(p => p.where === "fingerprint"));
+  const aliasRoot = join(root, "checkout-alias");
+  await symlink(root, aliasRoot);
+  await assertDeckInput(aliasRoot, false, join(aliasRoot, "site/index.html"));
 });

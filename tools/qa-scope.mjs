@@ -35,6 +35,7 @@ export function attributes(tag) {
 export function* htmlTags(html, { strict = true } = {}) {
   const tags = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[|<(?:[^<>"']|"[^"]*"|'[^']*')*>/g;
   const foreign = [];
+  let templateDepth = 0;
   for (let match; (match = tags.exec(html));) {
     const tag = match[0];
     const parent = foreign.at(-1);
@@ -57,9 +58,10 @@ export function* htmlTags(html, { strict = true } = {}) {
       if (namespace === "html" && /^(svg|math)$/.test(name)) namespace = name;
       if (parent?.name === "annotation-xml" && outer === "math" && name === "svg") namespace = "svg";
     }
-    const token = { name, namespace, closing: !!closing, tag, start: match.index, end: tags.lastIndex };
+    const token = { name, namespace, inert: templateDepth > 0, closing: !!closing, tag, start: match.index, end: tags.lastIndex };
+    if (namespace === "html" && name === "template") templateDepth = Math.max(0, templateDepth + (closing ? -1 : 1));
     if (!closing && namespace === "html" && /^(script|style|title|textarea)$/.test(name)) {
-      const end = new RegExp('<\\/\\s*' + name + '\\s*>', "ig");
+      const end = new RegExp("</" + name + "(?=[\\t\\n\\f\\r />])" + /(?:[^<>"']|"[^"]*"|'[^']*')*>/.source, "ig");
       end.lastIndex = tags.lastIndex;
       const close = end.exec(html);
       if (!close && strict) throw new Error('Unclosed <' + name + '>.');
@@ -90,7 +92,7 @@ export function slideSections(html, { strict = true } = {}) {
       : { tag: open.tag, hidden: open.hidden }) });
   };
   for (const token of htmlTags(html, { strict })) {
-    if (token.name !== "section") continue;
+    if (token.name !== "section" || token.namespace !== "html" || token.inert) continue;
     if (token.closing) {
       if (!/^<\s*\/\s*section\s*>$/i.test(token.tag)) continue;
       const open = stack.pop();

@@ -25,15 +25,12 @@ const marker = / <!-- deck-slide:([^ ]+) -->\s*$/;
 function tableRow(line, width, titleCol) {
   const cells = [""];
   const row = line.trim().slice(1);
-  for (const part of row.matchAll(/(\\*)\||([^|\\]+|\\+)/g)) {
-    if (part[1] === undefined) cells[cells.length - 1] += part[0];
-    else {
-      cells[cells.length - 1] += "\\".repeat(Math.floor(part[1].length / 2));
-      if (part[1].length % 2) cells[cells.length - 1] += "|";
-      else cells.push("");
-    }
+  for (const part of row.matchAll(/\\\||\||[^|\\]+|\\/g)) {
+    if (part[0] === "|") cells.push("");
+    else cells[cells.length - 1] += part[0] === "\\|" ? "|" : part[0];
   }
   if (row.endsWith("|") && cells.at(-1) === "") cells.pop();
+  if (width === 5 && cells.length === 4 && cells.every(cell => cell.trim())) cells.push("");
   if (cells.length !== width) fail(file + ": expected " + width + " columns, found " + cells.length + ". Use the standard columns and escape any literal pipes as \\|: " + line);
   const mark = marker.exec(cells[titleCol]);
   if (mark) cells[titleCol] = cells[titleCol].slice(0, mark.index);
@@ -52,6 +49,10 @@ function table(md, head, width, titleCol) {
 
 const slides = slideSections(html).map(s => html.slice(s.start, s.end));
 const fresh = routeRows(slides);
+const allIds = [...fresh.main, ...fresh.extras].map(row => row.id).filter(Boolean);
+if (new Set(allIds).size !== allIds.length) fail(file + ": duplicate slide IDs must be resolved before refreshing.");
+const mainIds = new Set(fresh.main.map(row => row.id));
+const extraIds = new Set(fresh.extras.map(row => row.id));
 let md = before;
 const migrations = [];
 
@@ -78,6 +79,10 @@ function match(old, rows, col) {
   });
   const unmatched = title => titles.flatMap((t, i) => t === title && !matches[i] ? [i] : []);
   const orphans = old.filter(o => o.id && !used.has(o));
+  const otherIds = col === 1 ? extraIds : mainIds;
+  for (const row of orphans) if (otherIds.has(row.id)) {
+    fail(file + ": slide #" + row.id + " moved between the route and Extras. Move its marked row to the matching table before refreshing.");
+  }
   for (const title of new Set(orphans.map(o => o.cells[col]))) {
     const prior = orphans.filter(o => o.cells[col] === title);
     const slots = unmatched(title);
@@ -94,6 +99,11 @@ function match(old, rows, col) {
     if (!legacy.length) continue;
     const slots = unmatched(title);
     if (!slots.length) continue;
+    const repeated = oldTitles.filter(t => t === title).length > 1 || titles.filter(t => t === title).length > 1;
+    const conflictingClock = col === 1 && repeated && legacy.some(row => row.cells[2] && rows.some(
+      (candidate, i) => !matches[i] && !slots.includes(i) && candidate.cells[2] === row.cells[2]
+    ));
+    if (conflictingClock) fail(file + ': conflicting clock for legacy row "' + title + '". Add an explicit slide ID marker before refreshing.');
     if (legacy.length > 1 || slots.length > 1) {
       // An unchanged legacy table only supplies occurrence order. Detect visible
       // reorder signals before assigning IDs on the first refresh.

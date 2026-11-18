@@ -191,10 +191,11 @@ const run = await createRun(out);
 const config = { sizes: sizeList, motion: opt.motion, titles: opt.titles, jobs, fast: opt.fast, theme: opt.theme ?? null, selectors: picks ?? null, changed, since: opt.since ?? null, targets: positionals.map(p => resolve(p)), lintBaseline: opt["lint-baseline"] ? resolve(opt["lint-baseline"]) : null, lintChecks: opt["lint-checks"]?.split(",") ?? null };
 if (config.lintBaseline) plan.tools.push(config.lintBaseline);
 const before = await fingerprint(plan, config);
-const inputFiles = new Set(before.inputs.files.filter(file => file.sha256).map(file => file.path));
+const inputFiles = new Map(before.inputs.files.filter(file => file.sha256).map(file => [file.path, file.target ?? file.path]));
+const inputFolders = plan.inputs.filter(path => before.inputs.files.some(file => file.directory && file.path === path + "/"));
 const uncovered = new Set();
 function coveredFile(path, actual) {
-  return inputFiles.has(path) && inputFiles.has(actual);
+  return inputFiles.get(path) === actual && inputFiles.has(actual);
 }
 const limitations = [opt.fast && "--fast", picks && "--slides", changed && "--changed/--since", opt.theme && "--theme", !["1920x1080", "1280x720"].every(size => sizeList.includes(size)) && "custom sizes omit a default size"].filter(Boolean);
 const receiptScope = { kind: opt.fast ? "fast" : limitations.length ? "scoped" : "full", limitations, universe: repoMode && !positionals.length ? "engine" : "decks", decks: deckList.map(({ index, name, themes, allIds, selectedIds }) => ({ index, name, themes, allIds, selectedIds })) };
@@ -218,6 +219,7 @@ server = createServer(async (req, res) => {
     return;
   }
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
+  if (root === serveRoot && !inputFiles.has(path) && !inputFolders.some(folder => path.startsWith(folder + sep))) uncovered.add(path);
   try {
     const actual = await realpath(path);
     if (root === serveRoot) {
@@ -358,24 +360,34 @@ async function offline(deck) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   page.setDefaultNavigationTimeout(15000);
   const flush = watch(page, `${deck.name} file://`, found.problems, found.warnings ??= []);
-  const requests = new Set();
-  page.on("request", request => {
-    if (request.url().startsWith("file:")) requests.add(request.url());
+  // Pin alias requests to the checked canonical file at Chromium interception.
+  await page.route(/^file:/, async route => {
+    const url = new URL(route.request().url());
+    let path, actual;
+    try {
+      path = fileURLToPath(url);
+      actual = await realpath(path);
+    } catch { /* Report the original request as well when it cannot be resolved. */ }
+    if (!coveredFile(path, actual)) {
+      found.problems.push({
+        where: deck.name + " file://", check: "resource-input-scope", errors: ["QA resource is outside the fingerprinted inputs or changed target: " + (path ?? url.href)]
+      });
+      await route.abort();
+    } else if (actual !== path) {
+      const target = pathToFileURL(actual);
+      target.search = url.search;
+      await route.continue({ url: target.href });
+    } else await route.continue();
   });
   try {
-  await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
-  await page.waitForTimeout(300);
+    await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
+    await page.waitForTimeout(300);
+  } catch (error) {
+    found.completed = false;
+    found.problems.push({ where: deck.name + " file://", errors: [error.message] });
   } finally {
     await flush();
     await page.close();
-    for (const url of requests) {
-      let path;
-      try { path = fileURLToPath(url); } catch { path = url; }
-      const actual = await realpath(path).catch(() => null);
-      if (!coveredFile(path, actual)) found.problems.push({
-        where: deck.name + " file://", check: "resource-input-scope", errors: ["QA resource is outside the fingerprinted inputs: " + path]
-      });
-    }
   }
   return found;
 }

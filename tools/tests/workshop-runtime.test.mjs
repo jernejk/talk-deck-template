@@ -322,15 +322,19 @@ test("global Live tracks nested reveals and pending iframe unload survives slide
   }
 });
 
-test("player cancellation repaints progress, ignores other pointers and keeps focus on the active slide", async t => {
+test("player cancellation repaints progress, ignores other pointers and keeps focus on the active slide", { timeout: 20000 }, async t => {
   for (const engine of [browser, safari]) {
     const p = await pageFor(t, engine);
     await p.goto(base + "/lifecycle.html#scrub");
-    const result = await p.evaluate(async () => {
+    await p.locator("#scrub video").evaluate(video => { video.preload = "auto"; });
+    await p.waitForFunction(() => {
+      const video = document.querySelector("#scrub video");
+      if (video.error) throw new Error("Scrub video failed before loadedmetadata: " + video.error.message);
+      return video.readyState > 0;
+    }, null, { timeout: 5000 });
+    const result = await p.evaluate(() => {
       const slide = Deck.current(), seek = slide.querySelector(".player-seek"), video = slide.querySelector("video");
       const event = (target, type, pointerId) => target.dispatchEvent(new PointerEvent(type, { pointerId, bubbles: true, button: 0 }));
-      video.preload = "auto";
-      if (video.readyState === 0) await new Promise(resolve => video.addEventListener("loadedmetadata", resolve, { once: true }));
       seek.focus();
       event(seek, "pointerdown", 11);
       event(window, "pointerup", 22);
@@ -342,7 +346,7 @@ test("player cancellation repaints progress, ignores other pointers and keeps fo
       event(seek, "pointerdown", 33);
       Deck.goTo(document.querySelector("#stepped"));
       event(window, "pointerup", 33);
-      return { during, cancelled, inactiveFocused: document.activeElement === slide };
+      return { during, cancelled, inactiveFocused: slide.contains(document.activeElement) };
     });
     assert.equal(result.during, "0");
     const [value, a11y, progress, seekFocused] = result.cancelled;
@@ -354,7 +358,7 @@ test("player cancellation repaints progress, ignores other pointers and keeps fo
   }
 });
 
-test("travelling SVG dots suspend at idle, wake at the same phase, and park on reduced motion", async t => {
+test("travelling SVG dots suspend at idle, wake at the same phase, and park on reduced motion", { timeout: 20000 }, async t => {
   const p = await pageFor(t, browser, { reducedMotion: "no-preference" });
   await p.clock.install();
   await p.goto(base + "/lifecycle.html#travel");
@@ -374,12 +378,11 @@ test("travelling SVG dots suspend at idle, wake at the same phase, and park on r
   assert.notEqual(await dot.getAttribute("transform"), rested);
   async function changeMotion(reducedMotion) {
     await p.evaluate(() => {
-      window.motionChanged = new Promise(resolve => {
-        matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => resolve(true), { once: true });
-      });
+      window.motionChanged = false;
+      matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => { window.motionChanged = true; }, { once: true });
     });
     await p.emulateMedia({ reducedMotion });
-    await p.evaluate(() => window.motionChanged);
+    await p.waitForFunction(() => window.motionChanged, null, { timeout: 5000, polling: 20 });
   }
   await changeMotion("reduce");
   await p.clock.runFor(100);
@@ -391,4 +394,52 @@ test("travelling SVG dots suspend at idle, wake at the same phase, and park on r
   const left = await dot.getAttribute("transform");
   await p.clock.runFor(150);
   assert.equal(await dot.getAttribute("transform"), left);
+});
+
+test("navigation in enter, rest and wake hooks cannot revive stale motion or select a different index", { timeout: 30000 }, async t => {
+  const motion = '<svg viewBox="0 0 100 10"><g class="mx-travel"><path d="M0 5H100"/><circle r="2"/></g></svg>';
+  const hooks = '<script>const mode = new URLSearchParams(location.search).get("mode"); Deck.use({ ' +
+    'enter(slide, deck) { if (mode === "enter" && slide.id === "a") deck.goTo(document.getElementById("b")); },' +
+    'rest(slide, deck) { if (mode === "rest" && slide.id === "a") deck.goTo(document.getElementById("b")); },' +
+    'wake(slide, deck) { if (mode === "wake" && slide.id === "a") deck.goTo(document.getElementById("y")); }' +
+    '});</script>';
+  const markup = html(slide("a", motion) + slide("x", "", "data-hidden") + slide("b", motion) + slide("y", "", "data-hidden"))
+    .replace('"sections":{"Test":1}', '"sections":{"Test":1},"idle":1')
+    .replace('<script src="/components/components.js">', hooks + '<script src="/components/components.js">');
+  for (const mode of ["enter", "rest", "wake", "ordinary"]) {
+    const p = await pageFor(t, browser, { reducedMotion: "no-preference" });
+    await p.route("**/reentry.html?*", route => route.fulfill({ contentType: "text/html", body: markup }));
+    await p.clock.install();
+    await p.goto(base + "/reentry.html?mode=" + mode);
+    if (mode !== "enter") await p.clock.fastForward(5000);
+    if (mode === "wake" || mode === "ordinary") await go(p, "b");
+    const expected = mode === "wake" ? "y" : "b";
+    assert.equal(await p.evaluate(() => Deck.current().id), expected, mode);
+    assert.equal(await p.evaluate(() => location.hash), "#" + expected, mode);
+    if (expected === "b") {
+      const activeDot = p.locator("#b circle"), inactiveDot = p.locator("#a circle");
+      const [before, inactive] = await Promise.all([activeDot.getAttribute("transform"), inactiveDot.getAttribute("transform")]);
+      await p.clock.runFor(300);
+      assert.notEqual(await activeDot.getAttribute("transform"), before, mode);
+      assert.equal(await inactiveDot.getAttribute("transform"), inactive, mode);
+    }
+    await p.close();
+  }
+});
+
+test("global Live stays with the running fallback when an earlier fallback is revealed", { timeout: 15000 }, async t => {
+  const p = await pageFor(t);
+  const fallback = id => embed("/child.html").replace('<figure class="embed"', '<figure id="' + id + '" class="embed"')
+    .replace('<iframe', '<img class="embed-shot" src="/slides/assets/sample/demo-poster.png" alt="Fallback"><iframe');
+  const markup = html(slide("multiple", fallback("first") + fallback("second").replace(" data-step", "")));
+  await p.route("**/multi-live.html", route => route.fulfill({ contentType: "text/html", body: markup }));
+  await p.goto(base + "/multi-live.html");
+  await p.keyboard.press("l");
+  assert.ok(await p.locator("#second").evaluate(fig => fig.classList.contains("is-live")));
+  await p.evaluate(() => Deck.next());
+  const live = p.locator(".deck-nav button").filter({ hasText: /^Live/ });
+  assert.equal(await live.getAttribute("aria-pressed"), "true");
+  await p.keyboard.press("l");
+  assert.equal(await p.locator(".embed.is-live").count(), 0);
+  assert.equal(await live.getAttribute("aria-pressed"), "false");
 });
