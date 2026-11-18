@@ -141,10 +141,13 @@ function decodeAttribute(text, record = () => {}) {
 }
 
 function refreshTarget(content) {
-  const target = /^\s*\d+(?:\.\d*)?\s*[;,]\s*(?:url\s*=\s*)?([\s\S]*)$/i.exec(content)?.[1].trim();
+  // Browsers accept extra dots in the delay and whitespace as a separator.
+  const delay = /^[\t\n\f\r ]*[\d.]+(?=[\t\n\f\r ;,]|$)/.exec(content);
+  if (!delay) return;
+  const target = content.slice(delay[0].length).replace(/^[\t\n\f\r ]*[;,]?[\t\n\f\r ]*(?:url[\t\n\f\r ]*=[\t\n\f\r ]*)?/i, "").trim();
   if (!target || !/^["']/.test(target)) return target;
   const close = target.indexOf(target[0], 1);
-  return target.slice(1, close < 0 ? undefined : close);
+  return target.slice(1, close < 0 ? undefined : close).trim();
 }
 
 async function inlineStyleAttribute(tag, attr, file) {

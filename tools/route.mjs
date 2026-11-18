@@ -30,7 +30,12 @@ function tableRow(line, width, titleCol) {
     else cells[cells.length - 1] += part[0] === "\\|" ? "|" : part[0];
   }
   if (row.endsWith("|") && cells.at(-1) === "") cells.pop();
-  if (width === 5 && cells.length === 4 && cells.every(cell => cell.trim())) cells.push("");
+  if (width === 5 && cells.length === 4) {
+    const [number, title, clock, kind] = cells.map(cell => cell.trim());
+    const hasClock = /^\d+:\d{2}–\d+:\d{2}$/.test(clock);
+    const knownKind = kind === "Slide" || /^\*\*Live:\*\*\s+\S/.test(kind);
+    if (number && title && kind && (hasClock || knownKind)) cells.push("");
+  }
   if (cells.length !== width) fail(file + ": expected " + width + " columns, found " + cells.length + ". Use the standard columns and escape any literal pipes as \\|: " + line);
   const mark = marker.exec(cells[titleCol]);
   if (mark) cells[titleCol] = cells[titleCol].slice(0, mark.index);

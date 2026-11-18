@@ -699,3 +699,54 @@ test("QA pins alias requests to the snapshot target and accepts canonical checko
   await symlink(root, aliasRoot);
   await assertDeckInput(aliasRoot, false, join(aliasRoot, "site/index.html"));
 });
+
+test("inline rejects browser-supported local refresh variants without replacing the existing export", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), out = join(dir, "standalone.html");
+  const markup = content => '<meta http-equiv="refresh" content="' + content + '"><p id="here">Test</p>';
+  const previous = "Previous export\n";
+  await writeFile(out, previous);
+  await writeFile(join(dir, "next.html"), "<p>Other page</p>");
+  for (const content of [
+    "0 url=next.html", "0 next.html", "1.2.3; url=next.html", ".5; url=next.html",
+    "0; url=next.html", "0&#59; URL=&#39;next.html&#39;", "0, next.html"
+  ]) {
+    await writeFile(index, markup(content));
+    const r = await author("inline", dir);
+    assert.equal(r.status, 1, content);
+    assert.match(r.stderr, /unsupported meta refresh to a local page/, content);
+    assert.equal(await readFile(out, "utf8"), previous, content);
+  }
+  for (const content of ["5", "5 ; ", "5 url=#here", "5; url=&#39; #here&#39;"]) {
+    const html = markup(content);
+    await writeFile(index, html);
+    const r = await author("inline", dir);
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(await readFile(out, "utf8"), html);
+  }
+});
+
+test("route only pads an omitted cue when clock or Kind identifies the generated cells", async t => {
+  const dir = await authoringFixture(t), index = join(dir, "index.html"), presenter = join(dir, "PRESENTER.md");
+  const header = "| # | Slide | Clock | Kind | Cue |\n|---|---|---|---|---|\n";
+  const slide = '<section class="slide" id="alpha" data-title="Alpha"';
+  await writeFile(index, slide + '><aside class="notes"><p><b>0:00–1:00.</b> Test</p></aside></section>');
+  const before = header + "| 1 | Alpha | Illustration | my cue text |\n";
+  await writeFile(presenter, before);
+  let r = await author("route", dir);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /expected 5 columns, found 4/);
+  assert.equal(await readFile(presenter, "utf8"), before);
+
+  for (const [cells, body, expected] of [
+    ["0:00–1:00 | Illustration", '><aside class="notes"><p><b>0:00–1:00.</b></p></aside></section>', "0:00–1:00 | Illustration"],
+    [" | Slide", "></section>", " | Slide"],
+    [" | **Live:** Demo", ' data-live="Demo"></section>', " | **Live:** Demo"]
+  ]) {
+    await writeFile(index, slide + body);
+    await writeFile(presenter, header + "| 1 | Alpha | " + cells + " |\n");
+    r = await author("route", dir);
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(await readFile(presenter, "utf8"), header + "| 1 | Alpha | " + expected + " |  |\n");
+    assert.equal((await author("route", dir, "--check")).status, 0);
+  }
+});
