@@ -8,7 +8,7 @@ import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
 import { selectSlides, slideSections } from "./qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock } from "./qa-lock.mjs";
-import { artifact, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
+import { artifact, assertDeckInput, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
 import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -147,7 +147,7 @@ async function decks() {
   } else found.push(join(ROOT, "site/index.html"));
   const out = [];
   for (const index of found) {
-    if (index !== serveRoot && !index.startsWith(serveRoot + sep)) throw new Error(`${index} is outside ${serveRoot}.`);
+    await assertDeckInput(ROOT, repoMode, index);
     const html = await readFile(index, "utf8");
     const own = html.match(/templates\/([\w-]+)\/theme\.css" id="theme"/)?.[1];
     const isCatalog = basename(dirname(index)) === "catalog";
@@ -191,6 +191,12 @@ const run = await createRun(out);
 const config = { sizes: sizeList, motion: opt.motion, titles: opt.titles, jobs, fast: opt.fast, theme: opt.theme ?? null, selectors: picks ?? null, changed, since: opt.since ?? null, targets: positionals.map(p => resolve(p)), lintBaseline: opt["lint-baseline"] ? resolve(opt["lint-baseline"]) : null, lintChecks: opt["lint-checks"]?.split(",") ?? null };
 if (config.lintBaseline) plan.tools.push(config.lintBaseline);
 const before = await fingerprint(plan, config);
+const inputFiles = new Map(before.inputs.files.filter(file => file.sha256).map(file => [file.path, file.target ?? file.path]));
+const inputFolders = plan.inputs.filter(path => before.inputs.files.some(file => file.directory && file.path === path + "/"));
+const uncovered = new Set();
+function coveredFile(path, actual) {
+  return inputFiles.get(path) === actual && inputFiles.has(actual);
+}
 const limitations = [opt.fast && "--fast", picks && "--slides", changed && "--changed/--since", opt.theme && "--theme", !["1920x1080", "1280x720"].every(size => sizeList.includes(size)) && "custom sizes omit a default size"].filter(Boolean);
 const receiptScope = { kind: opt.fast ? "fast" : limitations.length ? "scoped" : "full", limitations, universe: repoMode && !positionals.length ? "engine" : "decks", decks: deckList.map(({ index, name, themes, allIds, selectedIds }) => ({ index, name, themes, allIds, selectedIds })) };
 const pending = [];
@@ -200,6 +206,7 @@ if (repoMode && !positionals.length) {
 }
 if (scope?.size === 0) note("nothing changed outside the docs; this records an empty scoped run, never full evidence.");
 
+const artifactRoot = await realpath(run.artifactRoot);
 server = createServer(async (req, res) => {
   let path, root = serveRoot;
   try {
@@ -212,8 +219,17 @@ server = createServer(async (req, res) => {
     return;
   }
   if (path !== root && !path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
+  if (root === serveRoot && !inputFiles.has(path) && !inputFolders.some(folder => path.startsWith(folder + sep))) uncovered.add(path);
   try {
-    const body = await readFile(path);
+    const actual = await realpath(path);
+    if (root === serveRoot) {
+      if (!coveredFile(path, actual)) {
+        uncovered.add(path);
+        res.writeHead(403).end("QA resource is outside the fingerprinted inputs");
+        return;
+      }
+    } else if (!actual.startsWith(artifactRoot + sep)) { res.writeHead(403).end(); return; }
+    const body = await readFile(actual);
     const headers = { "content-type": TYPES[extname(path)] || "application/octet-stream", "accept-ranges": "bytes" };
     if (req.headers.range) {
       const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
@@ -344,10 +360,35 @@ async function offline(deck) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   page.setDefaultNavigationTimeout(15000);
   const flush = watch(page, `${deck.name} file://`, found.problems, found.warnings ??= []);
+  // Pin alias requests to the checked canonical file at Chromium interception.
+  await page.route(/^file:/, async route => {
+    const url = new URL(route.request().url());
+    let path, actual;
+    try {
+      path = fileURLToPath(url);
+      actual = await realpath(path);
+    } catch { /* Report the original request as well when it cannot be resolved. */ }
+    if (!coveredFile(path, actual)) {
+      found.problems.push({
+        where: deck.name + " file://", check: "resource-input-scope", errors: ["QA resource is outside the fingerprinted inputs or changed target: " + (path ?? url.href)]
+      });
+      await route.abort();
+    } else if (actual !== path) {
+      const target = pathToFileURL(actual);
+      target.search = url.search;
+      await route.continue({ url: target.href });
+    } else await route.continue();
+  });
   try {
-  await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
-  await page.waitForTimeout(300);
-  } finally { await flush(); await page.close(); }
+    await page.goto(pathToFileURL(deck.index).href + "?res=auto", { waitUntil: "load" });
+    await page.waitForTimeout(300);
+  } catch (error) {
+    found.completed = false;
+    found.problems.push({ where: deck.name + " file://", errors: [error.message] });
+  } finally {
+    await flush();
+    await page.close();
+  }
   return found;
 }
 
@@ -483,6 +524,10 @@ if (config.lintBaseline) {
     for (const w of added) problems.push({ where: `${basename(dirname(w.index))} #${w.slide}`, check: "new-lint-warning", lintCheck: w.check, message: w.message });
   } catch (e) { problems.push({ where: "lint baseline", errors: [e.message] }); }
 }
+if (uncovered.size) problems.push({
+  where: "QA HTTP server", check: "resource-input-scope",
+  errors: [...uncovered].sort().map(path => "QA resource is outside the fingerprinted inputs: " + path)
+});
 const after = await fingerprint(plan, config);
 if (before.digest !== after.digest) { problems.push({ where: "fingerprint", errors: ["Inputs/tools/browser changed during QA. This run cannot be current evidence."] }); pending.push("rerun after inputs stop changing"); }
 const artifacts = results.flatMap(r => r.artifacts || []);

@@ -47,11 +47,20 @@ export async function snapshot(paths) {
       }
     } else if (info.isFile()) {
       const bytes = await readFile(path);
-      files.push({ path: label, bytes: bytes.length, sha256: hash(bytes) });
+      files.push({ path: label, ...(path !== label ? { target: path } : {}), bytes: bytes.length, sha256: hash(bytes) });
     }
   }
   for (const path of [...new Set(paths.map(p => resolve(p)))].sort()) await walk(path, path);
   return { digest: hash(files), files };
+}
+
+export async function assertDeckInput(root, repoMode, index) {
+  const folder = repoMode ? "examples" : "site";
+  const dir = join(root, folder), physicalDir = join(await canonicalPath(root), folder);
+  const actual = await canonicalPath(index);
+  if (!within(dir, index) || index === dir || !within(physicalDir, actual) || actual === physicalDir) {
+    throw new Error('QA deck must be inside the fingerprinted ' + (repoMode ? "examples/" : "site/") + ' directory: ' + index);
+  }
 }
 
 export function fingerprintPlan(root, repoMode, config = {}) {
@@ -166,6 +175,7 @@ export async function verifyReceipt(path, { expectedIndices } = {}) {
     coverage.push(...coverageProblems(receipt));
     if (expectedIndices && JSON.stringify([...expectedIndices].sort()) !== JSON.stringify(receipt.scope.decks.map(d => d.index).sort())) reasons.push("Receipt covers a different deck set.");
     const repoMode = await exists(join(receipt.root, "examples")) && await exists(join(receipt.root, "core/deck.js"));
+    for (const { index } of receipt.scope.decks) await assertDeckInput(receipt.root, repoMode, index);
     const plan = fingerprintPlan(receipt.root, repoMode, receipt.config);
     if (JSON.stringify(plan) !== JSON.stringify(receipt.fingerprint.plan)) reasons.push("Fingerprint plan does not cover the current canonical inputs/tools.");
     const current = await fingerprint(plan, receipt.config);
@@ -185,18 +195,26 @@ export async function verifyReceipt(path, { expectedIndices } = {}) {
   return { receipt, current: reasons.length === 0, valid: reasons.length === 0 && coverage.length === 0, reasons: [...reasons, ...coverage] };
 }
 
-async function pointer(out, file, options) {
+async function pointer(out, file, verify) {
   try {
     const p = JSON.parse(await readFile(join(out, file), "utf8"));
+    if (p.schema !== QA_SCHEMA || typeof p.receipt !== "string" || !p.receipt || isAbsolute(p.receipt)) throw new Error("Invalid receipt pointer.");
     const path = resolve(out, p.receipt);
     if (!within(resolve(out), path)) throw new Error("Receipt pointer escapes the output folder.");
-    return { path, ...await verifyReceipt(path, options) };
+    const actual = await canonicalPath(path);
+    if (!within(await canonicalPath(out), actual)) throw new Error("Receipt pointer escapes the output folder.");
+    return { path, ...await verify(path) };
   } catch (e) { return { valid: false, reasons: [`${file}: ${e.message}`] }; }
 }
 
 export async function qaStatus(out, expectedIndices) {
-  const latest = await pointer(out, "latest.json", { expectedIndices });
-  const full = await pointer(out, "latest-full.json", { expectedIndices });
+  const checked = new Map();
+  const verify = path => {
+    if (!checked.has(path)) checked.set(path, verifyReceipt(path, { expectedIndices }));
+    return checked.get(path);
+  };
+  const latest = await pointer(out, "latest.json", verify);
+  const full = await pointer(out, "latest-full.json", verify);
   const green = result => result.valid && !result.receipt.problems.length && !result.receipt.pending.length;
   const currentFull = green(full) && full.receipt.scope.kind === "full";
   const state = !latest.current ? "stale-or-missing" : `${green(latest) ? "current" : "incomplete"}-${latest.receipt.scope.kind}`;

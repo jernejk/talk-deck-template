@@ -66,8 +66,13 @@
     reducedMotion
   };
 
+  let activation = 0;
   function emit(hook, ...args) {
+    const version = activation;
     plugins.forEach(p => {
+      if (hook === "enter" && activation !== version ||
+          hook === "rest" && (!resting || activation !== version) ||
+          hook === "wake" && (resting || activation !== version)) return;
       try { p[hook]?.(...args, api); } catch (e) { console.error(`Deck plugin "${p.name || "?"}" failed in ${hook}:`, e); }
     });
   }
@@ -207,23 +212,34 @@
   }
 
   function show(n, { updateHash = true, stepMode = "start" } = {}) {
+    const target = deck.visible[Math.max(0, Math.min(deck.visible.length - 1, n))];
+    const beforeWake = activation;
     wake();
+    if (activation !== beforeWake) return;
     const before = deck.active;
-    deck.index = Math.max(0, Math.min(deck.visible.length - 1, n));
-    const active = current();
+    const at = deck.visible.indexOf(target);
+    if (at < 0) return;
+    deck.index = at;
+    const active = target;
     deck.active = active;
+    if (before !== active) activation++;
+    const version = activation;
     if (before !== active) setSteps(active, stepMode);
     else if (stepMode === "end") {
       const was = Number(active.dataset.shown) || 0;
       setSteps(active, "end");
       stepGroups(active).slice(was).forEach(g => emit("step", g, active));
     }
+    if (version !== activation) return;
+    const restoreFocus = before !== active && before?.contains(document.activeElement);
     deck.all.forEach(s => {
       const on = s === active;
       s.classList.toggle("is-active", on);
       s.inert = !on;
       s.setAttribute("aria-hidden", String(!on));
     });
+
+    if (restoreFocus) active.focus({ preventScroll: true });
 
     const bar = $("#progress");
     bar.style.width = `${(deck.index + 1) / deck.visible.length * 100}%`;
@@ -234,9 +250,9 @@
     renderNotes();
     if (before !== active) {
       if (before) emit("leave", before);
-      emit("enter", active);
+      if (version === activation) emit("enter", active);
     }
-    if (updateHash && active.id) {
+    if (version === activation && updateHash && active.id) {
       history.replaceState(null, "", "#" + active.id);
       // The preview host is the page a reload restores, so it carries the slide too.
       if (framed) try { if (window.parent.Deck) window.parent.history.replaceState(null, "", "#" + active.id); } catch {}
@@ -467,7 +483,8 @@
   function rest() {
     resting = true;
     document.documentElement.classList.add("is-resting");
-    current()?.querySelectorAll("svg").forEach(svg => { if (svg.animationsPaused && !svg.animationsPaused()) { svg.pauseAnimations(); restPaused.add(svg); } });
+    deck.active?.querySelectorAll("svg").forEach(svg => { if (svg.animationsPaused && !svg.animationsPaused()) { svg.pauseAnimations(); restPaused.add(svg); } });
+    if (deck.active) emit("rest", deck.active);
   }
   function wake() {
     lastInput = Date.now();
@@ -476,6 +493,7 @@
     document.documentElement.classList.remove("is-resting");
     restPaused.forEach(svg => svg.unpauseAnimations());
     restPaused.clear();
+    if (deck.active) emit("wake", deck.active);
   }
 
   function touchHint() {
@@ -554,9 +572,9 @@
     deck.all.forEach(rise);
     wire();
     toggleNotes(false);
-    refreshVisible(null, { updateHash: false });
     const entry = slideFromHash();
-    if (entry) goTo(entry, { updateHash: false });
+    deck.showExtras = entry?.hasAttribute("data-hidden") ?? false;
+    refreshVisible(entry, { updateHash: false });
     touchHint();
   }
 

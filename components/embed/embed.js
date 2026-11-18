@@ -1,6 +1,17 @@
 let liveControl = null;
 
-const fallbackIn = slide => [...(slide?.querySelectorAll(".embed") || [])].find(fig => fig.querySelector(".embed-shot"));
+const revealed = fig => !fig.closest("[data-step]:not(.is-shown)");
+function fallbackIn(slide) {
+  const ready = [...(slide?.querySelectorAll(".embed") || [])].filter(fig => fig.embedFallback && revealed(fig));
+  return ready.find(fig => fig.classList.contains("is-live")) ?? ready[0];
+}
+
+function refreshLiveControl(slide) {
+  if (!liveControl) return;
+  const fig = fallbackIn(slide);
+  liveControl.hidden = !fig;
+  liveControl.setAttribute("aria-pressed", String(Boolean(fig?.classList.contains("is-live"))));
+}
 
 function load(frame) {
   clearTimeout(frame.unloadTimer);
@@ -11,6 +22,7 @@ function load(frame) {
 
 // Blanking a frame mid-load aborts the request, so give it two seconds to finish first.
 function unload(frame) {
+  if (frame.dataset.state === "unload") return;
   if (frame.dataset.state === "loading") {
     frame.dataset.state = "unload";
     frame.unloadTimer = setTimeout(() => { if (frame.dataset.state === "unload") { frame.dataset.state = ""; frame.src = "about:blank"; } }, 2000);
@@ -134,7 +146,8 @@ function sync(fig) {
     toggle.classList.toggle("embed-go", !live);
     toggle.setAttribute("aria-pressed", String(live));
     reload.hidden = !live;
-    if (liveControl && fig === fallbackIn(fig.closest(".slide"))) liveControl.setAttribute("aria-pressed", String(live));
+    const slide = fig.closest(".slide");
+    if (slide.classList.contains("is-active")) refreshLiveControl(slide);
   } else {
     toggle.firstChild.textContent = fig.embedOpen ? "Shrink" : "Expand";
     toggle.setAttribute("aria-pressed", String(Boolean(fig.embedOpen)));
@@ -142,7 +155,7 @@ function sync(fig) {
 }
 
 function goLive(fig, deck) {
-  if (fig.classList.contains("is-live")) return;
+  if (!revealed(fig) || fig.classList.contains("is-live")) return;
   fig.classList.add("is-live");
   load(fig.querySelector(".embed-frame"));
   expand(fig, deck);
@@ -203,7 +216,7 @@ const embedsIn = root => root.matches(".embed") ? [root] : [...root.querySelecto
 
 function show(root) {
   embedsIn(root).forEach(fig => {
-    if (fig.embedFallback || fig.closest("[data-step]:not(.is-shown)")) return;
+    if (fig.embedFallback || !revealed(fig)) return;
     load(fig.querySelector(".embed-frame"));
   });
 }
@@ -227,7 +240,7 @@ Deck.use({
       resizing = true;
       addEventListener("resize", () => deck.current()?.querySelectorAll(".embed.is-expanded").forEach(fig => { if (fig.embedOpen) place(fig, area(fig)); }));
     }
-    if (liveControl || !fallbackIn(slide)) return;
+    if (liveControl || !slide.querySelector(".embed .embed-shot")) return;
     liveControl = deck.control({
       label: "Live", key: "l", pressed: false, bar: true,
       action() {
@@ -240,16 +253,19 @@ Deck.use({
     liveControl.hidden = true;
   },
   enter(slide) {
-    if (liveControl) {
-      liveControl.hidden = !fallbackIn(slide);
-      liveControl.setAttribute("aria-pressed", "false");
-    }
+    refreshLiveControl(slide);
     show(slide);
   },
   leave(slide, deck) {
     hide(slide, deck);
     if (liveControl) liveControl.hidden = true;
   },
-  step(els) { els.forEach(show); },
-  unstep(els, slide, deck) { els.forEach(el => hide(el, deck)); }
+  step(els, slide) {
+    els.forEach(show);
+    refreshLiveControl(slide);
+  },
+  unstep(els, slide, deck) {
+    els.forEach(el => hide(el, deck));
+    refreshLiveControl(slide);
+  }
 });

@@ -19,7 +19,9 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
      enter(slide, deck) {},            // the slide became active
      leave(slide, deck) {},            // it stopped being active
      step(elements, slide, deck) {},   // Space revealed a step group
-     unstep(elements, slide, deck) {}  // going back hid it again
+     unstep(elements, slide, deck) {}, // going back hid it again
+     rest(slide, deck) {},             // the active slide entered idle rest
+     wake(slide, deck) {}              // idle rest ended
    });
    ```
 

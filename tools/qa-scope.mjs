@@ -16,41 +16,99 @@ export function selectSlides(ids, selectors) {
   return ids.filter(id => chosen.has(id));
 }
 
-function attribute(tag, key) {
-  const m = new RegExp(`\\s${key}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, "i").exec(tag);
-  return m ? m[1] ?? m[2] ?? m[3] : "";
+export function* attributeTokens(tag) {
+  const pairs = /([^\s=/"'<>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+  pairs.lastIndex = /^<\s*[\w:-]+/.exec(tag)?.[0].length ?? tag.length;
+  for (let match; (match = pairs.exec(tag));) {
+    const [, name, double, single, bare] = match;
+    yield { name: name.toLowerCase(), value: double ?? single ?? bare ?? "", start: match.index, end: pairs.lastIndex };
+  }
 }
 
-// Keep original bytes outside owned sections. Ignore section-looking text in
-// comments, scripts and styles; count nested sections rather than truncating them.
-export function slideSections(html) {
-  const tags = /<!--[\s\S]*?-->|<(?:[^<>"']|"[^"]*"|'[^']*')*>/g;
-  const stack = [], out = [];
+export function attributes(tag) {
+  const attrs = new Map();
+  for (const { name, value } of attributeTokens(tag)) if (!attrs.has(name)) attrs.set(name, value);
+  return attrs;
+}
+
+// Retain offsets in the original HTML and skip tag-looking text in raw-text elements.
+export function* htmlTags(html, { strict = true } = {}) {
+  const tags = /<!--[\s\S]*?(?:-->|$)|<!\[CDATA\[|<(?:[^<>"']|"[^"]*"|'[^']*')*>/g;
+  const foreign = [];
+  let templateDepth = 0;
   for (let match; (match = tags.exec(html));) {
     const tag = match[0];
-    if (tag.startsWith("<!--")) continue;
-    const start = /^<\s*(script|style)\b/i.exec(tag);
-    if (start) {
-      const end = new RegExp(`<\\/\\s*${start[1]}\\s*>`, "ig");
-      end.lastIndex = tags.lastIndex;
-      const close = end.exec(html);
-      if (!close) throw new Error(`Unclosed <${start[1]}>.`);
-      tags.lastIndex = end.lastIndex;
+    const parent = foreign.at(-1);
+    if (tag === "<![CDATA[" && parent && parent.namespace !== "html") {
+      const end = html.indexOf("]]>", tags.lastIndex);
+      tags.lastIndex = end === -1 ? html.length : end + 3;
       continue;
     }
-    if (/^<\s*section\b/i.test(tag)) {
-      const slide = attribute(tag, "class").split(/\s+/).includes("slide");
-      if (slide && stack.some(s => s.slide)) throw new Error("A section.slide cannot contain another section.slide.");
-      stack.push({ slide, id: attribute(tag, "id"), start: match.index });
-    } else if (/^<\s*\/\s*section\s*>/i.test(tag)) {
+    const element = /^<\s*(\/\s*)?([a-z][\w:-]*)(?=[\s/>])/i.exec(tag);
+    if (!element) continue;
+    const [, closing, rawName] = element, name = rawName.toLowerCase();
+    const outer = parent?.namespace ?? "html";
+    let namespace = outer;
+    if (closing) {
+      const at = foreign.findLastIndex(node => node.name === name);
+      if (at >= 0) namespace = foreign.splice(at)[0].namespace;
+    } else {
+      // SVG and MathML integration points can contain HTML or a nested foreign subtree.
+      if (parent?.htmlChildren || parent?.mathText && !/^(mglyph|malignmark)$/.test(name)) namespace = "html";
+      if (namespace === "html" && /^(svg|math)$/.test(name)) namespace = name;
+      if (parent?.name === "annotation-xml" && outer === "math" && name === "svg") namespace = "svg";
+    }
+    const token = { name, namespace, inert: templateDepth > 0, closing: !!closing, tag, start: match.index, end: tags.lastIndex };
+    if (namespace === "html" && name === "template") templateDepth = Math.max(0, templateDepth + (closing ? -1 : 1));
+    if (!closing && namespace === "html" && /^(script|style|title|textarea)$/.test(name)) {
+      const end = new RegExp("</" + name + "(?=[\\t\\n\\f\\r />])" + /(?:[^<>"']|"[^"]*"|'[^']*')*>/.source, "ig");
+      end.lastIndex = tags.lastIndex;
+      const close = end.exec(html);
+      if (!close && strict) throw new Error('Unclosed <' + name + '>.');
+      token.contentEnd = close?.index ?? html.length;
+      tags.lastIndex = close ? end.lastIndex : html.length;
+    } else if (!closing && (parent || namespace !== "html")) {
+      const empty = namespace === "html"
+        ? /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(name)
+        : /\/>$/.test(tag);
+      if (!empty) {
+        const htmlChildren = namespace === "svg" && /^(title|desc|foreignobject)$/.test(name) ||
+          namespace === "math" && name === "annotation-xml" && /^(text\/html|application\/xhtml\+xml)$/i.test(attributes(tag).get("encoding") ?? "");
+        const mathText = namespace === "math" && /^(mi|mo|mn|ms|mtext)$/.test(name);
+        foreign.push({ name, namespace, htmlChildren, mathText });
+      }
+    }
+    yield token;
+  }
+}
+
+// QA requires a well-formed hierarchy and unique IDs. Authoring also reads
+// drafts without IDs and keeps their opening tags and hidden state.
+export function slideSections(html, { strict = true } = {}) {
+  const stack = [], out = [];
+  const record = (open, end) => {
+    if (open.slide) out.push({ id: open.id, start: open.start, end, ...(strict
+      ? { html: html.slice(open.start, end) }
+      : { tag: open.tag, hidden: open.hidden }) });
+  };
+  for (const token of htmlTags(html, { strict })) {
+    if (token.name !== "section" || token.namespace !== "html" || token.inert) continue;
+    if (token.closing) {
+      if (!/^<\s*\/\s*section\s*>$/i.test(token.tag)) continue;
       const open = stack.pop();
-      if (!open) throw new Error("Unmatched </section>.");
-      if (open.slide) out.push({ id: open.id, start: open.start, end: tags.lastIndex, html: html.slice(open.start, tags.lastIndex) });
+      if (open) record(open, token.end);
+      else if (strict) throw new Error("Unmatched </section>.");
+    } else {
+      const attrs = attributes(token.tag);
+      const slide = (attrs.get("class") || "").split(/\s+/).includes("slide");
+      if (strict && slide && stack.some(s => s.slide)) throw new Error("A section.slide cannot contain another section.slide.");
+      stack.push({ ...token, slide, id: attrs.get("id") || "", hidden: attrs.has("data-hidden") });
     }
   }
-  if (stack.length) throw new Error("Unclosed <section>.");
+  if (strict && stack.length) throw new Error("Unclosed <section>.");
+  stack.forEach(open => record(open, html.length));
   out.sort((a, b) => a.start - b.start);
-  selectSlides(out.map(s => s.id));
+  if (strict) selectSlides(out.map(s => s.id));
   return out;
 }
 

@@ -193,7 +193,18 @@ Deck.use({
 (() => {
 let liveControl = null;
 
-const fallbackIn = slide => [...(slide?.querySelectorAll(".embed") || [])].find(fig => fig.querySelector(".embed-shot"));
+const revealed = fig => !fig.closest("[data-step]:not(.is-shown)");
+function fallbackIn(slide) {
+  const ready = [...(slide?.querySelectorAll(".embed") || [])].filter(fig => fig.embedFallback && revealed(fig));
+  return ready.find(fig => fig.classList.contains("is-live")) ?? ready[0];
+}
+
+function refreshLiveControl(slide) {
+  if (!liveControl) return;
+  const fig = fallbackIn(slide);
+  liveControl.hidden = !fig;
+  liveControl.setAttribute("aria-pressed", String(Boolean(fig?.classList.contains("is-live"))));
+}
 
 function load(frame) {
   clearTimeout(frame.unloadTimer);
@@ -204,6 +215,7 @@ function load(frame) {
 
 // Blanking a frame mid-load aborts the request, so give it two seconds to finish first.
 function unload(frame) {
+  if (frame.dataset.state === "unload") return;
   if (frame.dataset.state === "loading") {
     frame.dataset.state = "unload";
     frame.unloadTimer = setTimeout(() => { if (frame.dataset.state === "unload") { frame.dataset.state = ""; frame.src = "about:blank"; } }, 2000);
@@ -327,7 +339,8 @@ function sync(fig) {
     toggle.classList.toggle("embed-go", !live);
     toggle.setAttribute("aria-pressed", String(live));
     reload.hidden = !live;
-    if (liveControl && fig === fallbackIn(fig.closest(".slide"))) liveControl.setAttribute("aria-pressed", String(live));
+    const slide = fig.closest(".slide");
+    if (slide.classList.contains("is-active")) refreshLiveControl(slide);
   } else {
     toggle.firstChild.textContent = fig.embedOpen ? "Shrink" : "Expand";
     toggle.setAttribute("aria-pressed", String(Boolean(fig.embedOpen)));
@@ -335,7 +348,7 @@ function sync(fig) {
 }
 
 function goLive(fig, deck) {
-  if (fig.classList.contains("is-live")) return;
+  if (!revealed(fig) || fig.classList.contains("is-live")) return;
   fig.classList.add("is-live");
   load(fig.querySelector(".embed-frame"));
   expand(fig, deck);
@@ -396,7 +409,7 @@ const embedsIn = root => root.matches(".embed") ? [root] : [...root.querySelecto
 
 function show(root) {
   embedsIn(root).forEach(fig => {
-    if (fig.embedFallback || fig.closest("[data-step]:not(.is-shown)")) return;
+    if (fig.embedFallback || !revealed(fig)) return;
     load(fig.querySelector(".embed-frame"));
   });
 }
@@ -420,7 +433,7 @@ Deck.use({
       resizing = true;
       addEventListener("resize", () => deck.current()?.querySelectorAll(".embed.is-expanded").forEach(fig => { if (fig.embedOpen) place(fig, area(fig)); }));
     }
-    if (liveControl || !fallbackIn(slide)) return;
+    if (liveControl || !slide.querySelector(".embed .embed-shot")) return;
     liveControl = deck.control({
       label: "Live", key: "l", pressed: false, bar: true,
       action() {
@@ -433,18 +446,21 @@ Deck.use({
     liveControl.hidden = true;
   },
   enter(slide) {
-    if (liveControl) {
-      liveControl.hidden = !fallbackIn(slide);
-      liveControl.setAttribute("aria-pressed", "false");
-    }
+    refreshLiveControl(slide);
     show(slide);
   },
   leave(slide, deck) {
     hide(slide, deck);
     if (liveControl) liveControl.hidden = true;
   },
-  step(els) { els.forEach(show); },
-  unstep(els, slide, deck) { els.forEach(el => hide(el, deck)); }
+  step(els, slide) {
+    els.forEach(show);
+    refreshLiveControl(slide);
+  },
+  unstep(els, slide, deck) {
+    els.forEach(el => hide(el, deck));
+    refreshLiveControl(slide);
+  }
 });
 })();
 
@@ -530,7 +546,7 @@ Deck.use({
 
 // motion
 (() => {
-const frames = new Map();
+let travel;
 const ms = v => (parseFloat(v) || 4) * (/ms$/.test(v.trim()) ? 1 : 1000);
 const dotsOf = g => [...g.children].filter(el => el.localName !== "path");
 
@@ -544,28 +560,52 @@ Deck.use({
     });
   },
   enter(slide, deck) {
+    if (slide !== deck.current()) return;
+    travel?.dispose();
+    travel = undefined;
     const plan = [...slide.querySelectorAll(".mx-travel")].map(g => {
       const path = g.querySelector(":scope > path");
       const dots = dotsOf(g);
       return { path, len: path.getTotalLength(), t: ms(getComputedStyle(g).getPropertyValue("--t")), dots: dots.map(d => [d, (Number(getComputedStyle(d).getPropertyValue("--i")) || 0) / dots.length]) };
     });
     if (!plan.length) return;
-    // ponytail: reduced motion parks each dot at its share of the path, so the still frame shows the flow.
-    const still = deck.reducedMotion();
-    const t0 = performance.now();
-    const tick = now => {
+    const media = matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = null, last = null, elapsed = 0;
+    function paint(still) {
       plan.forEach(({ path, len, t, dots }) => dots.forEach(([dot, phase]) => {
-        const p = still ? phase + .5 / dots.length : ((now - t0) / t + phase) % 1;
+        const p = still ? phase + .5 / dots.length : (elapsed / t + phase) % 1;
         const { x, y } = path.getPointAtLength(p * len);
-        dot.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+        dot.setAttribute("transform", 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
       }));
-      if (!still) frames.set(slide, requestAnimationFrame(tick));
-    };
-    tick(t0);
+    }
+    function tick(now) {
+      if (last !== null) elapsed += now - last;
+      last = now;
+      paint(false);
+      frame = requestAnimationFrame(tick);
+    }
+    function pause() {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = last = null;
+    }
+    function resume() {
+      if (media.matches || frame !== null || document.documentElement.classList.contains("is-resting")) return;
+      frame = requestAnimationFrame(tick);
+    }
+    function changeMotion() {
+      if (media.matches) { pause(); paint(true); }
+      else { paint(false); resume(); }
+    }
+    media.addEventListener("change", changeMotion);
+    travel = { slide, pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
+    changeMotion();
   },
+  rest(slide) { if (travel?.slide === slide) travel.pause(); },
+  wake(slide) { if (travel?.slide === slide) travel.resume(); },
   leave(slide) {
-    cancelAnimationFrame(frames.get(slide));
-    frames.delete(slide);
+    if (travel?.slide !== slide) return;
+    travel.dispose();
+    travel = undefined;
   }
 });
 })();
@@ -645,7 +685,7 @@ function buildVideo(fig, slide) {
 
   let started = false;
   let seekOnMetadata = false;
-  let scrubbing = false;
+  let scrubPointer = null;
   let raf = 0;
 
   function paint() {
@@ -659,7 +699,7 @@ function buildVideo(fig, slide) {
     toggle.ariaLabel = v.paused ? "Play" : "Pause";
     mute.ariaPressed = String(v.muted);
     time.textContent = `${fmt(done)} / ${fmt(total, Math.round)}`;
-    if (scrubbing) return;
+    if (scrubPointer !== null) return;
     seek.max = String(total);
     seek.value = String(done);
     seek.style.setProperty("--p", total ? `${done / total * 100}%` : "0%");
@@ -687,10 +727,24 @@ function buildVideo(fig, slide) {
     v.play().catch(swallow);
   }
 
+  function clearScrub() {
+    scrubPointer = null;
+    removeEventListener("pointerup", finishScrub, true);
+    removeEventListener("pointercancel", finishScrub, true);
+  }
+
+  function finishScrub(event) {
+    if (event.pointerId !== scrubPointer) return;
+    clearScrub();
+    paint();
+    if (event.type === "pointerup" && slide.classList.contains("is-active")) slide.focus({ preventScroll: true });
+  }
+
   const api = {
     play,
-    pause: () => v.pause(),
+    pause() { clearScrub(); v.pause(); paint(); },
     reset() {
+      clearScrub();
       v.pause();
       started = false;
       seekOnMetadata = v.readyState < 1;
@@ -713,9 +767,11 @@ function buildVideo(fig, slide) {
   toggle.addEventListener("click", () => v.paused ? play() : v.pause());
   mute.addEventListener("click", () => { v.muted = !v.muted; });
   seek.addEventListener("input", () => { v.currentTime = start + Number(seek.value); paint(); });
-  seek.addEventListener("pointerdown", () => {
-    scrubbing = true;
-    addEventListener("pointerup", () => { scrubbing = false; paint(); slide.focus({ preventScroll: true }); }, { once: true });
+  seek.addEventListener("pointerdown", event => {
+    if (scrubPointer !== null || event.button !== 0) return;
+    scrubPointer = event.pointerId;
+    addEventListener("pointerup", finishScrub, true);
+    addEventListener("pointercancel", finishScrub, true);
   });
   paint();
 }
