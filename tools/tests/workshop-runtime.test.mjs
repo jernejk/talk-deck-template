@@ -239,6 +239,44 @@ test("typed reveals and counters stop on reverse and start only when revealed", 
 });
 
 
+test("app and system reduced motion finish active text effects without revealing hidden or off-slide effects", async t => {
+  const text = "A deliberately long typing effect that must finish immediately when motion is reduced.";
+  const body = html(slide("effects", `<span id="typing" data-type="${text}" data-delay="1"></span><strong id="counting" data-count="100">100</strong><div data-step><span id="hidden-type" data-type="Hidden text"></span><strong id="hidden-count" data-count="999">Hidden count</strong></div>`) + slide("elsewhere", '<span data-type="Off-slide target">Untouched text</span><strong data-count="500">Untouched count</strong>'));
+  for (const engine of [browser, safari]) for (const source of ["app", "system"]) {
+    const p = await pageFor(t, engine, { reducedMotion: "no-preference" });
+    await p.route("**/motion-text.html*", r => r.fulfill({ contentType: "text/html", body }));
+    await p.goto(`${base}/motion-text.html?res=auto`);
+    await p.waitForFunction(() => {
+      const n = Number(document.querySelector("#counting").textContent);
+      const el = document.querySelector("#typing");
+      return n > 0 && n < 100 && el.textContent.length > 0 && el.textContent !== el.dataset.type;
+    });
+    const hidden = await p.locator("#hidden-count").textContent();
+    if (source === "app") await p.locator('[data-action="motion"]').evaluate(el => el.click());
+    else await p.emulateMedia({ reducedMotion: "reduce" });
+    await p.waitForFunction(() => document.querySelector('[data-action="motion"]').getAttribute("aria-pressed") === "true");
+    assert.equal(await p.locator("#counting").textContent(), "100", source);
+    assert.equal(await p.locator("#typing").textContent(), text, source);
+    assert.equal(await p.locator("#typing.is-typing").count(), 0);
+    assert.equal(await p.locator("#typing.is-typed").count(), 1);
+    assert.equal(await p.locator("#hidden-type").textContent(), "");
+    assert.equal(await p.locator("#hidden-count").textContent(), hidden);
+    assert.equal(await p.locator("#elsewhere [data-type]").textContent(), "Untouched text");
+    assert.equal(await p.locator("#elsewhere [data-count]").textContent(), "Untouched count");
+    await p.waitForTimeout(180);
+    assert.equal(await p.locator("#typing").textContent(), text);
+    await p.evaluate(() => Deck.next());
+    assert.equal(await p.locator("#hidden-type").textContent(), "Hidden text");
+    assert.equal(await p.locator("#hidden-count").textContent(), "999");
+    if (source === "app") await p.locator('[data-action="motion"]').evaluate(el => el.click());
+    else await p.emulateMedia({ reducedMotion: "no-preference" });
+    await p.waitForFunction(() => document.querySelector('[data-action="motion"]').getAttribute("aria-pressed") === "false");
+    await p.waitForTimeout(180);
+    assert.equal(await p.locator("#typing").textContent(), text);
+    assert.equal(await p.locator("#counting").textContent(), "100");
+  }
+});
+
 test("YouTube Play creates an HTTP embed and opens a file fallback without script errors", async t => {
   const temp = await mkdtemp(join(tmpdir(), "workshop-youtube-")); t.after(() => rm(temp, { recursive: true, force: true }));
   await writeFile(join(temp, "index.html"), youtube.replaceAll('="/', `="${pathToFileURL(ROOT + sep).href}`));

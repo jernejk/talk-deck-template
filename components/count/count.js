@@ -25,6 +25,7 @@ Deck.use({
   name: "count",
   enter(slide, deck) { countIn(slide, deck); },
   step(els, slide, deck) { els.forEach(el => countIn(el, deck)); },
+  motion(reduced, deck) { if (reduced && deck.current()) countIn(deck.current(), deck); },
   unstep(els) { els.forEach(stopCount); },
   leave(slide) { stopCount(slide); }
 });

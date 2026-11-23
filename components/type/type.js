@@ -27,6 +27,7 @@ Deck.use({
   name: "type",
   enter(slide, deck) { typeIn(slide, deck); },
   step(els, slide, deck) { els.forEach(el => typeIn(el, deck)); },
+  motion(reduced, deck) { if (reduced && deck.current()) typeIn(deck.current(), deck); },
   unstep(els) { els.forEach(stopType); },
   leave(slide) { stopType(slide); }
 });
