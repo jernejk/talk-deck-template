@@ -203,10 +203,12 @@ test("phone overlays, expanded demos and expired countdowns stay usable through 
       assert.equal(await p.locator("#notes-panel.is-open").count(), 0);
       await p.locator('[data-action="options"]').click(); await p.keyboard.press("Escape");
       assert.equal(await p.locator("#deck-options").isVisible(), false);
-      await p.locator('[data-action="overview"]').click();
+      const overviewVisible = await p.locator('[data-action="overview"]').isVisible();
+      if (overviewVisible) await p.locator('[data-action="overview"]').click();
+      else { await p.locator('[data-action=notes]').focus(); await p.keyboard.press('o'); }
       assert.equal(await p.locator("#overview").evaluate(el => el.contains(document.activeElement)), true);
       await p.keyboard.press("Escape");
-      await p.waitForFunction(() => document.activeElement.dataset.action === "overview");
+      await p.waitForFunction(action => document.activeElement.dataset.action === action, overviewVisible ? "overview" : "notes");
       await go(p, "image"); await p.locator("#image .image-zoom").click();
       await p.locator('[data-action="next"]').evaluate(el => el.focus());
       assert.equal(await p.locator("#image-viewer").evaluate(el => el.contains(document.activeElement)), true);
@@ -236,6 +238,44 @@ test("typed reveals and counters stop on reverse and start only when revealed", 
   assert.equal(await p.locator("#timed [data-count]").textContent(), count);
 });
 
+
+test("app and system reduced motion finish active text effects without revealing hidden or off-slide effects", async t => {
+  const text = "A deliberately long typing effect that must finish immediately when motion is reduced.";
+  const body = html(slide("effects", `<span id="typing" data-type="${text}" data-delay="1"></span><strong id="counting" data-count="100">100</strong><div data-step><span id="hidden-type" data-type="Hidden text"></span><strong id="hidden-count" data-count="999">Hidden count</strong></div>`) + slide("elsewhere", '<span data-type="Off-slide target">Untouched text</span><strong data-count="500">Untouched count</strong>'));
+  for (const engine of [browser, safari]) for (const source of ["app", "system"]) {
+    const p = await pageFor(t, engine, { reducedMotion: "no-preference" });
+    await p.route("**/motion-text.html*", r => r.fulfill({ contentType: "text/html", body }));
+    await p.goto(`${base}/motion-text.html?res=auto`);
+    await p.waitForFunction(() => {
+      const n = Number(document.querySelector("#counting").textContent);
+      const el = document.querySelector("#typing");
+      return n > 0 && n < 100 && el.textContent.length > 0 && el.textContent !== el.dataset.type;
+    });
+    const hidden = await p.locator("#hidden-count").textContent();
+    if (source === "app") await p.locator('[data-action="motion"]').evaluate(el => el.click());
+    else await p.emulateMedia({ reducedMotion: "reduce" });
+    await p.waitForFunction(() => document.querySelector('[data-action="motion"]').getAttribute("aria-pressed") === "true");
+    assert.equal(await p.locator("#counting").textContent(), "100", source);
+    assert.equal(await p.locator("#typing").textContent(), text, source);
+    assert.equal(await p.locator("#typing.is-typing").count(), 0);
+    assert.equal(await p.locator("#typing.is-typed").count(), 1);
+    assert.equal(await p.locator("#hidden-type").textContent(), "");
+    assert.equal(await p.locator("#hidden-count").textContent(), hidden);
+    assert.equal(await p.locator("#elsewhere [data-type]").textContent(), "Untouched text");
+    assert.equal(await p.locator("#elsewhere [data-count]").textContent(), "Untouched count");
+    await p.waitForTimeout(180);
+    assert.equal(await p.locator("#typing").textContent(), text);
+    await p.evaluate(() => Deck.next());
+    assert.equal(await p.locator("#hidden-type").textContent(), "Hidden text");
+    assert.equal(await p.locator("#hidden-count").textContent(), "999");
+    if (source === "app") await p.locator('[data-action="motion"]').evaluate(el => el.click());
+    else await p.emulateMedia({ reducedMotion: "no-preference" });
+    await p.waitForFunction(() => document.querySelector('[data-action="motion"]').getAttribute("aria-pressed") === "false");
+    await p.waitForTimeout(180);
+    assert.equal(await p.locator("#typing").textContent(), text);
+    assert.equal(await p.locator("#counting").textContent(), "100");
+  }
+});
 
 test("YouTube Play creates an HTTP embed and opens a file fallback without script errors", async t => {
   const temp = await mkdtemp(join(tmpdir(), "workshop-youtube-")); t.after(() => rm(temp, { recursive: true, force: true }));
@@ -442,4 +482,173 @@ test("global Live stays with the running fallback when an earlier fallback is re
   await p.keyboard.press("l");
   assert.equal(await p.locator(".embed.is-live").count(), 0);
   assert.equal(await live.getAttribute("aria-pressed"), "false");
+});
+
+test("phone navigation and Extras clear full-bleed headings and landscape text", async t => {
+  for (const engine of [browser, safari]) {
+    const p = await pageFor(t, engine, { hasTouch: true });
+    await p.goto(`${base}/examples/catalog/index.html?res=auto`);
+    for (const [width, height] of [[320,568],[375,667],[390,844],[568,320],[667,375],[844,390]]) {
+      await p.setViewportSize({ width, height });
+      const ids = width < height ? ["close","speaker","speaker-card","speaker-banner","speaker-facts","cover-split"] : ["motion","live-demo","video"];
+      for (const id of ids) for (const extras of [false,true]) {
+        await go(p, id);
+        await p.evaluate(extras => { Deck.current().scrollTop = 0; document.querySelector(".badge").hidden = !extras; }, extras);
+        await p.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+        const hits = await p.evaluate(() => {
+          const nav = document.querySelector(".deck-nav").getBoundingClientRect();
+          const badge = document.querySelector(".badge");
+          const overlaps = (a,b) => a.width > 0 && a.height > 0 && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+          const hits = [];
+          for (const el of Deck.current().querySelectorAll("h1,h2,.eyebrow")) {
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+            let node;
+            while (node = walker.nextNode()) {
+              if (!node.textContent.trim()) continue;
+              const range = document.createRange(); range.selectNodeContents(node);
+              for (const rect of range.getClientRects()) {
+                if (overlaps(rect, nav)) hits.push(`nav: ${node.textContent.trim()}`);
+                if (!badge.hidden && overlaps(rect, badge.getBoundingClientRect())) hits.push(`badge: ${node.textContent.trim()}`);
+              }
+            }
+          }
+          return { hits, paddingTop: getComputedStyle(Deck.current()).paddingTop };
+        });
+        const where = JSON.stringify({ engine:engine.browserType().name(), width,height,id,extras,hits });
+        assert.deepEqual(hits.hits, [], where);
+        if (width < height && id !== "speaker-facts") assert.equal(hits.paddingTop, "0px", where);
+        if (id === "close" && width < height) {
+          const qr = p.locator(".is-active .close-qr img");
+          await qr.scrollIntoViewIfNeeded();
+          const rect = await qr.boundingBox();
+          assert.ok(rect && rect.y >= -1 && rect.y + rect.height <= height + 1, `QR remains reachable by scrolling: ${where}`);
+        }
+      }
+    }
+  }
+});
+
+test("phone chrome stays reachable with picker, Live and Extras combinations", async t => {
+  for (const engine of [browser, safari]) {
+    const p = await pageFor(t, engine, { hasTouch: true });
+    for (const picker of ["auto", "visible", "none"]) {
+      await p.route("**/nav-fixture.html", r => r.fulfill({ contentType: "text/html", body: fixture.replace('"title":"Workshop regression"', `"picker":"${picker}","title":"Workshop regression"`) }));
+      await p.goto(`${base}/nav-fixture.html`);
+      for (const [width, height] of [[320,568],[375,667],[390,844],[568,320],[844,390]]) {
+        await p.setViewportSize({ width, height });
+        for (const live of [false,true]) for (const extras of [false,true]) {
+          await go(p, live ? "live" : "intro");
+          await p.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+          const result = await p.evaluate(extras => {
+            const badge = document.querySelector(".badge"); badge.hidden = !extras;
+            const nav = document.querySelector(".deck-nav").getBoundingClientRect();
+            const rects = [...document.querySelectorAll(".deck-nav button,.nav-picker")].filter(e => e.getClientRects().length && !e.hidden).map(e => { const r=e.getBoundingClientRect(); return { action:e.dataset.action, left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height }; });
+            const range=document.createRange(); range.selectNodeContents(Deck.current().querySelector(".title"));
+            const text=[...range.getClientRects()].map(r=>({left:r.left,right:r.right,top:r.top,bottom:r.bottom}));
+            return { rects, overlap:text.some(r=>r.left<nav.right && r.right>nav.left && r.top<nav.bottom && r.bottom>nav.top) };
+          }, extras);
+          assert.ok(result.rects.every(r=>r.left>=0 && r.right<=width && r.top>=0 && r.bottom<=height && r.height>=39), JSON.stringify({picker,width,height,live,extras,result}));
+          assert.equal(result.overlap,false,JSON.stringify({picker,width,height,live,extras,result}));
+          assert.ok(result.rects.some(r=>r.action==="fullscreen"));
+          assert.equal(result.rects.some(r=>r.action==="overview"), picker==="none" || width>520);
+        }
+      }
+      await p.unroute("**/nav-fixture.html");
+    }
+  }
+});
+
+test("expanded scrolling embeds lock wheel scroll and restore authored sizing and position", async t => {
+  for (const engine of [browser,safari]) {
+    const p = await pageFor(t,engine,{viewport:{width:390,height:844}});
+    const body=html(slide("demo", '<div style="height:800px">Before</div>'+embed("/child.html").replace(" data-step",' style="width:90%"')+'<p style="height:800px">After</p>')+slide("close",""));
+    await p.route("**/scroll-fixture.html",r=>r.fulfill({contentType:"text/html",body}));
+    await p.goto(`${base}/scroll-fixture.html`);
+    await p.evaluate(()=>{ Deck.current().scrollTop=650; });
+    const before=await p.locator(".slide.is-active").evaluate(s=>s.scrollTop);
+    await p.locator(".embed-toggle").click();
+    await p.mouse.move(20,300); await p.mouse.wheel(0,400);
+    assert.equal(await p.locator(".slide.is-active").evaluate(s=>s.scrollTop),before);
+    for(const [width,height] of [[844,390],[568,320],[390,600],[390,844]]) {
+      await p.setViewportSize({width,height});
+      const r=await p.locator(".embed-toggle").boundingBox();
+      assert.ok(r.y>=0 && r.y+r.height<=height,JSON.stringify(r));
+    }
+    await p.locator(".embed-toggle").click();
+    assert.equal(await p.locator(".slide.is-active").evaluate(s=>s.scrollTop),before);
+    assert.equal(await p.locator(".embed").evaluate(e=>e.style.width),"90%");
+    await p.locator(".embed-toggle").click(); await go(p,"close"); await go(p,"demo");
+    assert.equal(await p.locator(".embed").evaluate(e=>e.classList.contains("is-expanded")),false);
+    assert.notEqual(await p.locator(".slide.is-active").evaluate(s=>s.style.overflow),"hidden");
+  }
+});
+
+test("deck-owned loops preserve position across overlapping rest and motion; manual pause survives wake", async t => {
+  const p=await pageFor(t,browser,{reducedMotion:"no-preference"});
+  await p.clock.install(); await p.goto(`${base}/fixture.html`);
+  const v=p.locator("#plain-clip");
+  await p.waitForFunction(()=>!document.querySelector("#plain-clip").paused);
+  await p.clock.fastForward(96000);
+  assert.equal(await v.evaluate(v=>v.paused),true);
+  const time=await v.evaluate(v=>v.currentTime);
+  await p.evaluate(()=>document.querySelector('[data-action="motion"]').click());
+  await p.mouse.move(12,12);
+  assert.equal(await v.evaluate(v=>v.paused),true);
+  await p.evaluate(()=>document.querySelector('[data-action="motion"]').click());
+  await p.waitForFunction(()=>!document.querySelector("#plain-clip").paused);
+  assert.ok(await v.evaluate((v,time)=>Math.abs(v.currentTime-time)<1,time));
+  await v.evaluate(v=>v.pause()); await p.waitForTimeout(20);
+  await p.clock.fastForward(96000); await p.mouse.move(15,15);
+  assert.equal(await v.evaluate(v=>v.paused),true);
+  await go(p,"close");
+  assert.equal(await v.evaluate(v=>v.currentTime),0);
+});
+
+test("horizontal scroll regions reserve edge drags while vertical and ordinary slide swipes retain navigation", async t => {
+  const p=await pageFor(t);
+  await p.goto(`${base}/fixture.html`);
+  for(const left of [0,150,1000]) {
+    await p.evaluate(left=>{
+      let box=document.querySelector('#hscroll');
+      if(!box){box=document.createElement('div');box.id='hscroll';box.style.cssText='width:100px;overflow-x:auto';box.innerHTML='<p style="width:500px">Scrollable</p>';Deck.current().append(box);}
+      box.scrollLeft=left;
+      const fire=(type,x)=>{const e=new Event(type,{bubbles:true});Object.assign(e,{touches:type==='touchend'?[]:[{clientX:x,clientY:100}],changedTouches:[{clientX:x,clientY:100}]});box.firstChild.dispatchEvent(e);};fire('touchstart',250);fire('touchend',50);
+    },left);
+    assert.equal(await p.evaluate(()=>Deck.current().id),"intro");
+  }
+});
+
+test("travel painting reads every path before writing transforms and cannot restart after leave", async t=>{
+  const p=await pageFor(t,browser,{reducedMotion:"no-preference"});
+  await p.goto(`${base}/lifecycle.html`);
+  await p.evaluate(()=>{
+    const g=document.querySelector('.mx-travel');g.append(g.querySelector('circle').cloneNode());
+    window.paintOps=[];
+    const read=SVGGeometryElement.prototype.getPointAtLength,write=Element.prototype.setAttribute;
+    SVGGeometryElement.prototype.getPointAtLength=function(...args){paintOps.push('read');return read.apply(this,args);};
+    Element.prototype.setAttribute=function(k,v){if(k==='transform'&&this.closest('.mx-travel'))paintOps.push('write');return write.call(this,k,v);};
+    Deck.goTo(document.querySelector('#travel'));
+  });
+  await p.waitForTimeout(100);
+  const ops=await p.evaluate(()=>paintOps);
+  assert.ok(ops.length>=4);
+  for(let i=0;i+3<ops.length;i+=4)assert.deepEqual(ops.slice(i,i+4),['read','read','write','write']);
+  await go(p,"timer"); const n=await p.evaluate(()=>paintOps.length);
+  await p.mouse.move(40,40); await p.waitForTimeout(80);
+  assert.equal(await p.evaluate(()=>paintOps.length),n);
+});
+
+test("host preview reserves modified and editor R while plain R cycles resolution", async t=>{
+  const p=await pageFor(t);
+  await p.goto(`${base}/fixture.html?res=1920x1080`);
+  for(const modifier of ['ctrlKey','metaKey','altKey']){
+    await p.evaluate(modifier=>window.dispatchEvent(new KeyboardEvent('keydown',{key:'r',[modifier]:true})),modifier);
+    assert.ok(p.url().includes('res=1920x1080'));
+  }
+  await p.evaluate(()=>{
+    const input=document.createElement('input');document.body.append(input);
+    input.dispatchEvent(new KeyboardEvent('keydown',{key:'r',bubbles:true}));input.remove();
+  });
+  assert.ok(p.url().includes('res=1920x1080'));
+  await Promise.all([p.waitForURL('**res=1280x720'),p.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{key:'r'})))]);
 });

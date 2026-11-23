@@ -63,13 +63,13 @@
 }
 @media screen and (max-aspect-ratio:1/1), screen and (max-height:500px){
   .slide--presenter{overflow-y:auto}
-  .presenter-panel{width:92%;padding:7vh 6vw 4vh;height:auto}
+  .presenter-panel{width:92%;padding:max(7vh,var(--deck-content-top,0px)) 6vw 4vh;height:auto}
   .presenter-links{grid-template-columns:1fr;max-width:none}
   .presenter--card .presenter-side{position:static;width:auto;clip-path:none;padding:4vh 6vw 6vh}
   .presenter-portrait{width:50vw}
   .presenter-focus{max-width:none}
   .presenter-banner{position:static;height:40vh}
-  .presenter--facts{display:flex;flex-direction:column;align-items:stretch;gap:3vh;padding:9vh 6vw 14vh}
+  .presenter--facts{display:flex;flex-direction:column;align-items:stretch;gap:3vh;padding:max(9vh,var(--deck-content-top,0px)) 6vw 14vh}
   .presenter-fact,.presenter-fact:nth-child(2),.presenter-fact:nth-child(3){margin-left:0;max-width:none}
   .presenter-team{display:flex;flex-direction:column;gap:3vh}
   .presenter-card img{width:30vw}

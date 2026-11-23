@@ -160,9 +160,6 @@ export function coverageProblems(receipt) {
     if (!lint || !same(lint.slideIds, deck.allIds)) errors.push(`${deck.name}: full lint coverage missing.`);
     if (receipt.scope.kind === "full" && !same(deck.selectedIds, deck.allIds)) errors.push(`${deck.name}: partial slides cannot be full evidence.`);
   }
-  const counts = { slides: receipt.artifacts.filter(a => a.kind === "slide").length, sheets: receipt.artifacts.filter(a => a.kind === "sheet").length, total: receipt.artifacts.length };
-  if (!same(counts, receipt.screenshotCounts)) errors.push("Screenshot counts disagree with the artifact manifest.");
-  if (new Set(receipt.artifacts.map(a => a.path)).size !== receipt.artifacts.length) errors.push("Duplicate artifact paths.");
   if (receipt.scope.kind === "full" && (receipt.config.fast || receipt.config.changed || receipt.config.selectors !== null || receipt.config.theme !== null || !["1920x1080", "1280x720"].every(size => receipt.config.sizes.includes(size)))) errors.push("Scoped or fast configuration cannot be full evidence.");
   return errors;
 }

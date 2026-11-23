@@ -39,7 +39,9 @@
 }
 @media screen and (max-aspect-ratio:1/1){
   .slide--close{overflow-y:auto}
-  .close-grid{display:flex;flex-direction:column;align-items:flex-start;padding:9vh 6vw 6vh;height:auto}
+  .close-grid{display:flex;flex-direction:column;align-items:flex-start;padding:max(9vh,var(--deck-content-top,0px)) 6vw 6vh;height:auto}
   .qr-card img{width:60vw}
   .close-pet{display:none}
 }
+
+@media screen and (max-height:500px){.slide--close{overflow-y:auto}}

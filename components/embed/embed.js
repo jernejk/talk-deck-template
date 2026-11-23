@@ -36,9 +36,9 @@ function area(fig) {
   const slide = fig.closest(".slide");
   const s = slide.getBoundingClientRect();
   const foot = slide.querySelector(".slide-foot");
-  const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
+  const footTop = foot && getComputedStyle(foot).position !== "static" && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
   const root = document.documentElement, vw = root.clientWidth / 100, vh = root.clientHeight / 100;
-  return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: s.top + 8 * vh, bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
+  return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: Math.max(s.top + 8 * vh, (document.querySelector(".deck-nav")?.getBoundingClientRect().bottom || 0) + 8), bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
 }
 
 // data-logical renders the page that many CSS pixels wide and scales it in; two spare pixels hide the hairline a fractional scale leaves.
@@ -79,9 +79,33 @@ function move(fig, to, deck, done) {
   place(fig, to);
 }
 
+const scrollLocks = new WeakMap();
+function lockSlide(fig) {
+  const slide = fig.closest(".slide");
+  let state = scrollLocks.get(slide);
+  if (!state) {
+    state = { owners: new Set(), top: slide.scrollTop, left: slide.scrollLeft, overflow: [...slide.style].filter(key => /^(overflow|overflow-x|overflow-y)$/.test(key)).map(key => [key, slide.style.getPropertyValue(key), slide.style.getPropertyPriority(key)]) };
+    scrollLocks.set(slide, state);
+    slide.style.setProperty("overflow", "hidden", "important");
+  }
+  state.owners.add(fig);
+  fig.embedUnlock = () => {
+    state.owners.delete(fig);
+    if (!state.owners.size) {
+      slide.style.removeProperty("overflow");
+      for (const [key, value, priority] of state.overflow) slide.style.setProperty(key, value, priority);
+      slide.scrollTop = state.top; slide.scrollLeft = state.left;
+      scrollLocks.delete(slide);
+    }
+    fig.embedUnlock = null;
+  };
+}
+
 function expand(fig, deck) {
   if (fig.embedOpen) return;
   fig.embedOpen = true;
+  try {
+  if (!fig.embedUnlock) lockSlide(fig);
   if (!fig.classList.contains("is-expanded")) {
     const r = fig.getBoundingClientRect();
     const spot = document.createElement("div");
@@ -90,11 +114,13 @@ function expand(fig, deck) {
     spot.style.height = `${r.height}px`;
     fig.before(spot);
     fig.embedSpot = spot;
+    fig.embedStyles = ["left", "top", "width", "height"].map(key => [key, fig.style.getPropertyValue(key), fig.style.getPropertyPriority(key)]);
     fig.classList.add("is-expanded");
     place(fig, r);
     fig.offsetWidth;
   }
   move(fig, area(fig), deck);
+  } catch (error) { collapse(fig, deck, false); throw error; }
 }
 
 function collapse(fig, deck, animate) {
@@ -103,9 +129,13 @@ function collapse(fig, deck, animate) {
   const finish = () => {
     if (fig.embedOpen) return;
     fig.classList.remove("is-expanded", "is-moving");
-    fig.style.left = fig.style.top = fig.style.width = fig.style.height = "";
+    for (const [key, value, priority] of fig.embedStyles || []) {
+      if (value) fig.style.setProperty(key, value, priority); else fig.style.removeProperty(key);
+    }
+    fig.embedStyles = null;
     fig.embedSpot?.remove();
     fig.embedSpot = null;
+    fig.embedUnlock?.();
   };
   if (!animate) { stop(fig); return finish(); }
   move(fig, fig.embedSpot.getBoundingClientRect(), deck, finish);

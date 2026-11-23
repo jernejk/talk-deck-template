@@ -130,3 +130,16 @@ export function insertFragment(html, id, fragment) {
   if (!target) throw new Error(`Slide #${id} is missing.`);
   return html.slice(0, target.start) + sections[0].html + html.slice(target.end);
 }
+
+// Include all descendants, using IDs rather than human-facing names.
+export function inheritedTemplates(ids, templates) {
+  const selected = new Set(ids);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const t of templates) if (selected.has(t.extends) && !selected.has(t.id)) {
+      selected.add(t.id); changed = true;
+    }
+  }
+  return [...selected];
+}

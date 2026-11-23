@@ -6,7 +6,7 @@ import { basename, dirname, extname, join, relative, resolve, sep } from "node:p
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
-import { selectSlides, slideSections } from "./qa-scope.mjs";
+import { selectSlides, slideSections, inheritedTemplates } from "./qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock } from "./qa-lock.mjs";
 import { artifact, assertDeckInput, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
 import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
@@ -51,7 +51,7 @@ const note = msg => console.error(`qa --changed: ${msg}`);
 
 // --changed: the smallest set of decks, templates and slides that covers what git says changed. null means a full run.
 async function changedScope() {
-  const { USED_BY, slideSections } = await import("./lib.mjs");
+  const { USED_BY, slideSections, templates } = await import("./lib.mjs");
   let files;
   try {
     const git = (...args) => execFileSync("git", ["-C", ROOT, ...args], { encoding: "utf8", stdio: "pipe" }).split("\n").filter(Boolean);
@@ -79,8 +79,9 @@ async function changedScope() {
     const why = msg => note(`  ${f} → ${msg}`);
     if (f.endsWith(".md") || top === "docs" || f === "examples/index.html") continue;
     if (top === "templates" && rest.length && await exists(join(ROOT, "templates", name, "theme.css"))) {
-      add("catalog", [name]);
-      for (const deck of examples) add(deck, [name]);
+      const themes = inheritedTemplates([name], await templates(ROOT));
+      add("catalog", themes);
+      for (const deck of examples) add(deck, themes);
       why(`the catalog and every example, in ${name}`);
     } else if (top === "slides" && !rest.length && name.endsWith(".html") && await exists(join(ROOT, f))) {
       sources.add("slides");

@@ -21,14 +21,14 @@ Deck.use({
       return { path, len: path.getTotalLength(), t: ms(getComputedStyle(g).getPropertyValue("--t")), dots: dots.map(d => [d, (Number(getComputedStyle(d).getPropertyValue("--i")) || 0) / dots.length]) };
     });
     if (!plan.length) return;
-    const media = matchMedia("(prefers-reduced-motion: reduce)");
     let frame = null, last = null, elapsed = 0;
     function paint(still) {
-      plan.forEach(({ path, len, t, dots }) => dots.forEach(([dot, phase]) => {
+      const positions = plan.flatMap(({ path, len, t, dots }) => dots.map(([dot, phase]) => {
         const p = still ? phase + .5 / dots.length : (elapsed / t + phase) % 1;
         const { x, y } = path.getPointAtLength(p * len);
-        dot.setAttribute("transform", 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+        return [dot, x, y];
       }));
+      positions.forEach(([dot, x, y]) => dot.setAttribute("transform", 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')'));
     }
     function tick(now) {
       if (last !== null) elapsed += now - last;
@@ -41,17 +41,17 @@ Deck.use({
       frame = last = null;
     }
     function resume() {
-      if (media.matches || frame !== null || document.documentElement.classList.contains("is-resting")) return;
+      if (deck.reducedMotion() || frame !== null || document.documentElement.classList.contains("is-resting")) return;
       frame = requestAnimationFrame(tick);
     }
     function changeMotion() {
-      if (media.matches) { pause(); paint(true); }
+      if (deck.reducedMotion()) { pause(); paint(true); }
       else { paint(false); resume(); }
     }
-    media.addEventListener("change", changeMotion);
-    travel = { slide, pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
+    travel = { slide, pause, resume, changeMotion, dispose: pause };
     changeMotion();
   },
+  motion() { travel?.changeMotion(); },
   rest(slide) { if (travel?.slide === slide) travel.pause(); },
   wake(slide) { if (travel?.slide === slide) travel.resume(); },
   leave(slide) {
