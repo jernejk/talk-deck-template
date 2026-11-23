@@ -21,7 +21,8 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
      step(elements, slide, deck) {},   // Space revealed a step group
      unstep(elements, slide, deck) {}, // going back hid it again
      rest(slide, deck) {},             // the active slide entered idle rest
-     wake(slide, deck) {}              // idle rest ended
+     wake(slide, deck) {},             // idle rest ended
+     motion(reduced, deck) {}          // reduced motion turned on or off (Options or system setting)
    });
    ```
 
@@ -103,3 +104,5 @@ The core (`core/deck.css`, `core/deck.js`) owns the slide frame, base type (`.ey
 ## Interactive workshop regions
 
 Put `data-deck-interactive` on a custom editor or control container to keep its keyboard and touch gestures inside the demo. Use only the interactive subtree, not the slide. Native form fields, editable content and media controls already own their input. Click or Tab outside to return slide keys and PageDown/PageUp clickers to the deck. Plain muted clips without controls still allow slide swipes.
+
+Decorative muted looping `.video` clips started by the deck pause at idle rest and under Reduce motion, preserving their position. They resume only while active and revealed, after both pause reasons clear. User-paused clips and user playback after autoplay refusal stay under user control. Leaving or reversing a reveal stops and resets clips. Intentional `.player` playback is unaffected.

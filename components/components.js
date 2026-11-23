@@ -229,9 +229,9 @@ function area(fig) {
   const slide = fig.closest(".slide");
   const s = slide.getBoundingClientRect();
   const foot = slide.querySelector(".slide-foot");
-  const footTop = foot && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
+  const footTop = foot && getComputedStyle(foot).position !== "static" && getComputedStyle(foot).display !== "none" ? foot.getBoundingClientRect().top : s.bottom;
   const root = document.documentElement, vw = root.clientWidth / 100, vh = root.clientHeight / 100;
-  return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: s.top + 8 * vh, bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
+  return { left: s.left + 4 * vw, right: s.right - 4 * vw, top: Math.max(s.top + 8 * vh, (document.querySelector(".deck-nav")?.getBoundingClientRect().bottom || 0) + 8), bottom: Math.min(footTop, s.bottom) - 2.4 * vh };
 }
 
 // data-logical renders the page that many CSS pixels wide and scales it in; two spare pixels hide the hairline a fractional scale leaves.
@@ -272,9 +272,33 @@ function move(fig, to, deck, done) {
   place(fig, to);
 }
 
+const scrollLocks = new WeakMap();
+function lockSlide(fig) {
+  const slide = fig.closest(".slide");
+  let state = scrollLocks.get(slide);
+  if (!state) {
+    state = { owners: new Set(), top: slide.scrollTop, left: slide.scrollLeft, overflow: [...slide.style].filter(key => /^(overflow|overflow-x|overflow-y)$/.test(key)).map(key => [key, slide.style.getPropertyValue(key), slide.style.getPropertyPriority(key)]) };
+    scrollLocks.set(slide, state);
+    slide.style.setProperty("overflow", "hidden", "important");
+  }
+  state.owners.add(fig);
+  fig.embedUnlock = () => {
+    state.owners.delete(fig);
+    if (!state.owners.size) {
+      slide.style.removeProperty("overflow");
+      for (const [key, value, priority] of state.overflow) slide.style.setProperty(key, value, priority);
+      slide.scrollTop = state.top; slide.scrollLeft = state.left;
+      scrollLocks.delete(slide);
+    }
+    fig.embedUnlock = null;
+  };
+}
+
 function expand(fig, deck) {
   if (fig.embedOpen) return;
   fig.embedOpen = true;
+  try {
+  if (!fig.embedUnlock) lockSlide(fig);
   if (!fig.classList.contains("is-expanded")) {
     const r = fig.getBoundingClientRect();
     const spot = document.createElement("div");
@@ -283,11 +307,13 @@ function expand(fig, deck) {
     spot.style.height = `${r.height}px`;
     fig.before(spot);
     fig.embedSpot = spot;
+    fig.embedStyles = ["left", "top", "width", "height"].map(key => [key, fig.style.getPropertyValue(key), fig.style.getPropertyPriority(key)]);
     fig.classList.add("is-expanded");
     place(fig, r);
     fig.offsetWidth;
   }
   move(fig, area(fig), deck);
+  } catch (error) { collapse(fig, deck, false); throw error; }
 }
 
 function collapse(fig, deck, animate) {
@@ -296,9 +322,13 @@ function collapse(fig, deck, animate) {
   const finish = () => {
     if (fig.embedOpen) return;
     fig.classList.remove("is-expanded", "is-moving");
-    fig.style.left = fig.style.top = fig.style.width = fig.style.height = "";
+    for (const [key, value, priority] of fig.embedStyles || []) {
+      if (value) fig.style.setProperty(key, value, priority); else fig.style.removeProperty(key);
+    }
+    fig.embedStyles = null;
     fig.embedSpot?.remove();
     fig.embedSpot = null;
+    fig.embedUnlock?.();
   };
   if (!animate) { stop(fig); return finish(); }
   move(fig, fig.embedSpot.getBoundingClientRect(), deck, finish);
@@ -569,14 +599,14 @@ Deck.use({
       return { path, len: path.getTotalLength(), t: ms(getComputedStyle(g).getPropertyValue("--t")), dots: dots.map(d => [d, (Number(getComputedStyle(d).getPropertyValue("--i")) || 0) / dots.length]) };
     });
     if (!plan.length) return;
-    const media = matchMedia("(prefers-reduced-motion: reduce)");
     let frame = null, last = null, elapsed = 0;
     function paint(still) {
-      plan.forEach(({ path, len, t, dots }) => dots.forEach(([dot, phase]) => {
+      const positions = plan.flatMap(({ path, len, t, dots }) => dots.map(([dot, phase]) => {
         const p = still ? phase + .5 / dots.length : (elapsed / t + phase) % 1;
         const { x, y } = path.getPointAtLength(p * len);
-        dot.setAttribute("transform", 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+        return [dot, x, y];
       }));
+      positions.forEach(([dot, x, y]) => dot.setAttribute("transform", 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')'));
     }
     function tick(now) {
       if (last !== null) elapsed += now - last;
@@ -589,17 +619,17 @@ Deck.use({
       frame = last = null;
     }
     function resume() {
-      if (media.matches || frame !== null || document.documentElement.classList.contains("is-resting")) return;
+      if (deck.reducedMotion() || frame !== null || document.documentElement.classList.contains("is-resting")) return;
       frame = requestAnimationFrame(tick);
     }
     function changeMotion() {
-      if (media.matches) { pause(); paint(true); }
+      if (deck.reducedMotion()) { pause(); paint(true); }
       else { paint(false); resume(); }
     }
-    media.addEventListener("change", changeMotion);
-    travel = { slide, pause, resume, dispose() { pause(); media.removeEventListener("change", changeMotion); } };
+    travel = { slide, pause, resume, changeMotion, dispose: pause };
     changeMotion();
   },
+  motion() { travel?.changeMotion(); },
   rest(slide) { if (travel?.slide === slide) travel.pause(); },
   wake(slide) { if (travel?.slide === slide) travel.resume(); },
   leave(slide) {
@@ -1254,27 +1284,83 @@ Deck.use({
 // video
 (() => {
 const videosIn = root => root.matches?.(".video video") ? [root] : [...root.querySelectorAll(".video video")];
-
-function play(root, deck) {
-  if (deck.reducedMotion()) return;
-  videosIn(root).forEach(v => {
-    if (v.closest("[data-step]:not(.is-shown)")) return;
-    v.muted = true;
-    v.play().catch(e => {
-      if (e.name === "NotAllowedError") v.controls = true;
-      else if (e.name !== "AbortError") console.error(`Video didn't start: ${e.message}`);
-    });
+const states = new WeakMap();
+let activeDeck;
+const eligible = (v, deck) => v.closest(".slide") === deck.current() && !v.closest("[data-step]:not(.is-shown)");
+const blocked = deck => deck.reducedMotion() || document.documentElement.classList.contains("is-resting");
+function stateFor(v) {
+  if (states.has(v)) return states.get(v);
+  const s = { owned: false, suspended: false, pending: false, version: 0, pauses: 0 };
+  states.set(v, s);
+  v.addEventListener("pause", () => {
+    if (s.pauses) { s.pauses--; return; }
+    s.owned = s.suspended = false;
+    s.version++;
+  });
+  // A user start after fallback controls were exposed belongs to the user.
+  v.addEventListener("play", () => {
+    if (!s.pending) s.owned = s.suspended = false;
+  });
+  return s;
+}
+function pause(v, s) {
+  if (!v.paused) { s.pauses++; v.pause(); }
+}
+function start(v, deck, s) {
+  if (!eligible(v, deck) || blocked(deck) || s.pending) return;
+  const version = ++s.version;
+  s.owned = s.pending = true;
+  s.suspended = false;
+  v.muted = true;
+  v.play().then(() => {
+    if (version !== s.version || !eligible(v, deck) || (v.loop && blocked(deck))) {
+      pause(v, s);
+      if (!eligible(v, deck)) v.currentTime = 0;
+    }
+  }).catch(e => {
+    if (version !== s.version) return;
+    s.owned = s.suspended = false;
+    if (e.name === "NotAllowedError") v.controls = true;
+    else if (e.name !== "AbortError") console.error(`Video didn't start: ${e.message}`);
+  }).finally(() => {
+    s.pending = false;
+    if (s.suspended && s.owned && eligible(v, deck) && !blocked(deck)) start(v, deck, s);
   });
 }
-
-function stop(root) {
-  videosIn(root).forEach(v => { v.pause(); v.currentTime = 0; });
+function play(root, deck) {
+  activeDeck = deck;
+  videosIn(root).forEach(v => {
+    const s = stateFor(v);
+    if (!eligible(v, deck)) return;
+    if (blocked(deck)) { s.owned = s.suspended = v.loop && v.muted; return; }
+    if (s.pending) { s.owned = s.suspended = true; return; }
+    start(v, deck, s);
+  });
 }
-
+function reconcile(deck) {
+  if (!deck) return;
+  videosIn(deck.current()).forEach(v => {
+    const s = stateFor(v);
+    if (!s.owned || !v.loop || !v.muted) return;
+    if (blocked(deck)) {
+      if (!v.paused || s.pending) { s.suspended = true; s.version++; pause(v, s); }
+    } else if (s.suspended && eligible(v, deck)) start(v, deck, s);
+  });
+}
+function stop(root) {
+  videosIn(root).forEach(v => {
+    const s = stateFor(v);
+    s.version++; s.owned = s.suspended = false;
+    pause(v, s); v.currentTime = 0;
+  });
+}
 Deck.use({
   name: "video",
   enter(slide, deck) { play(slide, deck); },
   step(els, slide, deck) { els.forEach(el => play(el, deck)); },
+  rest(slide, deck) { reconcile(deck); },
+  wake(slide, deck) { reconcile(deck); },
+  motion() { reconcile(activeDeck); },
   unstep(els) { els.forEach(stop); },
   leave(slide) { stop(slide); }
 });

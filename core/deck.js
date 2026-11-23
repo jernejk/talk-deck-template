@@ -20,16 +20,24 @@
   const defaultSize = sizeKey(touchOnly ? null : parseSize(CONFIG.resolution));
   const previewSize = parseSize(query.has("res") ? query.get("res") : defaultSize);
   const SIZES = [...new Set(["auto", "1920x1080", "1280x720", "1024x768", sizeKey(parseSize(CONFIG.resolution))])];
+  const PICKER = ["auto", "visible", "none"].includes(CONFIG.picker) ? CONFIG.picker : "auto";
+  const TIMINGS = CONFIG.timings === true;
+  const END_ARROWS = CONFIG.disableEndArrows === true;
+  const standalone = matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches || navigator.standalone === true;
   const controlKeys = new Map();
   const pendingControls = [];
 
   const $ = (sel, root = document) => root.querySelector(sel);
-  const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const osMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  let motionForced = false;
+  try { motionForced = localStorage.getItem("deck-motion") === "reduce"; } catch {}
+  const reducedMotion = () => motionForced || matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const CONTROLS = `
 <div id="sr-status" class="sr-only" aria-live="polite"></div>
 <nav class="deck-nav" aria-label="Slide controls">
   <button type="button" class="nav-arrow" data-action="prev" aria-label="Previous slide">‹</button>
+  <label class="nav-picker"><span class="picker-count" aria-hidden="true"><b></b><span></span></span><select aria-label="Go to slide"></select></label>
   <button type="button" class="nav-arrow" data-action="next" aria-label="Next slide">›</button>
   <button type="button" data-action="overview" aria-haspopup="dialog">Slides<kbd>O</kbd></button>
   <button type="button" data-action="notes" aria-controls="notes-panel" aria-pressed="false">Notes<kbd>N</kbd></button>
@@ -40,6 +48,7 @@
   <div class="opt-head">Size<kbd>R</kbd></div>
   <div class="opt-sizes" role="group" aria-label="Size"></div>
   <div class="opt-list">
+    <button type="button" data-action="motion" aria-pressed="false">Reduce motion</button>
     <button type="button" data-action="extras" aria-pressed="false">Extras<kbd>H</kbd></button>
     <button type="button" data-action="close">To close<kbd>C</kbd></button>
   </div>
@@ -181,6 +190,7 @@
     });
     $("#badge").hidden = !deck.showExtras;
     $('[data-action="extras"]').setAttribute("aria-pressed", String(deck.showExtras));
+    renderPicker();
     const at = keep ? deck.visible.indexOf(keep) : -1;
     show(at >= 0 ? at : Math.min(deck.index, deck.visible.length - 1), opts);
   }
@@ -228,6 +238,7 @@
     else if (stepMode === "end") {
       const was = Number(active.dataset.shown) || 0;
       setSteps(active, "end");
+      syncArrows();
       stepGroups(active).slice(was).forEach(g => emit("step", g, active));
     }
     if (version !== activation) return;
@@ -248,6 +259,8 @@
     document.title = name === DECK_TITLE ? name : `${name} · ${DECK_TITLE}`;
     $("#sr-status").textContent = `Slide ${deck.index + 1} of ${deck.visible.length}: ${active.dataset.title || ""}`;
     renderNotes();
+    syncPicker();
+    syncArrows();
     if (before !== active) {
       if (before) emit("leave", before);
       if (version === activation) emit("enter", active);
@@ -266,6 +279,7 @@
     if (shown < groups.length) {
       groups[shown].forEach(el => setStepVisible(el, true));
       slide.dataset.shown = shown + 1;
+      syncArrows();
       emit("step", groups[shown], slide);
       return;
     }
@@ -279,6 +293,7 @@
     if (shown > 0) {
       groups[shown - 1].forEach(el => setStepVisible(el, false));
       slide.dataset.shown = shown - 1;
+      syncArrows();
       emit("unstep", groups[shown - 1], slide);
       return;
     }
@@ -302,13 +317,86 @@
   }
 
   async function toggleFullscreen() {
-    if (!document.fullscreenEnabled) return;
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
     } catch {
-      $("#sr-status").textContent = "Fullscreen was not granted. Use your browser's fullscreen menu.";
+      toast(touchOnly ? "Full screen: Share › Add to Home Screen" : "Fullscreen was not granted. Use your browser's fullscreen menu.");
     }
+  }
+
+  function motionRules(rules, fn) {
+    for (const rule of rules) {
+      if (rule.styleSheet) { try { motionRules(rule.styleSheet.cssRules, fn); } catch {} }
+      else if (rule.media && /prefers-reduced-motion:\s*reduce/.test(motionMedia.get(rule) ?? rule.media.mediaText)) fn(rule);
+      else if (rule.cssRules) motionRules(rule.cssRules, fn);
+    }
+  }
+
+  // Forcing reduced motion switches the stylesheets' own reduced-motion blocks on; file:// pages refuse that, so .is-still is the blunt fallback.
+  const motionMedia = new WeakMap();
+  function applyMotion() {
+    for (const sheet of document.styleSheets) {
+      try {
+        motionRules(sheet.cssRules, rule => {
+          if (!motionMedia.has(rule)) motionMedia.set(rule, rule.media.mediaText);
+          rule.media.mediaText = motionForced ? "all" : motionMedia.get(rule);
+        });
+      } catch {}
+    }
+    document.documentElement.classList.toggle("is-still", motionForced);
+    const btn = $('[data-action="motion"]');
+    btn.setAttribute("aria-pressed", String(reducedMotion()));
+    btn.disabled = osMotion.matches;
+    btn.title = osMotion.matches ? "On in your system settings" : "";
+    emit("motion", reducedMotion());
+  }
+
+  function toggleMotion() {
+    motionForced = !motionForced;
+    try { motionForced ? localStorage.setItem("deck-motion", "reduce") : localStorage.removeItem("deck-motion"); } catch {}
+    applyMotion();
+  }
+
+  function renderPicker() {
+    const select = $(".nav-picker select");
+    if (!select) return;
+    let group = null, section;
+    select.replaceChildren();
+    deck.all.forEach((slide, i) => {
+      const n = deck.visible.indexOf(slide);
+      const clock = TIMINGS ? plannedClock(slide) : "";
+      const opt = new Option(`${n >= 0 ? n + 1 : "Extra"} · ${slide.dataset.title || "Untitled"}${clock ? ` · ${clock}` : ""}`, i);
+      if (slide.dataset.section !== section || !group) {
+        section = slide.dataset.section;
+        group = section ? Object.assign(document.createElement("optgroup"), { label: section }) : select;
+        if (group !== select) select.append(group);
+      }
+      group.append(opt);
+    });
+  }
+
+  function plannedClock(slide) {
+    for (const b of slide.querySelectorAll("aside.notes b")) {
+      const m = b.textContent.match(/(\d+:\d{2})\s*[–—-]\s*(\d+:\d{2})/);
+      if (m) return `${m[1]}–${m[2]}`;
+    }
+    return "";
+  }
+
+  function syncArrows() {
+    if (!END_ARROWS) return;
+    const slide = current(), shown = Number(slide.dataset.shown) || 0;
+    $('[data-action="prev"]').disabled = deck.index === 0 && shown === 0;
+    $('[data-action="next"]').disabled = deck.index === deck.visible.length - 1 && shown >= stepGroups(slide).length;
+  }
+
+  function syncPicker() {
+    const picker = $(".nav-picker");
+    if (!picker) return;
+    picker.querySelector("select").value = deck.all.indexOf(current());
+    picker.querySelector("b").textContent = deck.index + 1;
+    picker.querySelector(".picker-count span").textContent = ` / ${deck.visible.length}`;
   }
 
   function renderNotes() {
@@ -361,6 +449,8 @@
         tag.textContent = tagText;
         btn.append(tag);
       }
+      const clock = TIMINGS ? plannedClock(slide) : "";
+      if (clock) btn.append(Object.assign(document.createElement("span"), { className: "ov-time", textContent: clock }));
       if (slide === current()) btn.setAttribute("aria-current", "true");
       btn.addEventListener("click", () => {
         const dialog = $("#overview");
@@ -392,6 +482,7 @@
     overview: openOverview,
     notes: () => toggleNotes(),
     extras: toggleExtras,
+    motion: toggleMotion,
     close: jumpToClose,
     options: () => toggleOptions(),
     fullscreen: toggleFullscreen
@@ -455,7 +546,10 @@
     const zoomed = () => hostZoomed() ?? (window.visualViewport?.scale ?? 1) > 1.01;
     document.addEventListener("touchstart", e => {
       const t = e.target;
-      if (e.defaultPrevented || e.touches.length !== 1 || zoomed() || isOwnedByControl(t, true) || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel"))) { touch = null; return; }
+      if (e.defaultPrevented || e.touches.length !== 1 || zoomed() || isOwnedByControl(t, true) || (t instanceof Element && t.closest("button, a, input, details, dialog, .notes-panel, #deck-options, .rehearse, .tune, .deck-nav, .badge, .progress, .deck-hint"))) { touch = null; return; }
+      for (let el = t instanceof Element ? t : null; el && el !== deck.active; el = el.parentElement) {
+        if (el.scrollWidth > el.clientWidth + 1 && /^(auto|scroll)$/.test(getComputedStyle(el).overflowX)) { touch = null; return; }
+      }
       touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     }, { passive: true });
     document.addEventListener("touchend", e => {
@@ -469,6 +563,11 @@
 
     ["keydown", "pointerdown", "pointermove", "wheel", "touchstart"].forEach(type => document.addEventListener(type, wake, { passive: true, capture: true }));
     if (IDLE_MS) setInterval(() => { if (!resting && Date.now() - lastInput > IDLE_MS) rest(); }, 5000);
+
+    $(".nav-picker select")?.addEventListener("change", e => {
+      goTo(deck.all[e.target.value]);
+      focusDeck();
+    });
 
     window.addEventListener("hashchange", () => {
       const target = slideFromHash();
@@ -496,17 +595,56 @@
     if (deck.active) emit("wake", deck.active);
   }
 
-  function touchHint() {
-    if (!touchOnly || framed) return;
-    try { if (localStorage.getItem("deck-hint-seen")) return; localStorage.setItem("deck-hint-seen", "1"); } catch { /* private mode still gets the hint once per load */ }
+  function toast(text, ms = 6000) {
+    document.querySelector(".deck-hint")?.remove();
     const hint = document.createElement("div");
     hint.className = "deck-hint";
     hint.setAttribute("role", "status");
-    hint.textContent = "Swipe for the next slide · Slides lists them all";
+    hint.textContent = text;
     document.body.append(hint);
     const gone = () => { hint.classList.add("is-gone"); setTimeout(() => hint.remove(), 400); };
-    setTimeout(gone, 6000);
+    setTimeout(gone, ms);
     document.addEventListener("touchstart", gone, { once: true, passive: true });
+  }
+
+  function touchHint() {
+    if (!touchOnly || framed) return;
+    try { if (localStorage.getItem("deck-hint-seen")) return; localStorage.setItem("deck-hint-seen", "1"); } catch { /* private mode still gets the hint once per load */ }
+    toast("Swipe for the next slide · Slides lists them all");
+  }
+
+  function homeScreen() {
+    const head = document.head;
+    const meta = (name, content) => { if (!head.querySelector(`meta[name="${name}"]`)) head.append(Object.assign(document.createElement("meta"), { name, content })); };
+    const probe = document.body.appendChild(document.createElement("i"));
+    probe.style.color = "var(--bg, #000)";
+    const bg = getComputedStyle(probe).color;
+    probe.remove();
+    const [r, g, b] = (bg.match(/[\d.]+/g) || [0, 0, 0]).map(Number).map(v => bg.startsWith("color(") ? v * 255 : v);
+    meta("apple-mobile-web-app-capable", "yes");
+    meta("mobile-web-app-capable", "yes");
+    meta("apple-mobile-web-app-title", DECK_TITLE);
+    meta("apple-mobile-web-app-status-bar-style", 0.2126 * r + 0.7152 * g + 0.0722 * b < 128 ? "black-translucent" : "default");
+    meta("theme-color", bg);
+    const viewport = head.querySelector('meta[name="viewport"]');
+    if (viewport && !/viewport-fit/.test(viewport.content)) viewport.content += ",viewport-fit=cover";
+    const icon = head.querySelector('link[rel~="icon"]');
+    if (!touchOnly || standalone || !icon || head.querySelector('link[rel="apple-touch-icon"]')) return;
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = Object.assign(document.createElement("canvas"), { width: 180, height: 180 }), ctx = canvas.getContext("2d");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 180, 180);
+        ctx.drawImage(img, 0, 0, 180, 180);
+        head.append(Object.assign(document.createElement("link"), { rel: "apple-touch-icon", href: canvas.toDataURL("image/png") }));
+      } catch {}
+    };
+    img.src = icon.href;
+  }
+
+  async function keepAwake() {
+    if (document.visibilityState === "visible") try { await navigator.wakeLock?.request("screen"); } catch {}
   }
 
   let hosting = false;
@@ -547,7 +685,10 @@
     addEventListener("hashchange", () => { try { frame.contentWindow.location.hash = location.hash; } catch {} });
     frame.addEventListener("load", () => frame.contentWindow?.focus());
     document.addEventListener("pointerdown", () => frame.contentWindow?.focus());
-    addEventListener("keydown", e => { if (e.key.toLowerCase() === "r") cycleSize(); else frame.contentWindow?.focus(); });
+    addEventListener("keydown", e => {
+      if (e.defaultPrevented || e.isComposing || e.metaKey || e.ctrlKey || e.altKey || isOwnedByControl(e.target) || e.target?.closest?.("button, a, [role=button]")) return;
+      if (e.key.toLowerCase() === "r") cycleSize(); else frame.contentWindow?.focus();
+    });
   }
 
   function setSize(next) {
@@ -565,6 +706,16 @@
     deck.started = true;
     if (previewSize && !framed && window.top === window) { hostPreview(previewSize); return; }
     if (!$(".deck-nav")) document.body.insertAdjacentHTML("beforeend", CONTROLS);
+    const nav = $(".deck-nav");
+    nav.dataset.picker = PICKER;
+    const measureNav = () => {
+      const value = `${nav.getBoundingClientRect().bottom}px`;
+      if (document.documentElement.style.getPropertyValue("--deck-nav-bottom") !== value) document.documentElement.style.setProperty("--deck-nav-bottom", value);
+    };
+    if (typeof ResizeObserver === "function") new ResizeObserver(() => requestAnimationFrame(measureNav)).observe(nav);
+    addEventListener("resize", measureNav);
+    measureNav();
+    if (PICKER === "none") nav.querySelector(".nav-picker")?.remove();
     pendingControls.splice(0).forEach(mountControl);
     sizeButtons();
     decorate();
@@ -572,6 +723,15 @@
     deck.all.forEach(rise);
     wire();
     toggleNotes(false);
+    applyMotion();
+    osMotion.addEventListener("change", applyMotion);
+    if (!framed) homeScreen();
+    if (standalone) {
+      if (!document.fullscreenEnabled) $('[data-action="fullscreen"]').hidden = true;
+      keepAwake();
+      document.addEventListener("visibilitychange", keepAwake);
+      document.addEventListener("pointerdown", keepAwake, { once: true });
+    }
     const entry = slideFromHash();
     deck.showExtras = entry?.hasAttribute("data-hidden") ?? false;
     refreshVisible(entry, { updateHash: false });

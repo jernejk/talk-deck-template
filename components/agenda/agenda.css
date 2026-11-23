@@ -69,6 +69,6 @@
   .agenda-part,.slide--cover-split{display:flex;flex-direction:column;align-items:stretch;gap:3vh;height:auto}
   .agenda-aside{padding-left:0;border-left:0;border-top:1px solid var(--rule);padding-top:3vh}
   .slide--cover-split{padding:0}
-  .cover-panel{padding:9vh 6vw 6vh}
+  .cover-panel{padding:max(9vh,var(--deck-content-top,0px)) 6vw 6vh}
   .cover-side{padding:3vh 6vw 10vh}
 }

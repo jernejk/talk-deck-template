@@ -750,3 +750,40 @@ test("route only pads an omitted cue when clock or Kind identifies the generated
     assert.equal((await author("route", dir, "--check")).status, 0);
   }
 });
+
+test("template changes include transitive descendants and terminate on cycles", async () => {
+  const { inheritedTemplates } = await import("../qa-scope.mjs");
+  const themes = [{ id: "child", name: "Display name", extends: "community" }, { id: "grandchild", extends: "child" }, { id: "community", extends: "grandchild" }, { id: "other" }];
+  assert.deepEqual(inheritedTemplates(["community"], themes), ["community", "child", "grandchild"]);
+  assert.deepEqual(inheritedTemplates(["removed"], themes), ["removed"]);
+});
+
+test("video lifecycle revokes pending play on leave/unstep and preserves manual fallback ownership", async()=>{
+  const { runInNewContext }=await import('node:vm');
+  const source=await readFile(join(ROOT,'components/video/video.js'),'utf8');
+  let plugin, pending=[], playing=false, resting=false, reduced=false;
+  const slide={querySelectorAll:()=>[v]}, other={querySelectorAll:()=>[]};
+  let current=slide,hidden=false;
+  const listeners={};
+  const v={muted:true,loop:true,currentTime:5,controls:false,
+    get paused(){return !playing;},
+    matches:()=>true,closest:s=>s==='.slide'?slide:hidden?{}:null,
+    addEventListener:(e,fn)=>listeners[e]=fn,
+    play(){playing=true;listeners.play?.();return new Promise((resolve,reject)=>pending.push({resolve,reject}));},
+    pause(){if(playing){playing=false;listeners.pause?.();}}
+  };
+  const deck={current:()=>current,reducedMotion:()=>reduced};
+  runInNewContext(source,{Deck:{use:p=>plugin=p},document:{documentElement:{classList:{contains:()=>resting}}},console});
+  const flush=async()=>{await new Promise(r=>setImmediate(r));};
+  plugin.enter(slide,deck); current=other;plugin.leave(slide);pending.shift().resolve();await flush();
+  assert.equal(playing,false);assert.equal(v.currentTime,0);
+  current=slide;plugin.enter(slide,deck);hidden=true;plugin.unstep([v]);pending.shift().resolve();await flush();
+  assert.equal(playing,false);
+  hidden=false;plugin.enter(slide,deck);pending.shift().reject({name:'NotAllowedError'});await flush();
+  assert.equal(v.controls,true);
+  // A manual start after refusal must survive rest and reduced motion.
+  playing=true;listeners.play();resting=true;plugin.rest(slide,deck);reduced=true;plugin.motion();
+  assert.equal(playing,true);
+  playing=false;listeners.pause();resting=false;reduced=false;plugin.wake(slide,deck);
+  assert.equal(pending.length,0);
+});
