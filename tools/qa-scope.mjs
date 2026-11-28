@@ -143,3 +143,14 @@ export function inheritedTemplates(ids, templates) {
   }
   return [...selected];
 }
+
+// Splits each deck × template × size into runs of slides when there are fewer render jobs than
+// workers would like, so one long deck (the catalog, or a standalone deck at two sizes) no longer
+// sets the wall clock. Chunks hold at least 8 slides: each one loads the deck again.
+export function chunkSlides(ids, totalSlides, jobs, min = 8) {
+  if (jobs < 2 || ids.length < 2 * min) return [ids];
+  const target = Math.max(min, Math.ceil(totalSlides / (jobs * 2)));
+  const n = Math.min(Math.ceil(ids.length / target), Math.floor(ids.length / min));
+  // Even runs: their lengths differ by at most one slide.
+  return Array.from({ length: n }, (_, k) => ids.slice(Math.round(k * ids.length / n), Math.round((k + 1) * ids.length / n)));
+}

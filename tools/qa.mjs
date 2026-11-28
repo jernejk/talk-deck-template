@@ -5,7 +5,7 @@ import { basename, dirname, extname, join, relative, resolve, sep } from "node:p
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
-import { selectSlides, slideSections, inheritedTemplates } from "./qa-scope.mjs";
+import { chunkSlides, selectSlides, slideSections, inheritedTemplates } from "./qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock, browserBudget } from "./qa-lock.mjs";
 import { artifact, assertDeckInput, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
 import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
@@ -262,23 +262,26 @@ function watch(page, where, problems, warnings) {
   return watchPage(page, where, problems, warnings);
 }
 
-// One job = one deck in one template at one size. Each job returns its own findings, and they are merged in job order, so --jobs never changes the report.
-async function render(deck, theme, [w, h]) {
+// One job = one deck in one template at one size, or a run of its slides when the run is split
+// (see chunkSlides). Each job returns its own findings; chunks merge back into one task and all
+// tasks merge in job order, so --jobs never changes the report.
+async function render(deck, theme, [w, h], part = deck.selectedIds, group = { shots: [], left: 1 }) {
   const found = { problems: [], warnings: [], qrShots: [], artifacts: [], checkedIds: [], qrIds: [] };
+  const wanted = new Set(part);
   const where = `${deck.name} ${theme} ${w}x${h}`;
-  const page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
+  let page, flush;
+  try {
+  page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
   page.setDefaultTimeout(5000);
   page.setDefaultNavigationTimeout(15000);
-  const flush = watch(page, where, found.problems, found.warnings);
-  try {
+  flush = watch(page, where, found.problems, found.warnings);
   await page.goto(`${base}${deck.path}?res=auto&theme=${theme}`, { waitUntil: "networkidle" });
   const ids = await page.$$eval("section.slide", s => s.map(x => x.id));
   if (JSON.stringify(ids) !== JSON.stringify(deck.allIds)) throw new Error("Runtime slide IDs differ from the input snapshot.");
   const dir = join(run.artifactRoot, encodeURIComponent(deck.name), encodeURIComponent(theme), `${w}x${h}`);
   await mkdir(dir, { recursive: true });
-  const shots = [];
   for (const [i, id] of ids.entries()) {
-    if (!deck.selectedIds.includes(id)) continue;
+    if (!wanted.has(id)) continue;
     await page.evaluate(id => Deck.goTo(document.getElementById(id), { stepMode: "end" }), id);
     if (deck.info.slides.find(s => s.id === id).features.length) {
       try { await readySlide(page, id); }
@@ -333,18 +336,24 @@ async function render(deck, theme, [w, h]) {
     if (opt.fast && !qrs.length) continue;
     const shot = join(dir, `${String(i + 1).padStart(2, "0")}-${encodeURIComponent(id)}.png`);
     await page.screenshot({ path: shot });
-    shots.push(shot);
+    group.shots[i] = shot;
     found.artifacts.push(await artifact(run.artifactRoot, shot, { kind: "slide", index: deck.index, slide: id, theme, size: `${w}x${h}` }));
     if (qrs.length) found.qrShots.push({ where: `${where} #${id}`, shot, expected: qrs });
   }
   found.lateErrors = await lateErrors(page);
-  if (!opt.fast && shots.length) {
-    const sheet = join(run.artifactRoot, encodeURIComponent(deck.name), encodeURIComponent(theme), `sheet-${w}x${h}.png`);
-    await contactSheet(page, shots, sheet);
-    found.artifacts.push(await artifact(run.artifactRoot, sheet, { kind: "sheet", index: deck.index, theme, size: `${w}x${h}` }));
-  }
   } catch (e) { found.completed = false; found.problems.push({ where, errors: [e.message] }); }
-  finally { await flush(); await page.close(); }
+  try {
+    // The last chunk of a deck × template × size to finish draws the contact sheet for all of them,
+    // so every chunk counts itself off here, even one that failed.
+    const shots = group.shots.filter(Boolean);
+    if (--group.left === 0 && !opt.fast && shots.length) {
+      if (!page) throw new Error("no page to draw the contact sheet on");
+      const sheet = join(run.artifactRoot, encodeURIComponent(deck.name), encodeURIComponent(theme), `sheet-${w}x${h}.png`);
+      await contactSheet(page, shots, sheet);
+      found.sheet = await artifact(run.artifactRoot, sheet, { kind: "sheet", index: deck.index, theme, size: `${w}x${h}` });
+    }
+  } catch (e) { found.completed = false; found.problems.push({ where, errors: [e.message] }); }
+  finally { await flush?.(); await page?.close(); }
   return found;
 }
 
@@ -450,7 +459,9 @@ async function keyboard(deck) {
 
 const summary = {};
 const tasks = [];
-const addTask = (kind, deck, run, metadata = {}) => tasks.push({ kind, index: deck.index, deck: deck.name, ...metadata, run });
+// cost: a rough estimate in slide-renders (about 0.3 s each), so the longest jobs start first.
+// The others were measured on the examples: the catalog's WebKit feature pass is about 28 renders.
+const addTask = (kind, deck, run, metadata = {}, cost = 1) => tasks.push({ kind, index: deck.index, deck: deck.name, ...metadata, run, cost });
 for (const deck of deckList) {
   deck.info = await inspectDeck(deck.html, browser);
   if (JSON.stringify(deck.info.slides.map(s => s.id)) !== JSON.stringify(deck.allIds)) throw new Error(`${deck.name}: parsed slide IDs disagree.`);
@@ -463,19 +474,24 @@ if (deckList.some(d => d.features.relevant)) {
 }
 if (scope) note(`checking ${deckList.map(d => `${d.name} in ${d.themes.join(" ")}${d.picks ? ` (slides ${d.picks.join(",")})` : ""}`).join(", ")}.`);
 else if (changed && repoMode) note("checking everything.");
+const renderSlides = deckList.reduce((n, d) => n + d.selectedIds.length * d.themes.length * sizes.length, 0);
 for (const deck of deckList) {
   summary[deck.name] = null;
   for (const theme of deck.themes) {
     if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { addTask("template", deck, async () => ({ completed: false, problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
-    for (const size of sizes) addTask("render", deck, () => render(deck, theme, size), { theme, size: size.join("x") });
+    for (const size of sizes) {
+      const parts = chunkSlides(deck.selectedIds, renderSlides, jobs), group = { shots: [], left: parts.length };
+      for (const [chunk, part] of parts.entries()) addTask("render", deck, () => render(deck, theme, size, part, group), { theme, size: size.join("x"), chunk, chunks: parts.length }, part.length);
+    }
   }
-  for (const [kind, check] of [["offline", offline], ["keyboard", keyboard]]) {
+  const featureCost = per => deck.features.relevant ? per * (1 + deck.features.ids.length) : 0;
+  for (const [kind, check, cost] of [["offline", offline, 2], ["keyboard", keyboard, 2 + deck.allIds.length / 8]]) {
     addTask(kind, deck, () => opt.fast
       ? { completed: false, problems: [], pending: [`${deck.name}: full ${kind} verification deferred by --fast`] }
-      : check(deck));
+      : check(deck), {}, opt.fast ? 0 : cost);
   }
-  addTask("lint", deck, () => lintDeck(deck));
-  addTask("features-chromium", deck, () => checkFeatures({ browser, browserName: "chromium", deck, base, scope: deck.features }));
+  addTask("lint", deck, () => lintDeck(deck), {}, 0.5);
+  addTask("features-chromium", deck, () => checkFeatures({ browser, browserName: "chromium", deck, base, scope: deck.features }), {}, featureCost(2));
   addTask("features-webkit", deck, () => {
     if (!deck.features.relevant) return { problems: [], checks: [{ check: "features", state: "not-applicable", reason: "No feature slides in scope." }] };
     if (!webkitBrowser) {
@@ -483,17 +499,38 @@ for (const deck of deckList) {
       return { completed: false, problems: receiptScope.kind === "full" ? [item] : [], warnings: receiptScope.kind === "full" ? [] : [item], pending: [`${deck.name}: Playwright WebKit feature checks`] };
     }
     return checkFeatures({ browser: webkitBrowser, browserName: "webkit", deck, base, scope: deck.features });
-  });
+  }, {}, featureCost(4));
 }
-const results = [];
+const raw = [];
+// Longest first (a stable sort, so equal costs keep job order); results still land in job order.
+const order = tasks.map((t, i) => i).sort((a, b) => tasks[b].cost - tasks[a].cost);
 let next = 0;
 await Promise.all(Array.from({ length: Math.min(jobs, tasks.length) }, async () => {
-  while (next < tasks.length) {
-    const i = next++, { run, ...task } = tasks[i], start = performance.now();
-    try { const found = await run(); results[i] = { ...task, completed: true, ...found, durationMs: Math.round((performance.now() - start) * 1000) / 1000 }; }
-    catch (e) { results[i] = { ...task, completed: false, durationMs: Math.round((performance.now() - start) * 1000) / 1000, problems: [{ where: `${task.deck} ${task.kind}`, errors: [e.message] }] }; }
+  while (next < order.length) {
+    const i = order[next++], { run, cost, ...task } = tasks[i], start = performance.now();
+    try { const found = await run(); raw[i] = { ...task, completed: true, ...found, durationMs: Math.round((performance.now() - start) * 1000) / 1000 }; }
+    catch (e) { raw[i] = { ...task, completed: false, durationMs: Math.round((performance.now() - start) * 1000) / 1000, problems: [{ where: `${task.deck} ${task.kind}`, errors: [e.message] }] }; }
   }
 }));
+// Chunks of one deck × template × size merge back into one render task, in slide order.
+const results = [];
+for (const r of raw) {
+  if (r.kind !== "render" || r.chunks === undefined) { results.push(r); continue; }
+  const { chunk, chunks, sheet, ...rest } = r;
+  // A chunk that threw has no finding lists of its own.
+  if (chunk === 0) results.push({ ...rest, problems: rest.problems ?? [], artifacts: rest.artifacts ?? [], completed: rest.completed !== false, sheets: [], ...(chunks > 1 && { chunks }) });
+  const into = results[results.length - 1];
+  if (chunk > 0) {
+    into.completed &&= rest.completed !== false;
+    into.durationMs = Math.round((into.durationMs + rest.durationMs) * 1000) / 1000;
+    if (rest.lateErrors === "bounded-timeout") into.lateErrors = rest.lateErrors;
+    for (const key of ["warnings", "qrShots", "artifacts", "checkedIds", "qrIds"]) into[key] = [...(into[key] || []), ...(rest[key] || [])];
+    const seen = new Set(into.problems.map(p => JSON.stringify(p)));
+    for (const p of rest.problems || []) if (!seen.has(JSON.stringify(p))) { seen.add(JSON.stringify(p)); into.problems.push(p); }
+  }
+  if (sheet) into.sheets.push(sheet);
+  if (chunk === chunks - 1) { into.artifacts.push(...into.sheets); delete into.sheets; }
+}
 const qrShots = results.flatMap(r => r.qrShots || []);
 for (const r of results) { problems.push(...(r.problems || [])); pending.push(...(r.pending || [])); }
 const seen = new Set();

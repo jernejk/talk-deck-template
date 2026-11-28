@@ -5,7 +5,7 @@ import { join, resolve, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { selectSlides, slideSections, outsideSlides, insertFragment } from "../qa-scope.mjs";
+import { chunkSlides, selectSlides, slideSections, outsideSlides, insertFragment } from "../qa-scope.mjs";
 import { acquireOutputLock, acquireResourceLock, browserBudget } from "../qa-lock.mjs";
 import { nativeWebkitControlDiagnostic } from "../qa-features.mjs";
 import { assertDeckInput, assertOutputBoundary, snapshot } from "../qa-receipt.mjs";
@@ -132,6 +132,46 @@ test("the browser budget follows the core count unless TALK_DECK_BROWSER_SLOTS s
   const more = await acquireResourceLock({ slots: 2, budget: 8, directory, waitMs: 0 });
   await assert.rejects(acquireResourceLock({ kind: "perf", budget: 8, directory, waitMs: 0 }), /budget busy \(8\/8 slots; requested perf 8\)/);
   await wide(); await more();
+});
+
+test("render chunks are even, hold at least eight slides and only split when workers would idle", () => {
+  const ids = n => Array.from({ length: n }, (_, i) => `s${i}`);
+  const lengths = (...a) => chunkSlides(...a).map(c => c.length);
+  assert.deepEqual(lengths(ids(68), 1118, 1), [68]);
+  assert.deepEqual(lengths(ids(15), 30, 16), [15]);
+  assert.deepEqual(lengths(ids(68), 1118, 16), [34, 34]);
+  assert.deepEqual(lengths(ids(68), 136, 4), [17, 17, 17, 17]);
+  assert.deepEqual(lengths(ids(30), 60, 16), [10, 10, 10]);
+  for (const [n, total, jobs] of [[68, 136, 16], [23, 46, 9], [100, 100, 3]]) {
+    const parts = chunkSlides(ids(n), total, jobs);
+    assert.deepEqual(parts.flat(), ids(n));
+    assert(parts.every(p => p.length >= 8) && Math.max(...parts.map(p => p.length)) - Math.min(...parts.map(p => p.length)) <= 1);
+  }
+});
+
+test("a chunked run reports the same findings and captures as one job, and is full evidence", { timeout: 180000 }, async t => {
+  const out = await mkdtemp(join(artifacts, "qa-chunks-"));
+  t.after(() => rm(out, { recursive: true, force: true }));
+  const once = async jobs => {
+    const r = await new Promise((done, reject) => {
+      const child = spawn(process.execPath, [join(ROOT, "tools/qa.mjs"), join(ROOT, "examples/starter"), "--jobs", String(jobs), "--out", join(out, `j${jobs}`)], { cwd: ROOT, env: { ...process.env, TALK_DECK_BROWSER_SLOTS: "4" } });
+      let stdout = "";
+      child.stdout.on("data", s => { stdout += s; });
+      child.on("error", reject); child.on("close", code => done({ code, json: JSON.parse(stdout) }));
+    });
+    const receipt = JSON.parse(await readFile(r.json.receipt, "utf8"));
+    const port = /127\.0\.0\.1:\d+/g;
+    return { code: r.code, problems: JSON.stringify(r.json.problems).replace(port, "host"), warnings: JSON.stringify(r.json.warnings).replace(port, "host"), counts: r.json.screenshotCounts,
+      shots: receipt.artifacts.map(a => [a.kind, a.theme, a.size, a.slide ?? null, a.path.split("/").slice(-3).join("/")]),
+      renders: receipt.tasks.filter(task => task.kind === "render").map(task => [task.theme, task.size, task.checkedIds.join(), task.chunks ?? 1]) };
+  };
+  const serial = await once(1), parallel = await once(4);
+  assert.equal(serial.code, 0);
+  assert(parallel.renders.every(r => r[3] > 1), "the starter deck splits at --jobs 4");
+  for (const key of ["code", "problems", "warnings", "counts", "shots"]) assert.deepEqual(parallel[key], serial[key], key);
+  assert.deepEqual(parallel.renders.map(r => r.slice(0, 3)), serial.renders.map(r => r.slice(0, 3)));
+  const s = await new Promise(done => { const c = spawn(process.execPath, [join(ROOT, "tools/qa.mjs"), join(ROOT, "examples/starter"), "--status", "--out", join(out, "j4")], { cwd: ROOT }); let o = ""; c.stdout.on("data", d => { o += d; }); c.on("close", () => done(JSON.parse(o))); });
+  assert.equal(s.currentFull, true, JSON.stringify(s));
 });
 
 test("resource contention queues within its bound and recovers a dead guard owner", async t => {
