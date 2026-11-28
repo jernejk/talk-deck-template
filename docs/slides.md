@@ -26,6 +26,8 @@ Every pattern names its shape, so you can see at a glance which slides look alik
 
 `npm run build` rejects a pattern whose layout is missing, isn't in this list, or differs between `slides/index.json` and the file. The list lives in `LAYOUTS` in `tools/lib.mjs`. Add a new layout there and here only when no existing one fits.
 
+`npm run layouts` fills in missing tags. With no path it checks the library: a pattern tagged on one side gets the same tag on the other, and an untagged one gets a guess from the components it uses (the guess gives every pattern in `slides/` its own tag back). Pass deck folders to tag their slides instead, which turns on the layout-variety lint for decks made before the tags. It prints a table of what it would do; `--write` applies it. Read the guesses: a fork's own pattern can use the same components in another shape.
+
 | Layout | Shape |
 |---|---|
 | `statement` | One big line or numeral, little else |

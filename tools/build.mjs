@@ -127,9 +127,9 @@ const layouts = Object.keys(LAYOUTS).join(", ");
 for (const p of list) {
   const tag = p.html.match(/^<section\b[^>]*>/)?.[0] ?? "";
   const html = tag.match(/\sdata-layout="([^"]*)"/)?.[1];
-  if (!p.layout) problems.push(`slides/index.json: "${p.name}" has no layout. Add "layout" with one of: ${layouts}.`);
+  if (!p.layout) problems.push(`slides/index.json: "${p.name}" has no layout. Add "layout" with one of: ${layouts}, or run npm run layouts -- --write to fill in a guess.`);
   else if (!Object.hasOwn(LAYOUTS, p.layout)) problems.push(`slides/index.json: "${p.name}" has layout "${p.layout}", which isn't one of: ${layouts}.`);
-  if (html === undefined) problems.push(`slides/${p.name}.html has no data-layout on its <section>. Add data-layout="${p.layout || "…"}".`);
+  if (html === undefined) problems.push(`slides/${p.name}.html has no data-layout on its <section>. Add data-layout="${p.layout || "…"}", or run npm run layouts -- --write.`);
   else if (p.layout && html !== p.layout) problems.push(`slides/${p.name}.html has data-layout="${html}", but slides/index.json says "${p.layout ?? ""}". Make them match.`);
 }
 for (const ref of assetRefs(catalog)) if (!await exists(join(REPO, "slides", ref))) problems.push(`The catalog references ${ref}, which isn't in slides/assets/.`);
