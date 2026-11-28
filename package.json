@@ -31,7 +31,7 @@
     "build": "node tools/build.mjs",
     "qa": "node tools/qa.mjs",
     "accept": "node tools/accept.mjs",
-    "test": "node --test --test-concurrency=1 tools/tests/qa-contracts.test.mjs tools/tests/workshop-runtime.test.mjs tools/tests/layouts.test.mjs",
+    "test": "node --test --test-concurrency=1 tools/tests/qa-contracts.test.mjs tools/tests/workshop-runtime.test.mjs tools/tests/layouts.test.mjs tools/tests/lint.test.mjs",
     "lint": "node tools/lint.mjs",
     "perf": "node tools/perf.mjs",
     "new": "node tools/new.mjs",

@@ -67,10 +67,11 @@ function check([html, catalog]) {
     if (bad.size) warn(s, "curly-quotes", `straight quotes in slide text: ${[...bad].slice(0, 3).join(" ")}${bad.size > 3 ? ` (+${bad.size - 3})` : ""}`);
   }
 
-  // ponytail: a short list on purpose. Reserved example domains (example.com, .test, .invalid) are not flagged.
+  // ponytail: a short list on purpose. Reserved example domains (example.com, .test, .invalid) are not flagged,
+  // and neither is loopback (localhost, 127.x): it names the viewer's own machine, so it reveals nothing.
   const PRIVATE = [
     ["an email", /[\w.+-]+@(?!example\.(?:com|org|net)\b)[\w-]+(?:\.[\w-]+)*\.(?!test\b|invalid\b|example\b)[a-z]{2,}\b/gi],
-    ["a private host or address", /\blocalhost\b|\b127\.\d+\.\d+\.\d+\b|\b10\.\d+\.\d+\.\d+\b|\b192\.168\.\d+\.\d+\b|\b172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+\b/gi],
+    ["a private host or address", /\b10\.\d+\.\d+\.\d+\b|\b192\.168\.\d+\.\d+\b|\b172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+\b/gi],
     ["a URL with a token", /[?&#](?:token|access_token|api_?key|key|auth|code|sig|signature|session|sid|secret|password)=[^\s&"']+/gi],
     ["a key or token", /\b(?:sk|pk|rk)-[\w-]{16,}|\bgh[pousr]_\w{20,}|\bxox[abprs]-[\w-]{10,}|\bAKIA[0-9A-Z]{16}\b/g],
     ["a long ID", /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b|\b(?=[a-z]*\d)[0-9a-f]{24,}\b/gi]
@@ -102,8 +103,12 @@ function check([html, catalog]) {
     if (found.size) warn(s, "fixed-colour", `fixed colours in inline styles: ${[...found].join(" ")}; use var(--a1) … var(--a6)`);
   }
 
+  // A deck made before the tags has none, and the check below would pass it silently. The message
+  // names no count, so tagging some slides doesn't read as a new warning against a lint baseline.
+  const main = catalog ? [] : slides.filter(s => !s.hasAttribute("data-hidden"));
+  if (main.length > 1 && main.some(s => !s.dataset.layout)) warn(null, "layout-variety", "some main slides have no data-layout, so their layouts aren't compared; npm run layouts -- <deck> --write tags them");
   let last = null;
-  for (const s of catalog ? [] : slides.filter(s => !s.hasAttribute("data-hidden"))) {
+  for (const s of main) {
     const layout = s.dataset.layout;
     if (layout && last?.dataset.layout === layout) warn(s, "layout-variety", `same layout as #${last.id} before it (${layout}); vary neighbouring slides`);
     last = s;
