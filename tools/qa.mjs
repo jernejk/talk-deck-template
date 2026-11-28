@@ -185,7 +185,7 @@ const out = resolve(opt.out);
 if (plan.inputs.some(p => out === p || out.startsWith(p + sep)) || out === serveRoot) throw new Error("--out must be outside served input folders (use the deck's qa/ folder or an external evidence folder).");
 await assertOutputBoundary(out, plan.inputs, [serveRoot]);
 const releaseOutput = await acquireOutputLock(out);
-let releaseResources, server, browser, webkitBrowser;
+let releaseResources, server, browser, webkitBrowser, renderBrowsers = [];
 try {
 releaseResources = await acquireResourceLock({ kind: "qa", slots: jobs, budget });
 const run = await createRun(out);
@@ -248,6 +248,9 @@ await new Promise(r => server.listen(0, "127.0.0.1", r));
 const base = `http://127.0.0.1:${server.address().port}/`;
 
 browser = await chromium.launch();
+// One Chromium takes screenshots one at a time (about ten a second at 1920x1080 on an M5 Max, however
+// many pages it has), so render jobs spread over one browser per two workers. The other checks use the first.
+renderBrowsers = [browser, ...await Promise.all(Array.from({ length: Math.ceil(jobs / 2) - 1 }, () => chromium.launch()))];
 // Missing standalone lint is visible and leaves its evidence pending.
 const lintFile = join(ROOT, "tools/lint.mjs");
 const lintModule = await exists(lintFile) ? await import(pathToFileURL(lintFile).href) : null;
@@ -265,13 +268,13 @@ function watch(page, where, problems, warnings) {
 // One job = one deck in one template at one size, or a run of its slides when the run is split
 // (see chunkSlides). Each job returns its own findings; chunks merge back into one task and all
 // tasks merge in job order, so --jobs never changes the report.
-async function render(deck, theme, [w, h], part = deck.selectedIds, group = { shots: [], left: 1 }) {
+async function render(deck, theme, [w, h], part = deck.selectedIds, group = { shots: [], left: 1 }, worker = 0) {
   const found = { problems: [], warnings: [], qrShots: [], artifacts: [], checkedIds: [], qrIds: [] };
   const wanted = new Set(part);
   const where = `${deck.name} ${theme} ${w}x${h}`;
   let page, flush;
   try {
-  page = await browser.newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
+  page = await renderBrowsers[worker % renderBrowsers.length].newPage({ viewport: { width: w, height: h }, reducedMotion: opt.motion ? "no-preference" : "reduce" });
   page.setDefaultTimeout(5000);
   page.setDefaultNavigationTimeout(15000);
   flush = watch(page, where, found.problems, found.warnings);
@@ -481,7 +484,7 @@ for (const deck of deckList) {
     if (!theme || !await exists(join(templatesDir, theme, "theme.css"))) { addTask("template", deck, async () => ({ completed: false, problems: [{ where: deck.name, errors: [`template "${theme}" not found`] }] })); continue; }
     for (const size of sizes) {
       const parts = chunkSlides(deck.selectedIds, renderSlides, jobs), group = { shots: [], left: parts.length };
-      for (const [chunk, part] of parts.entries()) addTask("render", deck, () => render(deck, theme, size, part, group), { theme, size: size.join("x"), chunk, chunks: parts.length }, part.length);
+      for (const [chunk, part] of parts.entries()) addTask("render", deck, worker => render(deck, theme, size, part, group, worker), { theme, size: size.join("x"), chunk, chunks: parts.length }, part.length);
     }
   }
   const featureCost = per => deck.features.relevant ? per * (1 + deck.features.ids.length) : 0;
@@ -505,10 +508,10 @@ const raw = [];
 // Longest first (a stable sort, so equal costs keep job order); results still land in job order.
 const order = tasks.map((t, i) => i).sort((a, b) => tasks[b].cost - tasks[a].cost);
 let next = 0;
-await Promise.all(Array.from({ length: Math.min(jobs, tasks.length) }, async () => {
+await Promise.all(Array.from({ length: Math.min(jobs, tasks.length) }, async (_, worker) => {
   while (next < order.length) {
     const i = order[next++], { run, cost, ...task } = tasks[i], start = performance.now();
-    try { const found = await run(); raw[i] = { ...task, completed: true, ...found, durationMs: Math.round((performance.now() - start) * 1000) / 1000 }; }
+    try { const found = await run(worker); raw[i] = { ...task, completed: true, ...found, durationMs: Math.round((performance.now() - start) * 1000) / 1000 }; }
     catch (e) { raw[i] = { ...task, completed: false, durationMs: Math.round((performance.now() - start) * 1000) / 1000, problems: [{ where: `${task.deck} ${task.kind}`, errors: [e.message] }] }; }
   }
 }));
@@ -576,6 +579,7 @@ console.log(JSON.stringify({ decks: summary, scope: receiptScope.kind, sizes: si
 process.exitCode = problems.length ? 1 : 0;
 } finally {
   await webkitBrowser?.close();
+  await Promise.all(renderBrowsers.slice(1).map(b => b.close()));
   await browser?.close();
   if (server) await new Promise(r => server.close(r));
   await releaseResources?.();
