@@ -1,16 +1,16 @@
 import { chromium, webkit } from "playwright";
 import { createServer } from "node:http";
 import { access, mkdir, readdir, readFile, realpath } from "node:fs/promises";
-import { availableParallelism } from "node:os";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { execFileSync } from "node:child_process";
 import { selectSlides, slideSections, inheritedTemplates } from "./qa-scope.mjs";
-import { acquireOutputLock, acquireResourceLock } from "./qa-lock.mjs";
+import { acquireOutputLock, acquireResourceLock, browserBudget } from "./qa-lock.mjs";
 import { artifact, assertDeckInput, assertOutputBoundary, createRun, fingerprint, fingerprintPlan, qaStatus, QA_SCHEMA, writeReceipt } from "./qa-receipt.mjs";
 import { checkFeatures, featureScope, inspectDeck, lateErrors, readySlide, watchPage } from "./qa-features.mjs";
 
+const budget = browserBudget();
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const { values: opt, positionals } = parseArgs({
   allowPositionals: true,
@@ -20,7 +20,7 @@ const { values: opt, positionals } = parseArgs({
     sizes: { type: "string", default: "1920x1080,1280x720" },
     motion: { type: "boolean", default: false },
     titles: { type: "boolean", default: false },
-    jobs: { type: "string", default: String(Math.min(4, availableParallelism())) },
+    jobs: { type: "string", default: String(budget) },
     slides: { type: "string" },
     fast: { type: "boolean", default: false },
     changed: { type: "boolean", default: false },
@@ -31,7 +31,7 @@ const { values: opt, positionals } = parseArgs({
   }
 });
 const jobs = Number(opt.jobs);
-if (!Number.isInteger(jobs) || jobs < 1 || jobs > 4) throw new Error(`--jobs must be a whole number from 1 to 4, not "${opt.jobs}".`);
+if (!Number.isInteger(jobs) || jobs < 1 || jobs > budget) throw new Error(`--jobs must be a whole number from 1 to ${budget} (this machine's browser budget; TALK_DECK_BROWSER_SLOTS sets it), not "${opt.jobs}".`);
 
 const exists = path => access(path).then(() => true, () => false);
 const repoMode = await exists(join(ROOT, "examples")) && await exists(join(ROOT, "core/deck.js"));
@@ -187,7 +187,7 @@ await assertOutputBoundary(out, plan.inputs, [serveRoot]);
 const releaseOutput = await acquireOutputLock(out);
 let releaseResources, server, browser, webkitBrowser;
 try {
-releaseResources = await acquireResourceLock({ kind: "qa", slots: jobs });
+releaseResources = await acquireResourceLock({ kind: "qa", slots: jobs, budget });
 const run = await createRun(out);
 const config = { sizes: sizeList, motion: opt.motion, titles: opt.titles, jobs, fast: opt.fast, theme: opt.theme ?? null, selectors: picks ?? null, changed, since: opt.since ?? null, targets: positionals.map(p => resolve(p)), lintBaseline: opt["lint-baseline"] ? resolve(opt["lint-baseline"]) : null, lintChecks: opt["lint-checks"]?.split(",") ?? null };
 if (config.lintBaseline) plan.tools.push(config.lintBaseline);

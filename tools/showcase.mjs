@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { REPO, esc, exists, fail } from "./lib.mjs";
 
-import { acquireResourceLock } from "./qa-lock.mjs";
+import { acquireResourceLock, browserBudget } from "./qa-lock.mjs";
 
 const OUT = join(REPO, "docs/showcase");
 const HERO = join(REPO, "docs/hero/index.html");
@@ -245,11 +245,12 @@ const tmp = await mkdtemp(join(tmpdir(), "showcase-"));
 [...shots.values()].forEach((s, i) => { s.file = join(tmp, `${i}.png`); });
 let browser, releaseResources;
 try {
-  releaseResources = await acquireResourceLock({ kind: "qa", slots: 4 });
+  const slots = Math.min(4, browserBudget());
+  releaseResources = await acquireResourceLock({ kind: "qa", slots });
   browser = await chromium.launch();
   const queue = [...shots.values()];
   let failed;
-  await Promise.all(Array.from({ length: 4 }, async () => {
+  await Promise.all(Array.from({ length: slots }, async () => {
     while (queue.length && !failed) {
       const s = queue.shift();
       try { await shoot(browser, s.t, s.file); } catch (e) { failed ??= e; }

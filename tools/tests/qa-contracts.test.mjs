@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { selectSlides, slideSections, outsideSlides, insertFragment } from "../qa-scope.mjs";
-import { acquireOutputLock, acquireResourceLock } from "../qa-lock.mjs";
+import { acquireOutputLock, acquireResourceLock, browserBudget } from "../qa-lock.mjs";
 import { nativeWebkitControlDiagnostic } from "../qa-features.mjs";
 import { assertDeckInput, assertOutputBoundary, snapshot } from "../qa-receipt.mjs";
 
@@ -102,25 +102,44 @@ test("fragment parser preserves outside bytes, handles nested sections and ignor
 test("task resource locks coordinate QA and exclusive perf without touching other processes", async t => {
   const directory = await mkdtemp(join(artifacts, "qa-lock-test-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  const a = await acquireResourceLock({ kind: "qa", slots: 1, directory });
-  const b = await acquireResourceLock({ kind: "qa", slots: 3, directory });
-  await assert.rejects(acquireResourceLock({ kind: "qa", slots: 1, directory, waitMs: 0 }), /budget busy/);
-  await assert.rejects(acquireResourceLock({ kind: "perf", directory, waitMs: 0 }), /budget busy/);
+  const budget = 4;
+  const a = await acquireResourceLock({ kind: "qa", slots: 1, budget, directory });
+  const b = await acquireResourceLock({ kind: "qa", slots: 3, budget, directory });
+  await assert.rejects(acquireResourceLock({ kind: "qa", slots: 1, budget, directory, waitMs: 0 }), /budget busy \(4\/4 slots/);
+  await assert.rejects(acquireResourceLock({ kind: "perf", budget, directory, waitMs: 0 }), /budget busy/);
+  await assert.rejects(acquireResourceLock({ kind: "qa", slots: 5, budget, directory, waitMs: 0 }), /1–4 slots/);
   await a(); await b();
-  const perf = await acquireResourceLock({ kind: "perf", directory });
-  await assert.rejects(acquireResourceLock({ kind: "qa", directory, waitMs: 0 }), /budget busy/);
+  const perf = await acquireResourceLock({ kind: "perf", budget, directory });
+  await assert.rejects(acquireResourceLock({ kind: "qa", budget, directory, waitMs: 0 }), /budget busy/);
   await perf();
   const out = join(directory, "output"), release = await acquireOutputLock(out);
   await assert.rejects(acquireOutputLock(out), /in use/);
   await release(); await (await acquireOutputLock(out))();
 });
 
+test("the browser budget follows the core count unless TALK_DECK_BROWSER_SLOTS sets it", async t => {
+  assert.equal(browserBudget({}, 4), 4);
+  assert.equal(browserBudget({}, 8), 6);
+  assert.equal(browserBudget({}, 18), 16);
+  assert.equal(browserBudget({}, 64), 16);
+  assert.equal(browserBudget({ TALK_DECK_BROWSER_SLOTS: "2" }, 18), 2);
+  assert.equal(browserBudget({ TALK_DECK_BROWSER_SLOTS: "" }, 8), 6);
+  for (const bad of ["0", "1.5", "65", "lots"]) assert.throws(() => browserBudget({ TALK_DECK_BROWSER_SLOTS: bad }, 8), /TALK_DECK_BROWSER_SLOTS/);
+  // A wider budget admits more concurrent slots; perf still takes all of them.
+  const directory = await mkdtemp(join(artifacts, "qa-budget-test-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const wide = await acquireResourceLock({ slots: 6, budget: 8, directory });
+  const more = await acquireResourceLock({ slots: 2, budget: 8, directory, waitMs: 0 });
+  await assert.rejects(acquireResourceLock({ kind: "perf", budget: 8, directory, waitMs: 0 }), /budget busy \(8\/8 slots; requested perf 8\)/);
+  await wide(); await more();
+});
+
 test("resource contention queues within its bound and recovers a dead guard owner", async t => {
   const directory = await mkdtemp(join(artifacts, "qa-queue-test-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  const held = await acquireResourceLock({ slots: 4, directory });
+  const held = await acquireResourceLock({ slots: 4, budget: 4, directory });
   const start = Date.now();
-  const waiting = acquireResourceLock({ slots: 1, directory, waitMs: 2000 });
+  const waiting = acquireResourceLock({ slots: 1, budget: 4, directory, waitMs: 2000 });
   const release = setTimeout(held, 120);
   t.after(() => clearTimeout(release));
   const done = await waiting;
